@@ -362,6 +362,7 @@ extends		AbstractCVM
 					}
 				}
 			}).start() ;
+
 			// Sleep to let the test scenario execute to completion.
 			Thread.sleep(90000L) ;
 			// Shut down the application.
