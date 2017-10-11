@@ -4,13 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
+import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionHandlerI;
 
 public class RequestDispatcher 
 	extends AbstractComponent 
-	implements RequestDispatcherI{
+	implements RequestDispatcherI, RequestSubmissionHandlerI{
 	
 	private String dispatcherUri;
 	private Set<String> registeredVms;
@@ -41,13 +42,5 @@ public class RequestDispatcher
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void notifyRequestTermination(RequestI r) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
+	}	
 }
