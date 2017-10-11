@@ -1,4 +1,4 @@
-package fr.upmc.datacenter.gaspardleo;
+package fr.upmc.gaspardleo.step1.requestdispatcher;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -8,7 +8,10 @@ import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionHandlerI;
 
-public class RequestDispatcher extends AbstractComponent implements RequestSubmissionHandlerI, RequestNotificationI {
+public class RequestDispatcher 
+	extends AbstractComponent 
+	implements RequestDispatcherI{
+	
 	private String dispatcherUri;
 	private Set<String> registeredVms;
 	
