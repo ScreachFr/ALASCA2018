@@ -1,7 +1,9 @@
-package fr.upmc.gaspardleo.step1.requestdispatcher;
+package fr.upmc.gaspardleo.step1.requestdispatcher.ports;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractInboundPort;
+import fr.upmc.gaspardleo.step1.requestdispatcher.RequestDispatcher;
+import fr.upmc.gaspardleo.step1.requestdispatcher.interfaces.RequestDispatcherI;
 
 public class RequestDispatcherInboundPort 
 	extends AbstractInboundPort 

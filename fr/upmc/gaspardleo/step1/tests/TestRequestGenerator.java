@@ -53,9 +53,11 @@ import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagem
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
+import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.datacenterclient.requestgenerator.RequestGenerator;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
+import fr.upmc.gaspardleo.step1.requestdispatcher.RequestDispatcher;
 
 public class				TestRequestGenerator
 extends		AbstractCVM
@@ -80,7 +82,10 @@ extends		AbstractCVM
 	public static final String	RequestNotificationOutboundPortURI = "rnobp" ;
 	public static final String	RequestGeneratorManagementInboundPortURI = "rgmip" ;
 	public static final String	RequestGeneratorManagementOutboundPortURI = "rgmop" ;
-
+	
+	public static final String RD_RequestSumissionInboundPort = "rd_rsip";
+	public static final String RD_RequestSumissionOutboundPort = "rd_rsop";
+	
 	/** Port connected to the computer component to access its services.	*/
 	protected ComputerServicesOutboundPort			csPort ;
 	/** 	Computer monitor component.										*/
@@ -94,6 +99,8 @@ extends		AbstractCVM
 	/** Port connected to the request generator component to manage its
 	 *  execution (starting and stopping the request generation).			*/
 	protected RequestGeneratorManagementOutboundPort	rgmop ;
+	
+	protected RequestDispatcher rd;
 
 	// ------------------------------------------------------------------------
 	// Component virtual machine constructors
@@ -176,12 +183,19 @@ extends		AbstractCVM
 		// --------------------------------------------------------------------
 		// Create an Application VM component
 		// --------------------------------------------------------------------
+		
+		this.rd = new RequestDispatcher("rd0", 
+									RD_RequestSumissionInboundPort,
+									RD_RequestSumissionOutboundPort);
+
+		this.addDeployedComponent(this.rd);
+		
 		this.vm = new ApplicationVM("vm0",	// application vm component URI
 								    ApplicationVMManagementInboundPortURI,
 								    RequestSubmissionInboundPortURI,
 								    RequestNotificationOutboundPortURI) ;
 		this.addDeployedComponent(this.vm) ;
-
+		
 		// Create a mock up port to manage the AVM component (allocate cores).
 		this.avmPort = new ApplicationVMManagementOutboundPort(
 									ApplicationVMManagementOutboundPortURI,
@@ -207,14 +221,14 @@ extends		AbstractCVM
 					6000000000L,	// mean number of instructions in requests
 					RequestGeneratorManagementInboundPortURI,
 					RequestSubmissionOutboundPortURI,
-					RequestNotificationInboundPortURI);
+					RequestNotificationInboundPortURI) ;
 		this.addDeployedComponent(rg) ;
 
 		// Toggle on tracing and logging in the request generator to
 		// follow the submission and end of execution notification of
 		// individual requests.
-		this.rg.toggleTracing();
-		this.rg.toggleLogging();
+		this.rg.toggleTracing() ;
+		this.rg.toggleLogging() ;
 
 		// Connecting the request generator to the application virtual machine.
 		// Request generators have three different interfaces:
@@ -223,7 +237,18 @@ extends		AbstractCVM
 		//   virtual machines, and
 		// - one for request generation management i.e., starting and stopping
 		//   the generation process.
-		this.rg.doPortConnection(
+		
+		this.rd.doPortConnection(
+					RD_RequestSumissionOutboundPort, 
+					RequestSubmissionInboundPortURI, 
+					RequestNotificationConnector.class.getCanonicalName());
+		
+		this.rd.doPortConnection(
+				RequestNotificationOutboundPortURI, 
+				RD_RequestSumissionInboundPort, 
+				RequestNotificationConnector.class.getCanonicalName());
+		
+		/*this.rg.doPortConnection(
 					RequestSubmissionOutboundPortURI,
 					RequestSubmissionInboundPortURI,
 					RequestSubmissionConnector.class.getCanonicalName()) ;
@@ -232,7 +257,8 @@ extends		AbstractCVM
 					RequestNotificationOutboundPortURI,
 					RequestNotificationInboundPortURI,
 					RequestNotificationConnector.class.getCanonicalName()) ;
-
+		*/
+		
 		// Create a mock up port to manage to request generator component
 		// (starting and stopping the generation).
 		this.rgmop = new RequestGeneratorManagementOutboundPort(

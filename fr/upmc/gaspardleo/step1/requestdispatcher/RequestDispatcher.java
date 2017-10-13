@@ -12,6 +12,7 @@ import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.datacenterclient.requestgenerator.interfaces.RequestGeneratorManagementI;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementInboundPort;
+import fr.upmc.gaspardleo.step1.requestdispatcher.interfaces.RequestDispatcherI;
 
 public class RequestDispatcher 
 	extends AbstractComponent 
@@ -24,7 +25,7 @@ public class RequestDispatcher
 	private RequestSubmissionInboundPort reqSubmissionInboundPort;
 	
 	public RequestDispatcher(String dispatcherUri, 
-			String requestSubmissionOutboundPortUri, String requestSubmissionInboundPortUri) throws Exception {
+			String requestSubmissionInboundPortUri, String requestSubmissionOutboundPortUri) throws Exception {
 		super(1, 1);
 		
 		this.dispatcherUri = dispatcherUri;
