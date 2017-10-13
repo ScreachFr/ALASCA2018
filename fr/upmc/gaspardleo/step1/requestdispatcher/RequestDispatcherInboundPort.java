@@ -19,19 +19,19 @@ public class RequestDispatcherInboundPort
 	@Override
 	public void registerVM(String vmUri) throws Exception {
 		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
-		requestDispatcher.handleRequestSync(
+		requestDispatcher.handleRequestAsync(
 				new ComponentI.ComponentService<RequestDispatcher>(){
 					@Override
 					public RequestDispatcher call() throws Exception {
 						requestDispatcher.registerVM(vmUri);
 						return requestDispatcher;
-					}});		
+					}});
 	}
 
 	@Override
 	public void unregisterVM(String vmUri) throws Exception {
 		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
-		requestDispatcher.handleRequestSync(
+		requestDispatcher.handleRequestAsync(
 				new ComponentI.ComponentService<RequestDispatcher>(){
 					@Override
 					public RequestDispatcher call() throws Exception {

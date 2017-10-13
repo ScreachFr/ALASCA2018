@@ -8,6 +8,10 @@ import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionHandlerI;
+import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
+import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
+import fr.upmc.datacenterclient.requestgenerator.interfaces.RequestGeneratorManagementI;
+import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementInboundPort;
 
 public class RequestDispatcher 
 	extends AbstractComponent 
@@ -16,12 +20,27 @@ public class RequestDispatcher
 	private String dispatcherUri;
 	private Set<String> registeredVms;
 	
+	private RequestSubmissionOutboundPort reqSubmissionOutboundPort;
+	private RequestSubmissionInboundPort reqSubmissionInboundPort;
 	
-	public RequestDispatcher(String dispatcherUri) {
+	public RequestDispatcher(String dispatcherUri, 
+			String requestSubmissionOutboundPortUri, String requestSubmissionInboundPortUri) throws Exception {
 		super(1, 1);
 		
 		this.dispatcherUri = dispatcherUri;
 		this.registeredVms = new HashSet<>();
+		
+		// Request submission outbound port connection.
+		this.addOfferedInterface(RequestSubmissionHandlerI.class) ;
+		this.reqSubmissionOutboundPort = new RequestSubmissionOutboundPort(requestSubmissionOutboundPortUri, this) ;
+		this.addPort(this.reqSubmissionOutboundPort);
+		this.reqSubmissionOutboundPort.publishPort();
+		
+		// Request submission inbound port connection.
+		this.addOfferedInterface(RequestSubmissionHandlerI.class) ;
+		this.reqSubmissionInboundPort = new RequestSubmissionInboundPort(requestSubmissionInboundPortUri, this);
+		this.addPort(this.reqSubmissionInboundPort);
+		this.reqSubmissionInboundPort.publishPort();
 	}
 	
 	public void registerVM(String vmUri) throws Exception {

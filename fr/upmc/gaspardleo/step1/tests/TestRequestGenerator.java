@@ -207,14 +207,14 @@ extends		AbstractCVM
 					6000000000L,	// mean number of instructions in requests
 					RequestGeneratorManagementInboundPortURI,
 					RequestSubmissionOutboundPortURI,
-					RequestNotificationInboundPortURI) ;
+					RequestNotificationInboundPortURI);
 		this.addDeployedComponent(rg) ;
 
 		// Toggle on tracing and logging in the request generator to
 		// follow the submission and end of execution notification of
 		// individual requests.
-		this.rg.toggleTracing() ;
-		this.rg.toggleLogging() ;
+		this.rg.toggleTracing();
+		this.rg.toggleLogging();
 
 		// Connecting the request generator to the application virtual machine.
 		// Request generators have three different interfaces:
