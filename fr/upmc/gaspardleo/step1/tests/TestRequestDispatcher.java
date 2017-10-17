@@ -36,10 +36,20 @@ public class TestRequestDispatcher extends AbstractCVM {
 	private static final String ComputerDynamicStateDataOutboundPortURI = "cdsdop";
 
 	// Vm ports
-	private static final String VM_ApplicationVMManagementInboundPortURI = "vm-avmmip";
-	private static final String VM_RequestSubmissionInboundPortURI = "vm-rsip";
-	private static final String VM_RequestNotificationOutboundPortURI = "vm-rnop";
-	private static final String VM_ApplicationVMManagementOutboundPortURI = "vm-avmmop";
+	private static final String VM0_ApplicationVMManagementInboundPortURI = "vm0-avmmip";
+	private static final String VM0_RequestSubmissionInboundPortURI = "vm0-rsip";
+	private static final String VM0_RequestNotificationOutboundPortURI = "vm0-rnop";
+	private static final String VM0_ApplicationVMManagementOutboundPortURI = "vm0-avmmop";
+			
+	private static final String VM1_ApplicationVMManagementInboundPortURI = "vm1-avmmip";
+	private static final String VM1_RequestSubmissionInboundPortURI = "vm1-rsip";
+	private static final String VM1_RequestNotificationOutboundPortURI = "vm1-rnop";
+	private static final String VM1_ApplicationVMManagementOutboundPortURI = "vm1-avmmop";
+	
+	private static final String VM2_ApplicationVMManagementInboundPortURI = "vm2-avmmip";
+	private static final String VM2_RequestSubmissionInboundPortURI = "vm2-rsip";
+	private static final String VM2_RequestNotificationOutboundPortURI = "vm2-rnop";
+	private static final String VM2_ApplicationVMManagementOutboundPortURI = "vm2-avmmop";
 
 	// Rg ports
 	private static final String RG_RequestGeneratorManagementInboundPortURI = "rg-rgmip";
@@ -60,7 +70,7 @@ public class TestRequestDispatcher extends AbstractCVM {
 
 	// Components
 	private ComputerMonitor cm;
-	private ApplicationVM vm;
+	private ApplicationVM vm0, vm1, vm2;
 	private RequestGenerator rg;
 	private RequestDispatcher rd;
 
@@ -127,29 +137,77 @@ public class TestRequestDispatcher extends AbstractCVM {
 				ControlledDataConnector.class.getCanonicalName()) ;
 
 
-		// Vm application creation
-		this.vm = new ApplicationVM("vm0",	// application vm component URI
-				VM_ApplicationVMManagementInboundPortURI,
-				VM_RequestSubmissionInboundPortURI,
-				VM_RequestNotificationOutboundPortURI) ;
-		this.addDeployedComponent(this.vm) ;
+		// Vm applications creation
+		this.vm0 = new ApplicationVM("vm0",	// application vm component URI
+				VM0_ApplicationVMManagementInboundPortURI,
+				VM0_RequestSubmissionInboundPortURI,
+				VM0_RequestNotificationOutboundPortURI) ;
+		this.addDeployedComponent(this.vm0) ;
 
-
+		
 		// Create a mock up port to manage the AVM component (allocate cores).
 		this.avmPort = new ApplicationVMManagementOutboundPort(
-				VM_ApplicationVMManagementOutboundPortURI,
-				new AbstractComponent(0, 0) {}) ;
+				VM0_ApplicationVMManagementOutboundPortURI,
+				new AbstractComponent(0, 0) {});
 		this.avmPort.publishPort() ;
 		this.avmPort.
 		doConnection(
-				VM_ApplicationVMManagementInboundPortURI,
+				VM0_ApplicationVMManagementInboundPortURI,
 				ApplicationVMManagementConnector.class.getCanonicalName()) ;
 
+		// VM debug
+		this.vm0.toggleTracing();
+		this.vm0.toggleLogging();
+		
+		//-------
+		
+		this.vm1 = new ApplicationVM("vm1",	// application vm component URI
+				VM1_ApplicationVMManagementInboundPortURI,
+				VM1_RequestSubmissionInboundPortURI,
+				VM1_RequestNotificationOutboundPortURI) ;
+		this.addDeployedComponent(this.vm1) ;
+
+		
+		// Create a mock up port to manage the AVM component (allocate cores).
+		this.avmPort = new ApplicationVMManagementOutboundPort(
+				VM1_ApplicationVMManagementOutboundPortURI,
+				new AbstractComponent(1, 1) {});
+		this.avmPort.publishPort() ;
+		this.avmPort.
+		doConnection(
+				VM1_ApplicationVMManagementInboundPortURI,
+				ApplicationVMManagementConnector.class.getCanonicalName()) ;
 
 		// VM debug
-		this.vm.toggleTracing() ;
-		this.vm.toggleLogging() ;
+		this.vm1.toggleTracing();
+		this.vm1.toggleLogging();
 
+		
+		//------
+		
+		this.vm2 = new ApplicationVM("vm2",	// application vm component URI
+				VM2_ApplicationVMManagementInboundPortURI,
+				VM2_RequestSubmissionInboundPortURI,
+				VM2_RequestNotificationOutboundPortURI) ;
+		this.addDeployedComponent(this.vm2) ;
+
+		
+		// Create a mock up port to manage the AVM component (allocate cores).
+		this.avmPort = new ApplicationVMManagementOutboundPort(
+				VM2_ApplicationVMManagementOutboundPortURI,
+				new AbstractComponent(2, 2) {});
+		this.avmPort.publishPort() ;
+		this.avmPort.
+		doConnection(
+				VM2_ApplicationVMManagementInboundPortURI,
+				ApplicationVMManagementConnector.class.getCanonicalName()) ;
+
+		// VM debug
+		this.vm2.toggleTracing();
+		this.vm2.toggleLogging();
+
+		
+		
 		// Request Generator creation
 		this.rg = new RequestGenerator(
 				"rg",			// generator component URI
@@ -183,19 +241,23 @@ public class TestRequestDispatcher extends AbstractCVM {
 				RD_RequestSubmissionInboundPortURI,
 				RequestSubmissionConnector.class.getCanonicalName());
 		
-		this.rd.doPortConnection(
-				RD_RequestSubmissionOutboundPortURI,
-				VM_RequestSubmissionInboundPortURI,
-				RequestSubmissionConnector.class.getCanonicalName());
-		
-		this.vm.doPortConnection(
-				VM_RequestNotificationOutboundPortURI,
-				RD_RequestNotificationInboundPortURI,
-				RequestNotificationConnector.class.getCanonicalName()) ;
+//		this.rd.doPortConnection(
+//				RD_RequestSubmissionOutboundPortURI,
+//				VM_RequestSubmissionInboundPortURI,
+//				RequestSubmissionConnector.class.getCanonicalName());
+//		
+//		this.vm.doPortConnection(
+//				VM_RequestNotificationOutboundPortURI,
+//				RD_RequestNotificationInboundPortURI,
+//				RequestNotificationConnector.class.getCanonicalName()) ;
 		
 		this.rd.doPortConnection(RD_RequestNotificationOutboundPortURI,
 				RG_RequestNotificationInboundPortURI,
 				RequestNotificationConnector.class.getCanonicalName());
+		
+		this.rd.registerVM("vm0", VM0_RequestSubmissionInboundPortURI);
+		this.rd.registerVM("vm1", VM1_RequestSubmissionInboundPortURI);
+		this.rd.registerVM("vm2", VM2_RequestSubmissionInboundPortURI);
 		
 //		this.rg.doPortConnection(
 //				RG_RequestSubmissionOutboundPortURI,
