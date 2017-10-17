@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
@@ -13,8 +12,6 @@ import fr.upmc.datacenter.software.ports.RequestNotificationInboundPort;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
-import fr.upmc.datacenterclient.requestgenerator.interfaces.RequestGeneratorManagementI;
-import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementInboundPort;
 import fr.upmc.gaspardleo.step1.requestdispatcher.interfaces.RequestDispatcherI;
 
 public class RequestDispatcher 
