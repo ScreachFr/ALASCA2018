@@ -6,6 +6,5 @@ public interface AdmissionControllerI {
 			String RG_RequestSubmissionOutboundPortURI, 
 			String RG_RequestNotificationInboundPortURI,
 			String RG_RequestGeneratorManagementInboundPortURI,
-			String CVM_RequestSubmissionInboundPortURI,
-			String CVM_RequestNotificationOutboundPortURI) throws Exception;
+			String CVM_IPURI) throws Exception;
 }

@@ -1,7 +1,6 @@
 package fr.upmc.gaspardleo.step1.step12.admissioncontroller;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.applicationvm.ApplicationVM;
 import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
@@ -21,7 +20,7 @@ public class AdmissionController
 		extends AbstractComponent
 		implements AdmissionControllerI{
 	
-	public AdmissionController(AbstractCVM cvm){
+	public AdmissionController(){
 		super(1, 1);
 	}
 	
@@ -30,8 +29,7 @@ public class AdmissionController
 			String RG_RequestSubmissionOutboundPortURI, 
 			String RG_RequestNotificationInboundPortURI,
 			String RG_RequestGeneratorManagementInboundPortURI,
-			String CVM_RequestSubmissionInboundPortURI,
-			String CVM_RequestNotificationOutboundPortURI) throws Exception {
+			String CVM_IPURI) throws Exception {
 		
 		String AC_RequestSubmissionOutboundPortURI				= AbstractPort.generatePortURI();
 		
@@ -143,7 +141,7 @@ public class AdmissionController
 		this.addPort(cvmop);
 		cvmop.publishPort();
 		cvmop.doConnection(
-				CVM_RequestSubmissionInboundPortURI, 
+				CVM_IPURI, 
 				CVMConnector.class.getCanonicalName());
 		
 		// Deploy all components

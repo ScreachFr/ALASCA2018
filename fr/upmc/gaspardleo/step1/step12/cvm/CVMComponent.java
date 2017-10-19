@@ -27,5 +27,4 @@ public class CVMComponent extends AbstractComponent implements CVMI {
 	public void deployComponent(ComponentI cmp) throws Exception {
 		realCVM.addDeployedComponent(cmp);
 	}
-
 }

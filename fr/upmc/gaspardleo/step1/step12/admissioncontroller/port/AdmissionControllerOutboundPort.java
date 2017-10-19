@@ -18,8 +18,7 @@ public class AdmissionControllerOutboundPort
 			String RG_RequestSubmissionOutboundPortURI, 
 			String RG_RequestNotificationInboundPortURI,
 			String RG_RequestGeneratorManagementInboundPortURI,
-			String CVM_RequestSubmissionInboundPortURI,
-			String CVM_RequestNotificationOutboundPortURI) throws Exception {
+			String CVM_IPURI) throws Exception {
 		final AdmissionController admissionController = (AdmissionController)this.owner;
 		admissionController.handleRequestAsync(
 				new ComponentI.ComponentService<AdmissionController>(){
@@ -29,8 +28,7 @@ public class AdmissionControllerOutboundPort
 								RG_RequestSubmissionOutboundPortURI,
 								RG_RequestNotificationInboundPortURI,
 								RG_RequestGeneratorManagementInboundPortURI,
-								CVM_RequestSubmissionInboundPortURI,
-								CVM_RequestNotificationOutboundPortURI);
+								CVM_IPURI);
 						return admissionController;
 					}});
 	}
