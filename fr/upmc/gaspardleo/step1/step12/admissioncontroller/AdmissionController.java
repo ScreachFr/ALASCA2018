@@ -29,9 +29,9 @@ public class AdmissionController
 			String RG_RequestSubmissionOutboundPortURI, 
 			String RG_RequestNotificationInboundPortURI,
 			String RG_RequestGeneratorManagementInboundPortURI,
-			String CVM_IPURI) throws Exception {
+			String CVM_InboundPorURI) throws Exception {
 		
-		String AC_RequestSubmissionOutboundPortURI				= AbstractPort.generatePortURI();
+		String AC_CVMInboundPorURI								= AbstractPort.generatePortURI();
 		
 		String VM0_ApplicationVMManagementInboundPortURI 		= AbstractPort.generatePortURI();
 		String VM0_RequestSubmissionInboundPortURI 				= AbstractPort.generatePortURI();
@@ -136,12 +136,12 @@ public class AdmissionController
 		// Connections Admission Controller with CVM Component
 		
 		CVMOutboundPort cvmop = new CVMOutboundPort(
-				AC_RequestSubmissionOutboundPortURI, 
+				AC_CVMInboundPorURI, 
 				this);
 		this.addPort(cvmop);
 		cvmop.publishPort();
 		cvmop.doConnection(
-				CVM_IPURI, 
+				CVM_InboundPorURI, 
 				CVMConnector.class.getCanonicalName());
 		
 		// Deploy all components
