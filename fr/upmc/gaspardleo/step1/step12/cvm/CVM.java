@@ -29,7 +29,7 @@ public class CVM extends AbstractCVM{
 	private ComputerMonitor cm;
 
 	// Ports
-	private ComputerServicesOutboundPort csPort ;
+	private ComputerServicesOutboundPort csPort;
 
 	public CVM() throws Exception {
 		super();
@@ -45,10 +45,10 @@ public class CVM extends AbstractCVM{
 		String computerURI = "computer0";
 		int numberOfProcessors = 2;
 		int numberOfCores = 2;
-		Set<Integer> admissibleFrequencies = new HashSet<Integer>() ;
+		Set<Integer> admissibleFrequencies = new HashSet<Integer>();
 		admissibleFrequencies.add(1500);	// Cores can run at 1,5 GHz
 		admissibleFrequencies.add(3000);	// and at 3 GHz
-		Map<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
+		Map<Integer,Integer> processingPower = new HashMap<Integer,Integer>();
 		processingPower.put(1500, 1500000);	// 1,5 GHz executes 1,5 Mips
 		processingPower.put(3000, 3000000);	// 3 GHz executes 3 Mips
 		Computer c = new Computer(
@@ -67,7 +67,7 @@ public class CVM extends AbstractCVM{
 
 		this.csPort = new ComputerServicesOutboundPort(
 				ComputerServicesOutboundPortURI,
-				new AbstractComponent(0, 0) {}) ;
+				new AbstractComponent(0, 0) {});
 		this.csPort.publishPort();
 		this.csPort.doConnection(
 				ComputerServicesInboundPortURI,
@@ -76,18 +76,19 @@ public class CVM extends AbstractCVM{
 		this.cm = new ComputerMonitor(computerURI,
 				true,
 				ComputerStaticStateDataOutboundPortURI,
-				ComputerDynamicStateDataOutboundPortURI) ;
-		this.addDeployedComponent(this.cm) ;
+				ComputerDynamicStateDataOutboundPortURI);
+		this.addDeployedComponent(this.cm);
 
 		this.cm.doPortConnection(
 				ComputerStaticStateDataOutboundPortURI,
 				ComputerStaticStateDataInboundPortURI,
-				DataConnector.class.getCanonicalName()) ;
+				DataConnector.class.getCanonicalName());
 
 		this.cm.doPortConnection(
 				ComputerDynamicStateDataOutboundPortURI,
 				ComputerDynamicStateDataInboundPortURI,
-				ControlledDataConnector.class.getCanonicalName()) ;
+				ControlledDataConnector.class.getCanonicalName());
+		
+		super.deploy();
 	}
-	
 }

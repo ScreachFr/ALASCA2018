@@ -9,12 +9,16 @@ public class AdmissionControllerConnection
 
 	@Override
 	public void addRequestSource(
-			String RequestSubmissionOutboundPortURI, 
-			String RequestNotificationInboundPortURI,
-			String RequestGeneratorManagementInboundPortURI) throws Exception {
+			String RG_RequestSubmissionOutboundPortURI, 
+			String RG_RequestNotificationInboundPortURI,
+			String RG_RequestGeneratorManagementInboundPortURI,
+			String CVM_RequestSubmissionInboundPortURI,
+			String CVM_RequestNotificationOutboundPortURI) throws Exception {
 		((AdmissionControllerI)this.offering).addRequestSource(
-				RequestSubmissionOutboundPortURI,
-				RequestNotificationInboundPortURI,
-				RequestGeneratorManagementInboundPortURI);
+				RG_RequestSubmissionOutboundPortURI,
+				RG_RequestNotificationInboundPortURI,
+				RG_RequestGeneratorManagementInboundPortURI,
+				CVM_RequestSubmissionInboundPortURI,
+				CVM_RequestNotificationOutboundPortURI);
 	}
 }
