@@ -278,7 +278,6 @@ public class TestRequestDispatcher extends AbstractCVM {
 				RG_RequestGeneratorManagementInboundPortURI,
 				RequestGeneratorManagementConnector.class.getCanonicalName()) ;
 
-
 		super.deploy();
 	}
 

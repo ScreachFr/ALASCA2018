@@ -19,7 +19,6 @@ public class CVMComponent extends AbstractComponent implements CVMI {
 		this.addPort(cvmip);
 		this.cvmip.publishPort();
 		
-		
 		this.addOfferedInterface(CVMI.class);
 	}
 	
