@@ -93,6 +93,8 @@ public class CVM extends AbstractCVM implements CVMI {
 				ComputerDynamicStateDataOutboundPortURI,
 				ComputerDynamicStateDataInboundPortURI,
 				ControlledDataConnector.class.getCanonicalName()) ;
+		
+		super.deploy();
 	}
 
 	@Override
@@ -102,7 +104,7 @@ public class CVM extends AbstractCVM implements CVMI {
 
 	@Override
 	public void allocateCores(ApplicationVMManagementOutboundPort avmPort) throws Exception {
-		AllocatedCore[] ac = this.csPort.allocateCores(4) ;
+		AllocatedCore[] ac = this.csPort.allocateCores(1) ;
 		avmPort.allocateCores(ac) ;
 	}
 	

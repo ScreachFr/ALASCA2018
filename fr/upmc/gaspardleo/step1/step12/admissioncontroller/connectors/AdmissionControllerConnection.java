@@ -8,12 +8,12 @@ public class AdmissionControllerConnection
 		implements AdmissionControllerI{
 
 	@Override
-	public void addRequestSource(
-			String RG_RequestSubmissionOutboundPortURI, 
+	public String addRequestSource(
+			String RG_RequestSubmissionOutboundPortURI,
 			String RG_RequestNotificationInboundPortURI,
 			String RG_RequestGeneratorManagementInboundPortURI,
 			String CVM_IPURI) throws Exception {
-		((AdmissionControllerI)this.offering).addRequestSource(
+		return ((AdmissionControllerI)this.offering).addRequestSource(
 				RG_RequestSubmissionOutboundPortURI,
 				RG_RequestNotificationInboundPortURI,
 				RG_RequestGeneratorManagementInboundPortURI,

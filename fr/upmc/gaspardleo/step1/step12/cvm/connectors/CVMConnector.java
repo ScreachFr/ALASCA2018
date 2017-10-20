@@ -6,7 +6,6 @@ import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOu
 import fr.upmc.gaspardleo.step1.step12.cvm.interfaces.CVMI;
 
 public class CVMConnector extends AbstractConnector implements CVMI {
-
 	
 	@Override
 	public void deployComponent(ComponentI cmp) throws Exception {

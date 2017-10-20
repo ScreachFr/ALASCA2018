@@ -8,12 +8,17 @@ import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOu
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.ports.RequestNotificationInboundPort;
+import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
+import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
+import fr.upmc.datacenterclient.requestgenerator.interfaces.RequestGeneratorManagementI;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.step1.step11.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.step1.step12.admissioncontroller.interfaces.AdmissionControllerI;
+import fr.upmc.gaspardleo.step1.step12.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.step1.step12.cvm.connectors.CVMConnector;
+import fr.upmc.gaspardleo.step1.step12.cvm.ports.CVMInboundPort;
 import fr.upmc.gaspardleo.step1.step12.cvm.ports.CVMOutboundPort;
 
 public class AdmissionController 
@@ -24,14 +29,16 @@ public class AdmissionController
 		super(1, 1);
 	}
 	
+	
+	// TODO Supprimer les paramètres inutiles
 	@Override
-	public void addRequestSource(
-			String RG_RequestSubmissionOutboundPortURI, 
+	public String addRequestSource(
+			String RG_RequestSubmissionOutboundPortURI,
 			String RG_RequestNotificationInboundPortURI,
 			String RG_RequestGeneratorManagementInboundPortURI,
 			String CVM_InboundPorURI) throws Exception {
 		
-		String AC_CVMInboundPorURI								= AbstractPort.generatePortURI();
+		String AC_CMVOutboundPorURI								= AbstractPort.generatePortURI();
 		
 		String VM0_ApplicationVMManagementInboundPortURI 		= AbstractPort.generatePortURI();
 		String VM0_RequestSubmissionInboundPortURI 				= AbstractPort.generatePortURI();
@@ -52,13 +59,13 @@ public class AdmissionController
 		String RD_RequestSubmissionOutboundPortURI 				= AbstractPort.generatePortURI();
 		String RD_RequestNotificationInboundPortURI 			= AbstractPort.generatePortURI();
 		String RD_RequestNotificationOutboundPortURI 			= AbstractPort.generatePortURI();
-		
+				
 		String RGM_RequestGeneratorManagementOutboundPortURI 	= AbstractPort.generatePortURI();
 		
-		RequestDispatcher rd;
-		ApplicationVM vm0, vm1, vm2;
-		ApplicationVMManagementOutboundPort avmPort;
-		RequestGeneratorManagementOutboundPort rgmop;
+		RequestDispatcher 						rd;
+		ApplicationVM 							vm0, vm1, vm2;
+		ApplicationVMManagementOutboundPort 	avmPort0, avmPort1, avmPort2;
+		RequestGeneratorManagementOutboundPort 	rgmop;
 		
 		// Vm applications creation
 		vm0 = new ApplicationVM("vm0",	// application vm component URI
@@ -67,11 +74,11 @@ public class AdmissionController
 				VM0_RequestNotificationOutboundPortURI);
 		
 		// Create a mock up port to manage the AVM component (allocate cores).
-		avmPort = new ApplicationVMManagementOutboundPort(
+		avmPort0 = new ApplicationVMManagementOutboundPort(
 				VM0_ApplicationVMManagementOutboundPortURI,
 				new AbstractComponent(0, 0) {});
-		avmPort.publishPort();
-		avmPort.
+		avmPort0.publishPort();
+		avmPort0.
 		doConnection(
 				VM0_ApplicationVMManagementInboundPortURI,
 				ApplicationVMManagementConnector.class.getCanonicalName());
@@ -88,11 +95,11 @@ public class AdmissionController
 				VM1_RequestNotificationOutboundPortURI);
 		
 		// Create a mock up port to manage the AVM component (allocate cores).
-		avmPort = new ApplicationVMManagementOutboundPort(
+		avmPort1 = new ApplicationVMManagementOutboundPort(
 				VM1_ApplicationVMManagementOutboundPortURI,
 				new AbstractComponent(1, 1) {});
-		avmPort.publishPort();
-		avmPort.
+		avmPort1.publishPort();
+		avmPort1.
 		doConnection(
 				VM1_ApplicationVMManagementInboundPortURI,
 				ApplicationVMManagementConnector.class.getCanonicalName());
@@ -109,12 +116,11 @@ public class AdmissionController
 				VM2_RequestNotificationOutboundPortURI);
 		
 		// Create a mock up port to manage the AVM component (allocate cores).
-		avmPort = new ApplicationVMManagementOutboundPort(
+		avmPort2 = new ApplicationVMManagementOutboundPort(
 				VM2_ApplicationVMManagementOutboundPortURI,
 				new AbstractComponent(2, 2) {});
-		avmPort.publishPort();
-		avmPort.
-		doConnection(
+		avmPort2.publishPort();
+		avmPort2.doConnection(
 				VM2_ApplicationVMManagementInboundPortURI,
 				ApplicationVMManagementConnector.class.getCanonicalName());
 
@@ -134,15 +140,21 @@ public class AdmissionController
 		rd.toggleTracing();
 		
 		// Connections Admission Controller with CVM Component
-		
 		CVMOutboundPort cvmop = new CVMOutboundPort(
-				AC_CVMInboundPorURI, 
+				AC_CMVOutboundPorURI,
 				this);
+		
 		this.addPort(cvmop);
 		cvmop.publishPort();
 		cvmop.doConnection(
-				CVM_InboundPorURI, 
+				CVM_InboundPorURI,
 				CVMConnector.class.getCanonicalName());
+		
+		// Cores allocation
+		
+		cvmop.allocateCores(avmPort0);
+		cvmop.allocateCores(avmPort1);
+		cvmop.allocateCores(avmPort2);
 		
 		// Deploy all components
 		
@@ -150,25 +162,14 @@ public class AdmissionController
 		cvmop.deployComponent(vm1);
 		cvmop.deployComponent(vm2);
 		cvmop.deployComponent(rd);
-
-		// Connections Request Dispatcher with Request Generator
 		
-		RequestSubmissionInboundPort rsip = new RequestSubmissionInboundPort(
-				RD_RequestSubmissionInboundPortURI,
+		RequestNotificationOutboundPort rnop = new RequestNotificationOutboundPort(
+				RD_RequestNotificationOutboundPortURI, 
 				rd);
-		this.addPort(rsip);
-		rsip.publishPort();
-		rsip.doConnection(
-				RG_RequestSubmissionOutboundPortURI,
-				RequestSubmissionConnector.class.getCanonicalName());
-		
-		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(
-				RD_RequestNotificationOutboundPortURI,
-				rd);
-		this.addPort(rnip);
-		rnip.publishPort();
-		rnip.doConnection(
-				RG_RequestNotificationInboundPortURI,
+		this.addPort(rnop);
+		rnop.publishPort();
+		rnop.doConnection(
+				RG_RequestNotificationInboundPortURI, 
 				RequestNotificationConnector.class.getCanonicalName());
 		
 		// Register all applications VM in Request Dispatcher
@@ -185,5 +186,7 @@ public class AdmissionController
 		rgmop.doConnection(
 				RG_RequestGeneratorManagementInboundPortURI,
 				RequestGeneratorManagementConnector.class.getCanonicalName());
+		
+		return RD_RequestSubmissionInboundPortURI;
 	}
 }

@@ -14,22 +14,16 @@ public class AdmissionControllerOutboundPort
 	}
 
 	@Override
-	public void addRequestSource(
-			String RG_RequestSubmissionOutboundPortURI, 
+	public String addRequestSource(
+			String RG_RequestSubmissionOutboundPortURI,
 			String RG_RequestNotificationInboundPortURI,
 			String RG_RequestGeneratorManagementInboundPortURI,
-			String CVM_IPURI) throws Exception {
-		final AdmissionController admissionController = (AdmissionController)this.owner;
-		admissionController.handleRequestAsync(
-				new ComponentI.ComponentService<AdmissionController>(){
-					@Override
-					public AdmissionController call() throws Exception {
-						admissionController.addRequestSource(
-								RG_RequestSubmissionOutboundPortURI,
-								RG_RequestNotificationInboundPortURI,
-								RG_RequestGeneratorManagementInboundPortURI,
-								CVM_IPURI);
-						return admissionController;
-					}});
+			String CVM_IPURI) throws Exception { 
+		
+		return ((AdmissionControllerI)this.connector).addRequestSource(
+				RG_RequestSubmissionOutboundPortURI, 
+				RG_RequestNotificationInboundPortURI, 
+				RG_RequestGeneratorManagementInboundPortURI, 
+				CVM_IPURI);	
 	}
 }

@@ -75,6 +75,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	}
 
 	public void registerVM(String vmUri, String requestSubmissionInboundPort) throws Exception {
+	
 		String portUri = AbstractPort.generatePortURI();
 
 		if (this.registeredVmsUri.contains(vmUri)) 
@@ -97,7 +98,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	}
 
 	@Override
-	public void acceptRequestSubmission(RequestI r) throws Exception {
+	public void acceptRequestSubmission(RequestI r) throws Exception {		
 		if (registeredVmsRsop.size() == 0) {
 			this.logMessage(dispatcherUri + " : no registered vm.");
 		} else {

@@ -241,16 +241,6 @@ public class TestRequestDispatcher extends AbstractCVM {
 				RD_RequestSubmissionInboundPortURI,
 				RequestSubmissionConnector.class.getCanonicalName());
 		
-//		this.rd.doPortConnection(
-//				RD_RequestSubmissionOutboundPortURI,
-//				VM_RequestSubmissionInboundPortURI,
-//				RequestSubmissionConnector.class.getCanonicalName());
-//		
-//		this.vm.doPortConnection(
-//				VM_RequestNotificationOutboundPortURI,
-//				RD_RequestNotificationInboundPortURI,
-//				RequestNotificationConnector.class.getCanonicalName()) ;
-		
 		this.rd.doPortConnection(RD_RequestNotificationOutboundPortURI,
 				RG_RequestNotificationInboundPortURI,
 				RequestNotificationConnector.class.getCanonicalName());
@@ -258,17 +248,8 @@ public class TestRequestDispatcher extends AbstractCVM {
 		this.rd.registerVM("vm0", VM0_RequestSubmissionInboundPortURI);
 		this.rd.registerVM("vm1", VM1_RequestSubmissionInboundPortURI);
 		this.rd.registerVM("vm2", VM2_RequestSubmissionInboundPortURI);
+
 		
-//		this.rg.doPortConnection(
-//				RG_RequestSubmissionOutboundPortURI,
-//				VM_RequestSubmissionInboundPortURI,
-//				RequestSubmissionConnector.class.getCanonicalName()) ;
-
-//		this.vm.doPortConnection(
-//				VM_RequestNotificationOutboundPortURI,
-//				RG_RequestNotificationInboundPortURI,
-//				RequestNotificationConnector.class.getCanonicalName()) ;
-
 		// Rg management creation
 		this.rgmop = new RequestGeneratorManagementOutboundPort(
 				RGM_RequestGeneratorManagementOutboundPortURI,

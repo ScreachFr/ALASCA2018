@@ -1,40 +1,47 @@
 package fr.upmc.gaspardleo.step1.step12.test;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.examples.basic_cs.CVM;
 import fr.upmc.components.ports.AbstractPort;
+import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
+import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.datacenterclient.requestgenerator.RequestGenerator;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
-import fr.upmc.gaspardleo.step1.step11.tests.TestRequestDispatcher;
 import fr.upmc.gaspardleo.step1.step12.admissioncontroller.AdmissionController;
+import fr.upmc.gaspardleo.step1.step12.cvm.CVM;
 import fr.upmc.gaspardleo.step1.step12.cvm.CVMComponent;
 
 public class TestVMController {
 	
 	private static String CVM_IPURI 											= AbstractPort.generatePortURI();
 	
-	private static final String RG1_RequestGeneratorManagementInboundPortURI			= AbstractPort.generatePortURI();
-	private static final String RG1_RequestSubmissionOutboundPortURI					= AbstractPort.generatePortURI();
-	private static final String RG1_RequestNotificationInboundPortURI					= AbstractPort.generatePortURI();
+	private static final String RG1_RequestGeneratorManagementInboundPortURI	= AbstractPort.generatePortURI();
+	private static final String RG1_RequestSubmissionOutboundPortURI			= AbstractPort.generatePortURI();
+	private static final String RG1_RequestNotificationOutboundPortURI			= AbstractPort.generatePortURI();
+	private static final String RG1_RequestNotificationInboundPortURI			= AbstractPort.generatePortURI();
 	
-	private static final String RG2_RequestGeneratorManagementInboundPortURI			= AbstractPort.generatePortURI();
-	private static final String RG2_RequestSubmissionOutboundPortURI					= AbstractPort.generatePortURI();
-	private static final String RG2_RequestNotificationInboundPortURI					= AbstractPort.generatePortURI();
+	private static final String RG2_RequestGeneratorManagementInboundPortURI	= AbstractPort.generatePortURI();
+	private static final String RG2_RequestSubmissionOutboundPortURI			= AbstractPort.generatePortURI();
+	private static final String RG2_RequestNotificationOutboundPortURI			= AbstractPort.generatePortURI();
+	private static final String RG2_RequestNotificationInboundPortURI			= AbstractPort.generatePortURI();
 	
 	private static final String RGM1_RequestGeneratorManagementOutboundPortURI 	= AbstractPort.generatePortURI();
 	private static final String RGM2_RequestGeneratorManagementOutboundPortURI 	= AbstractPort.generatePortURI();
 	
-	private CVM 									cvm;
-	private CVMComponent 							cvmc;
-	private RequestGenerator 						rg1, rg2;
-	private AdmissionController 					ac1, ac2;
-	private RequestGeneratorManagementOutboundPort 	rgmop1, rgmop2;
+	private String RD1_RequestSubmissionInboundPortURI;
+	private String RD2_RequestSubmissionInboundPortURI;
+	
+	private static CVM 									cvm;
+	private CVMComponent 								cvmc;
+	private RequestGenerator 							rg1, rg2;
+	private AdmissionController 						ac1, ac2;
+	private RequestGeneratorManagementOutboundPort 		rgmop1, rgmop2;
 	
 	public TestVMController(){
 		initTest();
 	}
 	
+	@SuppressWarnings("static-access")
 	private void initTest(){
 		try {	
 			
@@ -71,11 +78,20 @@ public class TestVMController {
 			this.cvmc.deployComponent(ac1);
 			
 			// Dynamic ressources creation
-			this.ac1.addRequestSource(
-					RG1_RequestSubmissionOutboundPortURI, 
-					RG1_RequestNotificationInboundPortURI, 
+			RD1_RequestSubmissionInboundPortURI = this.ac1.addRequestSource(
+					RG1_RequestSubmissionOutboundPortURI,
+					RG1_RequestNotificationInboundPortURI,
 					RG1_RequestGeneratorManagementInboundPortURI, 
 					CVM_IPURI);
+			
+			RequestSubmissionOutboundPort rsop1 = new RequestSubmissionOutboundPort(
+					RG1_RequestSubmissionOutboundPortURI, 
+					rg1);
+			this.cvmc.addPort(rsop1);
+			rsop1.publishPort();
+			rsop1.doConnection(
+					RD1_RequestSubmissionInboundPortURI, 
+					RequestSubmissionConnector.class.getCanonicalName());
 			
 			// Rg management creation
 			this.rgmop1 = new RequestGeneratorManagementOutboundPort(
@@ -112,9 +128,9 @@ public class TestVMController {
 			this.cvmc.deployComponent(ac2);
 			
 			// Ressources dynamic creation
-			this.ac2.addRequestSource(
-					RG2_RequestSubmissionOutboundPortURI, 
-					RG2_RequestNotificationInboundPortURI, 
+			RD2_RequestSubmissionInboundPortURI = this.ac2.addRequestSource( 
+					RG2_RequestSubmissionOutboundPortURI,
+					RG2_RequestNotificationInboundPortURI,
 					RG2_RequestGeneratorManagementInboundPortURI, 
 					CVM_IPURI);
 			
@@ -150,19 +166,19 @@ public class TestVMController {
 		
 		// AbstractCVM.toggleDebugMode() ;
 		try {
-			final TestRequestDispatcher trd = new TestRequestDispatcher() ;
+			final TestVMController tvmc = new TestVMController() ;
 			// Deploy the components
-			trd.deploy() ;
+			cvm.deploy() ;
 			
 			System.out.println("starting...") ;
 			// Start them.
-			trd.start() ;
+			cvm.start() ;
 			
 			// Execute the chosen request generation test scenario in a
 			// separate thread.
 			new Thread(() -> {
 				try {
-					trd.testScenario();
+					tvmc.testScenario();
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -172,7 +188,7 @@ public class TestVMController {
 			Thread.sleep(90000L) ;
 			// Shut down the application.
 			System.out.println("shutting down...") ;
-			trd.shutdown() ;
+			cvm.shutdown() ;
 			System.out.println("ending...") ;
 			// Exit from Java.
 			System.exit(0) ;
