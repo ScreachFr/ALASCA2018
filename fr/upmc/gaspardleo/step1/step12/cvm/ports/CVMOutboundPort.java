@@ -2,6 +2,7 @@ package fr.upmc.gaspardleo.step1.step12.cvm.ports;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
+import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.step1.step12.cvm.CVMComponent;
 import fr.upmc.gaspardleo.step1.step12.cvm.interfaces.CVMI;
 
@@ -14,6 +15,11 @@ public class CVMOutboundPort extends AbstractOutboundPort implements CVMI {
 	@Override
 	public void deployComponent(ComponentI cmp) throws Exception {
 		((CVMComponent)this.owner).deployComponent(cmp);
+	}
+
+	@Override
+	public void allocateCores(ApplicationVMManagementOutboundPort avmPort) throws Exception {
+		((CVMComponent)this.owner).allocateCores(avmPort);
 	}
 
 }

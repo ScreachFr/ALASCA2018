@@ -6,16 +6,20 @@ import java.util.Map;
 import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
+import fr.upmc.components.ComponentI;
 import fr.upmc.components.connectors.DataConnector;
 import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.datacenter.connectors.ControlledDataConnector;
 import fr.upmc.datacenter.hardware.computers.Computer;
+import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
 import fr.upmc.datacenter.hardware.computers.ports.ComputerServicesOutboundPort;
 import fr.upmc.datacenter.hardware.processors.Processor;
 import fr.upmc.datacenter.hardware.tests.ComputerMonitor;
+import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.gaspardleo.step1.step12.cvm.interfaces.CVMI;
 
-public class CVM extends AbstractCVM{
+public class CVM extends AbstractCVM implements CVMI {
 	
 	// Computer ports
 	private static final String ComputerServicesInboundPortURI = "csip";
@@ -29,7 +33,7 @@ public class CVM extends AbstractCVM{
 	private ComputerMonitor cm;
 
 	// Ports
-	private ComputerServicesOutboundPort csPort ;
+	private ComputerServicesOutboundPort csPort;
 
 	public CVM() throws Exception {
 		super();
@@ -88,6 +92,17 @@ public class CVM extends AbstractCVM{
 				ComputerDynamicStateDataOutboundPortURI,
 				ComputerDynamicStateDataInboundPortURI,
 				ControlledDataConnector.class.getCanonicalName()) ;
+	}
+
+	@Override
+	public void deployComponent(ComponentI cmp) throws Exception {
+		this.addDeployedComponent(cmp);
+	}
+
+	@Override
+	public void allocateCores(ApplicationVMManagementOutboundPort avmPort) throws Exception {
+		AllocatedCore[] ac = this.csPort.allocateCores(4) ;
+		avmPort.allocateCores(ac) ;
 	}
 	
 }
