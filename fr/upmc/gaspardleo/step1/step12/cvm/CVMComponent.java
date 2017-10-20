@@ -2,16 +2,16 @@ package fr.upmc.gaspardleo.step1.step12.cvm;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ComponentI;
-import fr.upmc.components.cvm.AbstractCVM;
+import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.step1.step12.cvm.interfaces.CVMI;
 import fr.upmc.gaspardleo.step1.step12.cvm.ports.CVMInboundPort;
 
 public class CVMComponent extends AbstractComponent implements CVMI {
-	private AbstractCVM realCVM;
+	private CVM realCVM;
 	
 	private CVMInboundPort cvmip;
 	
-	public CVMComponent(AbstractCVM realCVM, String cvmipUri) throws Exception {
+	public CVMComponent(CVM realCVM, String cvmipUri) throws Exception {
 		super(1, 1);
 		this.realCVM = realCVM;
 		
@@ -26,4 +26,10 @@ public class CVMComponent extends AbstractComponent implements CVMI {
 	public void deployComponent(ComponentI cmp) throws Exception {
 		realCVM.addDeployedComponent(cmp);
 	}
+
+	@Override
+	public void allocateCores(ApplicationVMManagementOutboundPort avmPort) throws Exception {
+		realCVM.allocateCores(avmPort);
+	}
+	
 }
