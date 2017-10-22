@@ -76,7 +76,7 @@ public class TestRequestDispatcher extends AbstractCVM {
 
 	// Ports
 	private ComputerServicesOutboundPort csPort ;
-	private ApplicationVMManagementOutboundPort avmPort;
+	private ApplicationVMManagementOutboundPort avmPort0, avmPort1, avmPort2;
 	private RequestGeneratorManagementOutboundPort rgmop;
 
 	public TestRequestDispatcher() throws Exception {
@@ -146,11 +146,11 @@ public class TestRequestDispatcher extends AbstractCVM {
 
 		
 		// Create a mock up port to manage the AVM component (allocate cores).
-		this.avmPort = new ApplicationVMManagementOutboundPort(
+		this.avmPort0 = new ApplicationVMManagementOutboundPort(
 				VM0_ApplicationVMManagementOutboundPortURI,
 				new AbstractComponent(0, 0) {});
-		this.avmPort.publishPort() ;
-		this.avmPort.
+		this.avmPort0.publishPort() ;
+		this.avmPort0.
 		doConnection(
 				VM0_ApplicationVMManagementInboundPortURI,
 				ApplicationVMManagementConnector.class.getCanonicalName()) ;
@@ -169,11 +169,11 @@ public class TestRequestDispatcher extends AbstractCVM {
 
 		
 		// Create a mock up port to manage the AVM component (allocate cores).
-		this.avmPort = new ApplicationVMManagementOutboundPort(
+		this.avmPort1 = new ApplicationVMManagementOutboundPort(
 				VM1_ApplicationVMManagementOutboundPortURI,
 				new AbstractComponent(1, 1) {});
-		this.avmPort.publishPort() ;
-		this.avmPort.
+		this.avmPort1.publishPort() ;
+		this.avmPort1.
 		doConnection(
 				VM1_ApplicationVMManagementInboundPortURI,
 				ApplicationVMManagementConnector.class.getCanonicalName()) ;
@@ -193,11 +193,11 @@ public class TestRequestDispatcher extends AbstractCVM {
 
 		
 		// Create a mock up port to manage the AVM component (allocate cores).
-		this.avmPort = new ApplicationVMManagementOutboundPort(
+		this.avmPort2 = new ApplicationVMManagementOutboundPort(
 				VM2_ApplicationVMManagementOutboundPortURI,
 				new AbstractComponent(2, 2) {});
-		this.avmPort.publishPort() ;
-		this.avmPort.
+		this.avmPort2.publishPort() ;
+		this.avmPort2.
 		doConnection(
 				VM2_ApplicationVMManagementInboundPortURI,
 				ApplicationVMManagementConnector.class.getCanonicalName()) ;
@@ -266,9 +266,12 @@ public class TestRequestDispatcher extends AbstractCVM {
 	public void start() throws Exception {
 		super.start();
 
-		AllocatedCore[] ac = this.csPort.allocateCores(4) ;
-		this.avmPort.allocateCores(ac) ;
+		AllocatedCore[] ac = this.csPort.allocateCores(4);
+		this.avmPort0.allocateCores(new AllocatedCore[] {ac[0]});
+		this.avmPort1.allocateCores(new AllocatedCore[] {ac[1]});
+		this.avmPort2.allocateCores(new AllocatedCore[] {ac[2], ac[3]});
 	}
+	
 
 	
 	public void testScenario() throws Exception {
@@ -300,7 +303,7 @@ public class TestRequestDispatcher extends AbstractCVM {
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
-			}).start();;
+			}).start();
 			
 			// Sleep to let the test scenario execute to completion.
 			Thread.sleep(90000L) ;
