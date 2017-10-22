@@ -135,6 +135,9 @@ public class AdmissionController
 				RD_RequestNotificationInboundPortURI, 
 				RD_RequestNotificationOutboundPortURI);
 		
+//		rd.doPortConnection(RG_RequestSubmissionOutboundPortURI, RD_RequestNotificationOutboundPortURI,
+//				RequestSubmissionConnector.class.getCanonicalName());
+		
 		// Rd debug
 		rd.toggleLogging();
 		rd.toggleTracing();
@@ -152,9 +155,9 @@ public class AdmissionController
 		
 		// Cores allocation
 		
-		cvmop.allocateCores(avmPort0);
-		cvmop.allocateCores(avmPort1);
-		cvmop.allocateCores(avmPort2);
+		cvmop.addAVMPort(avmPort0);
+		cvmop.addAVMPort(avmPort1);
+		cvmop.addAVMPort(avmPort2);
 		
 		// Deploy all components
 		

@@ -73,9 +73,9 @@ public class TestVMController {
 			this.ac1 = new AdmissionController();
 			
 			// Components deployment
-			//TODO this.cvm.deploy();
-			this.cvmc.deployComponent(rg1);
-			this.cvmc.deployComponent(ac1);
+			this.cvm.deploy();
+			this.cvm.deployComponent(rg1);
+			this.cvm.deployComponent(ac1);
 			
 			// Dynamic ressources creation
 			RD1_RequestSubmissionInboundPortURI = this.ac1.addRequestSource(
@@ -84,13 +84,10 @@ public class TestVMController {
 					RG1_RequestGeneratorManagementInboundPortURI, 
 					CVM_IPURI);
 			
-			RequestSubmissionOutboundPort rsop1 = new RequestSubmissionOutboundPort(
-					RG1_RequestSubmissionOutboundPortURI, 
-					rg1);
-			this.cvmc.addPort(rsop1);
-			rsop1.publishPort();
-			rsop1.doConnection(
-					RD1_RequestSubmissionInboundPortURI, 
+			// Port connections
+			rg1.doPortConnection(
+					RG1_RequestSubmissionOutboundPortURI,
+					RD1_RequestSubmissionInboundPortURI,
 					RequestSubmissionConnector.class.getCanonicalName());
 			
 			// Rg management creation
@@ -101,6 +98,7 @@ public class TestVMController {
 			this.rgmop1.doConnection(
 					RG1_RequestGeneratorManagementInboundPortURI,
 					RequestGeneratorManagementConnector.class.getCanonicalName());
+			
 			
 			///////////////////////////
 			///		Application 2	///
@@ -133,6 +131,11 @@ public class TestVMController {
 					RG2_RequestNotificationInboundPortURI,
 					RG2_RequestGeneratorManagementInboundPortURI, 
 					CVM_IPURI);
+			
+			rg2.doPortConnection(
+					RG2_RequestSubmissionOutboundPortURI,
+					RD2_RequestSubmissionInboundPortURI,
+					RequestSubmissionConnector.class.getCanonicalName());
 			
 			// Rg management creation
 			this.rgmop2 = new RequestGeneratorManagementOutboundPort(

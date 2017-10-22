@@ -1,7 +1,9 @@
 package fr.upmc.gaspardleo.step1.step12.cvm;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +22,9 @@ import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOu
 import fr.upmc.gaspardleo.step1.step12.cvm.interfaces.CVMI;
 
 public class CVM extends AbstractCVM implements CVMI {
+	private final static int NB_CPU = 2;
+	private final static int NB_CORES = 2;
+	
 	
 	// Computer ports
 	private static final String ComputerServicesInboundPortURI = "csip";
@@ -35,9 +40,15 @@ public class CVM extends AbstractCVM implements CVMI {
 	// Ports
 	private ComputerServicesOutboundPort csPort;
 	
+	private AllocatedCore[] cores;
+	private int currentCore;
+	
+	private List<ApplicationVMManagementOutboundPort> avmPorts;
 
 	public CVM() throws Exception {
 		super();
+		this.currentCore = 0;
+		this.avmPorts = new ArrayList<>();
 	}
 
 	@Override
@@ -48,8 +59,8 @@ public class CVM extends AbstractCVM implements CVMI {
 		
 		// Computer creation
 		String computerURI = "computer0";
-		int numberOfProcessors = 2;
-		int numberOfCores = 2;
+		int numberOfProcessors = NB_CPU;
+		int numberOfCores = NB_CORES;
 		Set<Integer> admissibleFrequencies = new HashSet<Integer>() ;
 		admissibleFrequencies.add(1500);	// Cores can run at 1,5 GHz
 		admissibleFrequencies.add(3000);	// and at 3 GHz
@@ -78,6 +89,8 @@ public class CVM extends AbstractCVM implements CVMI {
 				ComputerServicesInboundPortURI,
 				ComputerServicesConnector.class.getCanonicalName());
 
+		
+	
 		this.cm = new ComputerMonitor(computerURI,
 				true,
 				ComputerStaticStateDataOutboundPortURI,
@@ -97,15 +110,43 @@ public class CVM extends AbstractCVM implements CVMI {
 		super.deploy();
 	}
 
+	public void addAVMPort(ApplicationVMManagementOutboundPort avmPort) {
+		this.avmPorts.add(avmPort);
+	}
+	
+	@Override
+	public void start() throws Exception {
+		super.start();
+		
+		this.cores = csPort.allocateCores(NB_CPU * NB_CORES);
+		
+		avmPorts.forEach(avmPort -> {
+			try {
+				avmPort.allocateCores(getAllocatedCore());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+	}
+	
 	@Override
 	public void deployComponent(ComponentI cmp) throws Exception {
 		this.addDeployedComponent(cmp);
 	}
 
+	private AllocatedCore[] getAllocatedCore() {
+		AllocatedCore[] result = new AllocatedCore[1];
+		
+		result[0] = cores[currentCore];
+		
+		currentCore = (currentCore + 1) % cores.length;
+		
+		return result;
+	}
+	
 	@Override
 	public void allocateCores(ApplicationVMManagementOutboundPort avmPort) throws Exception {
-		AllocatedCore[] ac = this.csPort.allocateCores(1) ;
-		avmPort.allocateCores(ac) ;
+		avmPort.allocateCores(getAllocatedCore()) ;
 	}
 	
 }

@@ -52,7 +52,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.rsip = new RequestSubmissionInboundPort(requestSubmissionInboundPortUri, this);
 		this.addPort(this.rsip);
 		this.rsip.publishPort();
-		this.addOfferedInterface(RequestSubmissionHandlerI.class) ;
 
 		// Request submission outbound port connection.
 		this.rsop = new RequestSubmissionOutboundPort(reqSubmissionOutboundPortUri, this) ;
@@ -64,7 +63,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.rnip = new RequestNotificationInboundPort(requestNotificationInboundPortUri, this);
 		this.addPort(this.rnip);
 		this.rnip.publishPort();
-		this.addOfferedInterface(RequestNotificationI.class);
 
 		// Request notification submission outbound port connection.
 		this.rnop = new RequestNotificationOutboundPort(requestNotificationOutboundPortUri, this);
@@ -89,6 +87,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 		registeredVmsRsop.add(rsop);
 		registeredVmsUri.add(registeredVmsUri.size(), vmUri);
+		
+		this.logMessage(this.dispatcherUri + " : " + vmUri + " has been added.");
 	}
 
 
@@ -99,6 +99,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void acceptRequestSubmission(RequestI r) throws Exception {		
+		this.logMessage(dispatcherUri + " : incoming request submission");
+		
 		if (registeredVmsRsop.size() == 0) {
 			this.logMessage(dispatcherUri + " : no registered vm.");
 		} else {
@@ -117,7 +119,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
-		this.logMessage(dispatcherUri + " : accepted a request submission and notification.");
+		this.logMessage(dispatcherUri + " : incoming request submission and notification.");
 
 		if (registeredVmsRsop.size() == 0) {
 			this.logMessage(dispatcherUri + " : no registered vm.");
@@ -138,6 +140,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
+		this.logMessage(dispatcherUri + " : incoming request termination notification.");
 		// TODO
 	}	
 }

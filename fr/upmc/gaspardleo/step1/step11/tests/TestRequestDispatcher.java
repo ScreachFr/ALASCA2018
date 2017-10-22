@@ -235,6 +235,7 @@ public class TestRequestDispatcher extends AbstractCVM {
 		
 		
 		
+		
 		// Port connections
 		this.rg.doPortConnection(
 				RG_RequestSubmissionOutboundPortURI,

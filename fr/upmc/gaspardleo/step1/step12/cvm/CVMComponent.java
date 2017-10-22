@@ -33,6 +33,10 @@ public class CVMComponent extends AbstractComponent implements CVMI {
 		realCVM.allocateCores(avmPort);
 	}
 	
+	public void addAVMPort(ApplicationVMManagementOutboundPort avmPort) {
+		this.realCVM.addAVMPort(avmPort);
+	}
+	
 	public void addPort(PortI cmp) throws Exception{
 		super.addPort(cmp);
 	}

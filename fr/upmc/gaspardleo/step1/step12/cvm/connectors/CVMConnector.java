@@ -18,5 +18,15 @@ public class CVMConnector extends AbstractConnector implements CVMI {
 		((CVMI)this.offering).allocateCores(avmPort);
 	}
 
+	@Override
+	public void start() throws Exception {
+		((CVMI)this.offering).start();
+	}
+
+	@Override
+	public void addAVMPort(ApplicationVMManagementOutboundPort avmPort) throws Exception {
+		((CVMI)this.offering).addAVMPort(avmPort);
+	}
+
 
 }
