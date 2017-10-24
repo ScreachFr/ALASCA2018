@@ -6,19 +6,12 @@ import fr.upmc.datacenter.software.applicationvm.ApplicationVM;
 import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
-import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
-import fr.upmc.datacenter.software.ports.RequestNotificationInboundPort;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
-import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
-import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
-import fr.upmc.datacenterclient.requestgenerator.interfaces.RequestGeneratorManagementI;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.step1.step11.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.step1.step12.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.step1.step12.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.step1.step12.cvm.connectors.CVMConnector;
-import fr.upmc.gaspardleo.step1.step12.cvm.ports.CVMInboundPort;
 import fr.upmc.gaspardleo.step1.step12.cvm.ports.CVMOutboundPort;
 
 public class AdmissionController 
@@ -29,8 +22,6 @@ public class AdmissionController
 		super(1, 1);
 	}
 	
-	
-	// TODO Supprimer les paramètres inutiles
 	@Override
 	public String addRequestSource(
 			String RG_RequestSubmissionOutboundPortURI,

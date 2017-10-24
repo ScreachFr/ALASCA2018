@@ -2,7 +2,6 @@ package fr.upmc.gaspardleo.step1.step12.admissioncontroller.port;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
-import fr.upmc.gaspardleo.step1.step12.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.step1.step12.admissioncontroller.interfaces.AdmissionControllerI;
 
 public class AdmissionControllerOutboundPort 
