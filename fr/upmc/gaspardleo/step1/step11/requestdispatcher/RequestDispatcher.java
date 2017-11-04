@@ -1,6 +1,8 @@
 package fr.upmc.gaspardleo.step1.step11.requestdispatcher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ports.AbstractPort;
@@ -19,6 +21,10 @@ public class RequestDispatcher
 extends AbstractComponent 
 implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHandlerI {
 
+	public static enum	RDPortTypes {
+		REQUEST_SUBMISSION, REQUEST_NOTIFICATION
+	}
+	
 	private String dispatcherUri;
 
 	private ArrayList<String> registeredVmsUri;
@@ -32,9 +38,12 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	private Integer vmCursor;
 
-	public RequestDispatcher(String dispatcherUri, 
-			String requestSubmissionInboundPortUri, String reqSubmissionOutboundPortUri,
-			String requestNotificationInboundPortUri, String requestNotificationOutboundPortUri) throws Exception {
+	public RequestDispatcher(
+			String dispatcherUri, 
+			String requestSubmissionInboundPortUri, 
+			String reqSubmissionOutboundPortUri,
+			String requestNotificationInboundPortUri,
+			String requestNotificationOutboundPortUri) throws Exception {
 		super(1, 1);
 
 		assert requestSubmissionInboundPortUri != null;
@@ -142,5 +151,15 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		this.logMessage(dispatcherUri + " : incoming request termination notification.");
 		// TODO
-	}	
+	}
+	
+	public Map<RDPortTypes, String>	getRDPortsURI() throws Exception {
+		HashMap<RDPortTypes, String> ret =
+				new HashMap<RDPortTypes, String>() ;		
+		ret.put(RDPortTypes.REQUEST_SUBMISSION,
+				this.rsip.getPortURI()) ;
+		ret.put(RDPortTypes.REQUEST_NOTIFICATION,
+				this.rnip.getPortURI()) ;
+		return ret ;
+	}
 }

@@ -44,7 +44,7 @@ public class TestVMController {
 			
 			// Simply adds some request generators to the current admission controller.
 			for (int i = 0; i < NB_DATASOURCE; i++) {
-				this.addDataSource();
+				this.addDataSource(i);
 			}
 			
 			
@@ -55,7 +55,7 @@ public class TestVMController {
 	}
 
 
-	private void addDataSource() throws Exception {
+	private void addDataSource(int i) throws Exception {
 		String rg_rgmip = AbstractPort.generatePortURI();
 		String rg_rsop = AbstractPort.generatePortURI();
 		String rg_rnip = AbstractPort.generatePortURI();
@@ -67,7 +67,7 @@ public class TestVMController {
 		
 		// Request Generator creation
 		rg = new RequestGenerator(
-				"rg1",		// generator component URI
+				"rg",		// generator component URI
 				500.0,		// mean time between two requests
 				6000000000L,// mean number of instructions in requests
 				rg_rgmip,

@@ -3,7 +3,7 @@ package fr.upmc.gaspardleo.step1.step12.cvm;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.PortI;
-import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.gaspardleo.step0.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.step1.step12.cvm.interfaces.CVMI;
 import fr.upmc.gaspardleo.step1.step12.cvm.ports.CVMInboundPort;
 
