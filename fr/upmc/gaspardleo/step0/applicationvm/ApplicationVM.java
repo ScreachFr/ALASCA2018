@@ -45,7 +45,6 @@ import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.exceptions.ComponentShutdownException;
-import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.TimeManagement;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.processors.Processor.ProcessorPortTypes;
@@ -120,13 +119,13 @@ import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  * @version	$Name$ -- $Revision$ -- $Date$
  */
-public class				ApplicationVM
-extends		AbstractComponent
-implements	ProcessorServicesNotificationConsumerI,
-			RequestSubmissionHandlerI,
-			ApplicationVMManagementI,
-			PushModeControllingI
-{
+public class ApplicationVM
+	extends 	AbstractComponent
+	implements	ProcessorServicesNotificationConsumerI,
+				RequestSubmissionHandlerI,
+				ApplicationVMManagementI,
+				PushModeControllingI {
+	
 	public static enum	ApplicationVMPortTypes {
 		REQUEST_SUBMISSION_IN, MANAGEMENT_IN, INTROSPECTION, STATIC_STATE,
 		DYNAMIC_STATE
@@ -137,39 +136,46 @@ implements	ProcessorServicesNotificationConsumerI,
 	// ------------------------------------------------------------------------
 
 	/** URI of this application VM.											*/
-	protected String						vmURI ;
+	protected String vmURI;
+	
 	/** Status, idle or in use, of each core allocated to this VM.			*/
-	protected Map<AllocatedCore,Boolean>	allocatedCoresIdleStatus ;
+	protected Map<AllocatedCore,Boolean> allocatedCoresIdleStatus;
+	
 	/** Map between processor URIs and the outbound ports to call them.		*/
-	protected Map<String,ProcessorServicesOutboundPort>
-											processorServicesPorts ;
+	protected Map<String,ProcessorServicesOutboundPort> processorServicesPorts;
+	
 	/** Map between processor URIs and the inbound ports through which task
 	 *  termination notifications are received from each processor.			*/
-	protected Map<String,ProcessorServicesNotificationInboundPort>
-											processorNotificationInboundPorts ;
+	protected Map<String,ProcessorServicesNotificationInboundPort> processorNotificationInboundPorts;
+	
 	/** Map between running task URIs and the processor cores running them.	*/
-	protected Map<String,AllocatedCore>		runningTasks ;
+	protected Map<String,AllocatedCore> runningTasks;
+	
 	/** Queue of tasks waiting to be started.								*/
-	protected Queue<TaskI>					taskQueue ;
-	/* Set of task URIs	which termination will need to be notified.			*/
-	protected HashSet<String>				tasksToNotify ;
+	protected Queue<TaskI> taskQueue;
+	
+	/** Set of task URIs	which termination will need to be notified.			**/
+	protected HashSet<String> tasksToNotify;
+	
 	/** Inbound port offering the management interface.						*/
-	protected ApplicationVMManagementInboundPort applicationVMManagementInboundPort ;
+	protected ApplicationVMManagementInboundPort applicationVMManagementInboundPort;
+	
 	/** Inbound port offering the request submission service of the VM.		*/
-	protected RequestSubmissionInboundPort	requestSubmissionInboundPort ;
+	protected RequestSubmissionInboundPort requestSubmissionInboundPort;
+	
 	/** Outbound port used by the VM to notify tasks' termination.			*/
-	protected RequestNotificationOutboundPort
-											requestNotificationOutboundPort ;
-	protected ApplicationVMIntrospectionInboundPort
-											avmIntrospectionInboundPort ;
+	protected RequestNotificationOutboundPort requestNotificationOutboundPort;
+	
+	protected ApplicationVMIntrospectionInboundPort avmIntrospectionInboundPort;
+	
 	/** data inbound port through which it pushes the static state data.	*/
-	protected ApplicationVMStaticStateDataInboundPort
-											avmStaticStateDataInboundPort ;
+	protected ApplicationVMStaticStateDataInboundPort avmStaticStateDataInboundPort;
+	
 	/** data inbound port through which it pushes the dynamic state data.	*/
-	protected ApplicationVMDynamicStateDataInboundPort
-											avmDynamicStateDataInboundPort ;
+	protected ApplicationVMDynamicStateDataInboundPort avmDynamicStateDataInboundPort;
+	
 	/** future of the task scheduled to push dynamic data.					*/
-	protected ScheduledFuture<?>			pushingFuture ;
+	protected ScheduledFuture<?> pushingFuture;
 
 
 	// ------------------------------------------------------------------------
@@ -199,56 +205,45 @@ implements	ProcessorServicesNotificationConsumerI,
 	 * @param requestNotificationOutboundPortURI	URI of the request notification outbound port.
 	 * @throws Exception
 	 */
-	public				ApplicationVM(String vmURI) throws Exception
-	{
+	public ApplicationVM(String vmURI) throws Exception {
 		// The normal thread pool is used to process component services, while
 		// the scheduled one is used to schedule the pushes of dynamic state
 		// when requested.
-		super(1, 1) ;
+		super(1, 1);
 
 		// Preconditions
-		assert	vmURI != null ;
+		assert	vmURI != null;
 
-		this.vmURI = vmURI ;
+		this.vmURI = vmURI;
 		// hash map keeping track of the idle status of cores
-		this.allocatedCoresIdleStatus = new HashMap<AllocatedCore,Boolean>() ;
+		this.allocatedCoresIdleStatus = new HashMap<AllocatedCore,Boolean>();
 		// queue of awaiting tasks
-		this.taskQueue = new LinkedList<TaskI>() ;
+		this.taskQueue = new LinkedList<TaskI>();
 		// tasks needing a end of execution notification
-		this.tasksToNotify = new HashSet<String>() ;
+		this.tasksToNotify = new HashSet<String>();
 		// tasks currently running on the cores
-		this.runningTasks = new HashMap<String,AllocatedCore>() ;
+		this.runningTasks = new HashMap<String,AllocatedCore>();
 
 		// Interfaces and ports
-		this.addOfferedInterface(ApplicationVMManagementI.class) ;
-		this.applicationVMManagementInboundPort =
-				new ApplicationVMManagementInboundPort(
-						AbstractPort.generatePortURI(),
-						this) ;		
-		this.addPort(this.applicationVMManagementInboundPort) ;
-		this.applicationVMManagementInboundPort.publishPort() ;
+		this.addOfferedInterface(ApplicationVMManagementI.class);
+		this.applicationVMManagementInboundPort = new ApplicationVMManagementInboundPort(this);		
+		this.addPort(this.applicationVMManagementInboundPort);
+		this.applicationVMManagementInboundPort.publishPort();
 		
-		this.addRequiredInterface(ProcessorServicesI.class) ;
-		this.addOfferedInterface(ProcessorServicesNotificationI.class) ;
-		this.processorServicesPorts =
-				new HashMap<String,ProcessorServicesOutboundPort>() ;
-		this.processorNotificationInboundPorts =
-				new HashMap<String,ProcessorServicesNotificationInboundPort>() ;
+		this.addRequiredInterface(ProcessorServicesI.class);
+		this.addOfferedInterface(ProcessorServicesNotificationI.class);
+		this.processorServicesPorts = new HashMap<String,ProcessorServicesOutboundPort>();
+		this.processorNotificationInboundPorts = new HashMap<String,ProcessorServicesNotificationInboundPort>();
 
-		this.addOfferedInterface(RequestSubmissionI.class) ;
-		this.requestSubmissionInboundPort =
-						new RequestSubmissionInboundPort(
-								AbstractPort.generatePortURI(), this) ;
-		this.addPort(this.requestSubmissionInboundPort) ;
-		this.requestSubmissionInboundPort.publishPort() ;
+		this.addOfferedInterface(RequestSubmissionI.class);
+		this.requestSubmissionInboundPort = new RequestSubmissionInboundPort(this);
+		this.addPort(this.requestSubmissionInboundPort);
+		this.requestSubmissionInboundPort.publishPort();
 
-		this.addRequiredInterface(RequestNotificationI.class) ;
-		this.requestNotificationOutboundPort =
-			new RequestNotificationOutboundPort(
-					AbstractPort.generatePortURI(),
-									this) ;
-		this.addPort(this.requestNotificationOutboundPort) ;
-		this.requestNotificationOutboundPort.publishPort() ;
+		this.addRequiredInterface(RequestNotificationI.class);
+		this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
+		this.addPort(this.requestNotificationOutboundPort);
+		this.requestNotificationOutboundPort.publishPort();
 	}
 
 	// ------------------------------------------------------------------------
@@ -259,25 +254,24 @@ implements	ProcessorServicesNotificationConsumerI,
 	 * @see fr.upmc.components.AbstractComponent#shutdown()
 	 */
 	@Override
-	public void			shutdown() throws ComponentShutdownException
-	{
+	public void shutdown() throws ComponentShutdownException {
 		// Disconnect ports to the request emitter and to the processors owning
 		// the allocated cores.
 		try {
 			if (this.requestNotificationOutboundPort.connected()) {
-				this.requestNotificationOutboundPort.doDisconnection() ;
+				this.requestNotificationOutboundPort.doDisconnection();
 			}
 		} catch (Exception e) {
-			throw new ComponentShutdownException(e) ;
+			throw new ComponentShutdownException(e);
 		}
 
 		for (ProcessorServicesOutboundPort p : this.processorServicesPorts.values()) {
 			try {
-				p.doDisconnection() ;
+				p.doDisconnection();
 			} catch (Exception e) {
 				throw new ComponentShutdownException(
 							"processor services outbound port disconnection"
-							+ " error", e) ;
+							+ " error", e);
 			}
 		}
 
@@ -292,39 +286,34 @@ implements	ProcessorServicesNotificationConsumerI,
 	 * @see fr.upmc.datacenter.software.interfaces.RequestSubmissionHandlerI#acceptRequestSubmission(fr.upmc.datacenter.software.interfaces.RequestI)
 	 */
 	@Override
-	public void			acceptRequestSubmission(final RequestI r)
-	throws Exception
-	{
-		this.taskQueue.add(new Task(r)) ;
-		this.startTask() ;
+	public void acceptRequestSubmission(final RequestI r) throws Exception {
+		this.taskQueue.add(new Task(r));
+		this.startTask();
 	}
 
 	/**
 	 * @see fr.upmc.datacenter.software.interfaces.RequestSubmissionHandlerI#acceptRequestSubmissionAndNotify(fr.upmc.datacenter.software.interfaces.RequestI)
 	 */
 	@Override
-	public void			acceptRequestSubmissionAndNotify(
-		final RequestI r
-		) throws Exception
-	{
+	public void acceptRequestSubmissionAndNotify(final RequestI r) throws Exception {
+		
 		if (AbstractCVM.DEBUG) {
 			System.out.println(
-							"ApplicationVM>>acceptRequestSubmissionAndNotify") ;
+							"ApplicationVM>>acceptRequestSubmissionAndNotify");
 		}
 		this.logMessage(this.vmURI + " queues request " + r.getRequestURI());
-		Task t = new Task(r) ;
-		this.taskQueue.add(t) ;
-		this.tasksToNotify.add(t.taskURI) ;
-		this.startTask() ;
+		Task t = new Task(r);
+		this.taskQueue.add(t);
+		this.tasksToNotify.add(t.taskURI);
+		this.startTask();
 	}
 
 	/**
 	 * @see fr.upmc.datacenter.hardware.processors.interfaces.ProcessorServicesNotificationConsumerI#acceptNotifyEndOfTask(fr.upmc.datacenter.software.applicationvm.interfaces.TaskI)
 	 */
 	@Override
-	public void			acceptNotifyEndOfTask(TaskI t) throws Exception
-	{
-		this.endTask(t) ;
+	public void acceptNotifyEndOfTask(TaskI t) throws Exception {
+		this.endTask(t);
 	}
 
 	// ------------------------------------------------------------------------
@@ -344,23 +333,23 @@ implements	ProcessorServicesNotificationConsumerI,
 	 *
 	 * @throws Exception
 	 */
-	public void			startTask() throws Exception
-	{
-		assert	!this.taskQueue.isEmpty() ;
+	public void startTask() throws Exception {
+		
+		assert	!this.taskQueue.isEmpty();
 
-		AllocatedCore ac = this.findIdleCore() ;
+		AllocatedCore ac = this.findIdleCore();
 		if (ac != null) {
-			this.allocatedCoresIdleStatus.remove(ac) ;
-			this.allocatedCoresIdleStatus.put(ac, false) ;
-			TaskI t = this.taskQueue.remove() ;
+			this.allocatedCoresIdleStatus.remove(ac);
+			this.allocatedCoresIdleStatus.put(ac, false);
+			TaskI t = this.taskQueue.remove();
 			this.logMessage(this.vmURI + " starts request " +
-											t.getRequest().getRequestURI()) ;
-			this.runningTasks.put(t.getTaskURI(), ac) ;
+											t.getRequest().getRequestURI());
+			this.runningTasks.put(t.getTaskURI(), ac);
 			ProcessorServicesOutboundPort p =
-				this.processorServicesPorts.get(ac.processorURI) ;
+				this.processorServicesPorts.get(ac.processorURI);
 			ProcessorServicesNotificationInboundPort np =
-				this.processorNotificationInboundPorts.get(ac.processorURI) ;
-			p.executeTaskOnCoreAndNotify(t, ac.coreNo, np.getPortURI()) ;
+				this.processorNotificationInboundPorts.get(ac.processorURI);
+			p.executeTaskOnCoreAndNotify(t, ac.coreNo, np.getPortURI());
 		}
 	}
 
@@ -378,22 +367,22 @@ implements	ProcessorServicesNotificationConsumerI,
 	 * @param t
 	 * @throws Exception
 	 */
-	public void			endTask(TaskI t) throws Exception
-	{
-		assert	t != null && this.isRunningTask(t) ;
+	public void endTask(TaskI t) throws Exception {
+		
+		assert	t != null && this.isRunningTask(t);
 
 		this.logMessage(this.vmURI + " terminates request " +
-											t.getRequest().getRequestURI()) ;
-		AllocatedCore ac = this.runningTasks.remove(t.getTaskURI()) ;
-		this.allocatedCoresIdleStatus.remove(ac) ;
-		this.allocatedCoresIdleStatus.put(ac, true) ;
+											t.getRequest().getRequestURI());
+		AllocatedCore ac = this.runningTasks.remove(t.getTaskURI());
+		this.allocatedCoresIdleStatus.remove(ac);
+		this.allocatedCoresIdleStatus.put(ac, true);
 		if (this.tasksToNotify.contains(t.getTaskURI())) {
-			this.tasksToNotify.remove(t.getTaskURI()) ;
+			this.tasksToNotify.remove(t.getTaskURI());
 			this.requestNotificationOutboundPort.
-									notifyRequestTermination(t.getRequest()) ;
+									notifyRequestTermination(t.getRequest());
 		}
 		if (!this.taskQueue.isEmpty()) {
-			this.startTask() ;
+			this.startTask();
 		}
 	}
 
@@ -411,13 +400,13 @@ implements	ProcessorServicesNotificationConsumerI,
 	 * @param t	the task to be tested.
 	 * @return	true if the t is currently considered as running on a core.
 	 */
-	public boolean			isRunningTask(TaskI t)
-	{
-		assert	t != null ;
+	public boolean isRunningTask(TaskI t) {
+		
+		assert	t != null;
 
 		return this.runningTasks.containsKey(t.getTaskURI()) &&
 						!this.allocatedCoresIdleStatus.
-									get(this.runningTasks.get(t.getTaskURI())) ;
+									get(this.runningTasks.get(t.getTaskURI()));
 	}
 
 	/**
@@ -432,25 +421,25 @@ implements	ProcessorServicesNotificationConsumerI,
 	 *
 	 * @return	an idle core reference or null if none is.
 	 */
-	public AllocatedCore	findIdleCore()
-	{
-		AllocatedCore ret = null ;
+	public AllocatedCore findIdleCore() {
+		
+		AllocatedCore ret = null;
 		for (AllocatedCore ac : this.allocatedCoresIdleStatus.keySet()) {
 			if (this.allocatedCoresIdleStatus.get(ac)) {
-				ret = ac ;
-				break ;
+				ret = ac;
+				break;
 			}
 		}
-		return ret ;
+		return ret;
 	}
 
-	protected void			printIdleStatus()
-	{
-		System.out.println("----------") ;
+	protected void printIdleStatus() {
+		
+		System.out.println("----------");
 		for (AllocatedCore ac : this.allocatedCoresIdleStatus.keySet()) {
-			System.out.println("*** " + ac.processorURI + " " + ac.coreNo + " " + this.allocatedCoresIdleStatus.get(ac)) ;
+			System.out.println("*** " + ac.processorURI + " " + ac.coreNo + " " + this.allocatedCoresIdleStatus.get(ac));
 		}
-		System.out.println("----------") ;
+		System.out.println("----------");
 	}
 
 	// ------------------------------------------------------------------------
@@ -470,43 +459,33 @@ implements	ProcessorServicesNotificationConsumerI,
 	 * @return	a map from application VM port types to their URI.
 	 * @throws Exception
 	 */
-	public Map<ApplicationVMPortTypes, String>	getAVMPortsURI()
-	throws Exception
-	{
+	public Map<ApplicationVMPortTypes, String>	getAVMPortsURI() throws Exception {
 		HashMap<ApplicationVMPortTypes, String> ret =
-						new HashMap<ApplicationVMPortTypes, String>() ;		
+						new HashMap<ApplicationVMPortTypes, String>();		
 		ret.put(ApplicationVMPortTypes.REQUEST_SUBMISSION_IN,
-						//this.requestSubmissionInboundPort.getClientPortURI()) ;
-						this.requestSubmissionInboundPort.getPortURI()) ;
+						this.requestSubmissionInboundPort.getPortURI());
 		ret.put(ApplicationVMPortTypes.MANAGEMENT_IN,
-						this.applicationVMManagementInboundPort.getPortURI()) ;
-		/*ret.put(ApplicationVMPortTypes.INTROSPECTION,
-						this.avmIntrospectionInboundPort.getPortURI()) ;
-		ret.put(ApplicationVMPortTypes.STATIC_STATE,
-						this.avmStaticStateDataInboundPort.getPortURI()) ;
-		ret.put(ApplicationVMPortTypes.DYNAMIC_STATE,
-						this.avmDynamicStateDataInboundPort.getPortURI()) ;*/
-		return ret ;
+						this.applicationVMManagementInboundPort.getPortURI());
+		return ret;
 	}
 
 	/**
 	 * @see fr.upmc.datacenter.interfaces.PushModeControllingI#startUnlimitedPushing(int)
 	 */
 	@Override
-	public void				startUnlimitedPushing(int interval)
-	throws Exception
-	{
-		// first, send the static state if the corresponding port is connected
-		this.sendStaticState() ;
+	public void startUnlimitedPushing(int interval) throws Exception {
 		
-		final ApplicationVM avm = this ;
+		// first, send the static state if the corresponding port is connected
+		this.sendStaticState();
+		
+		final ApplicationVM avm = this;
 		this.pushingFuture =
 				this.scheduleTaskAtFixedRate(
 						new ComponentI.ComponentTask() {
 							@Override
 							public void run() {
 								try {
-									avm.sendDynamicState() ;
+									avm.sendDynamicState();
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
@@ -514,75 +493,71 @@ implements	ProcessorServicesNotificationConsumerI,
 						},
 						TimeManagement.acceleratedDelay(interval),
 						TimeManagement.acceleratedDelay(interval),
-						TimeUnit.MILLISECONDS) ;
+						TimeUnit.MILLISECONDS);
 	}
 
 	/**
 	 * @see fr.upmc.datacenter.interfaces.PushModeControllingI#startLimitedPushing(int, int)
 	 */
 	@Override
-	public void			startLimitedPushing(final int interval, final int n)
-	throws Exception
-	{
-		assert	n > 0 ;
+	public void startLimitedPushing(final int interval, final int n) throws Exception {
+		
+		assert	n > 0;
 
 		this.logMessage(this.vmURI + " startLimitedPushing with interval "
-									+ interval + " ms for " + n + " times.") ;
+									+ interval + " ms for " + n + " times.");
 
 		// first, send the static state if the corresponding port is connected
-		this.sendStaticState() ;
+		this.sendStaticState();
 
-		final ApplicationVM avm = this ;
+		final ApplicationVM avm = this;
 		this.pushingFuture =
 			this.scheduleTask(
 					new ComponentI.ComponentTask() {
 						@Override
 						public void run() {
 							try {
-								avm.sendDynamicState(interval, n) ;
+								avm.sendDynamicState(interval, n);
 							} catch (Exception e) {
-								throw new RuntimeException(e) ;
+								throw new RuntimeException(e);
 							}
 						}
 					},
 					TimeManagement.acceleratedDelay(interval),
-					TimeUnit.MILLISECONDS) ;
+					TimeUnit.MILLISECONDS);
 	}
 
 	/**
 	 * @see fr.upmc.datacenter.interfaces.PushModeControllingI#stopPushing()
 	 */
 	@Override
-	public void				stopPushing() throws Exception
-	{
+	public void stopPushing() throws Exception {
 		if (this.pushingFuture != null &&
 						!(this.pushingFuture.isCancelled() ||
 												this.pushingFuture.isDone())) {
-			this.pushingFuture.cancel(false) ;
+			this.pushingFuture.cancel(false);
 		}
 	}
 	
-	public void				sendStaticState() throws Exception
-	{
+	public void sendStaticState() throws Exception {
+		
 		if (this.avmStaticStateDataInboundPort.connected()) {
-			this.avmStaticStateDataInboundPort.send(this.getStaticState()) ;
+			this.avmStaticStateDataInboundPort.send(this.getStaticState());
 		}
 	}
 
-	public void				sendDynamicState()
-	throws Exception
-	{
+	public void sendDynamicState() throws Exception {
+		
 		if (this.avmDynamicStateDataInboundPort.connected()) {
 			this.avmDynamicStateDataInboundPort.send(this.getDynamicState());
 		}
 	}
 
-	public void				sendDynamicState(final int interval, final int n)
-	throws Exception
-	{
-		this.sendDynamicState() ;
-		final ApplicationVM avm = this ;
-		final int fNumberOfRemainingPushes = n - 1 ;
+	public void sendDynamicState(final int interval, final int n) throws Exception {
+		
+		this.sendDynamicState();
+		final ApplicationVM avm = this;
+		final int fNumberOfRemainingPushes = n - 1;
 		if (fNumberOfRemainingPushes > 0) {
 			this.pushingFuture =
 					this.scheduleTask(
@@ -591,27 +566,26 @@ implements	ProcessorServicesNotificationConsumerI,
 								public void run() {
 									try {
 										avm.sendDynamicState(interval,
-													fNumberOfRemainingPushes) ;
+													fNumberOfRemainingPushes);
 									} catch (Exception e) {
-										throw new RuntimeException(e) ;
+										throw new RuntimeException(e);
 									}
 								}
 							},
 							TimeManagement.acceleratedDelay(interval),
-							TimeUnit.MILLISECONDS) ;
+							TimeUnit.MILLISECONDS);
 
 		}
 	}
 
-	public	ApplicationVMStaticStateI	getStaticState() throws Exception
-	{
-		return null ;
+	public ApplicationVMStaticStateI getStaticState() throws Exception {
+		//TODO: complete!
+		return null;
 	}
 
-	public	ApplicationVMDynamicStateI	getDynamicState()
-	throws Exception
-	{
-		return null ;
+	public	ApplicationVMDynamicStateI	getDynamicState() throws Exception {
+		//TODO: complete!
+		return null;
 	}
 
 	// ------------------------------------------------------------------------
@@ -622,37 +596,36 @@ implements	ProcessorServicesNotificationConsumerI,
 	 * @see fr.upmc.datacenter.software.applicationvm.interfaces.ApplicationVMManagementI#allocateCores(fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore[])
 	 */
 	@Override
-	public void			allocateCores(AllocatedCore[] allocatedCores)
-	throws Exception
-	{
-		assert	allocatedCores != null && allocatedCores.length != 0 ;
+	public void allocateCores(AllocatedCore[] allocatedCores) throws Exception {
+		
+		assert	allocatedCores != null && allocatedCores.length != 0;
 
-		for(int i = 0 ; i < allocatedCores.length ; i++) {
-			this.allocatedCoresIdleStatus.put(allocatedCores[i], true)  ;
+		for(int i = 0; i < allocatedCores.length; i++) {
+			this.allocatedCoresIdleStatus.put(allocatedCores[i], true) ;
 		}
 
 		// Link the VM with the newly allocated cores' processors if they are
 		// not yet.
-		for (int i = 0 ; i < allocatedCores.length ; i++) {
+		for (int i = 0; i < allocatedCores.length; i++) {
 			if (!this.processorServicesPorts.
 								containsKey(allocatedCores[i].processorURI)) {
 				ProcessorServicesOutboundPort p =
-									new ProcessorServicesOutboundPort(this) ;
-				this.addPort(p) ;
-				p.publishPort() ;
+									new ProcessorServicesOutboundPort(this);
+				this.addPort(p);
+				p.publishPort();
 				p.doConnection(
 					allocatedCores[i].processorInboundPortURI.
 											get(ProcessorPortTypes.SERVICES),
-					ProcessorServicesConnector.class.getCanonicalName()) ;
+					ProcessorServicesConnector.class.getCanonicalName());
 				this.processorServicesPorts.
-										put(allocatedCores[i].processorURI, p) ;
+										put(allocatedCores[i].processorURI, p);
 
 				ProcessorServicesNotificationInboundPort np =
-						new ProcessorServicesNotificationInboundPort(this) ;
-				this.addPort(np) ;
-				np.publishPort() ;
+						new ProcessorServicesNotificationInboundPort(this);
+				this.addPort(np);
+				np.publishPort();
 				this.processorNotificationInboundPorts.
-									put(allocatedCores[i].processorURI, np) ;
+									put(allocatedCores[i].processorURI, np);
 			}
 		}
 	}
@@ -661,10 +634,8 @@ implements	ProcessorServicesNotificationConsumerI,
 	 * @see fr.upmc.datacenter.software.applicationvm.interfaces.ApplicationVMManagementI#connectWithRequestSubmissioner()
 	 */
 	@Override
-	public void			connectWithRequestSubmissioner()
-	throws Exception
-	{
-		// TODO Auto-generated method stub
+	public void	connectWithRequestSubmissioner() throws Exception {
+		//TODO: complete!
 		
 	}
 }
