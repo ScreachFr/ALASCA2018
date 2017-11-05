@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
@@ -48,23 +47,23 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.vmCursor = 0;
 
 		// Request submission inbound port connection.
-		this.rsip = new RequestSubmissionInboundPort(AbstractPort.generatePortURI(), this);
+		this.rsip = new RequestSubmissionInboundPort(this);
 		this.addPort(this.rsip);
 		this.rsip.publishPort();
 
 		// Request submission outbound port connection.
-		this.rsop = new RequestSubmissionOutboundPort(AbstractPort.generatePortURI(), this) ;
+		this.rsop = new RequestSubmissionOutboundPort(this) ;
 		this.addPort(this.rsop);
 		this.rsop.publishPort();
 		this.addOfferedInterface(RequestSubmissionHandlerI.class) ;
 
 		// Request notification submission inbound port connection.
-		this.rnip = new RequestNotificationInboundPort(AbstractPort.generatePortURI(), this);
+		this.rnip = new RequestNotificationInboundPort(this);
 		this.addPort(this.rnip);
 		this.rnip.publishPort();
 
 		// Request notification submission outbound port connection.
-		this.rnop = new RequestNotificationOutboundPort(AbstractPort.generatePortURI(), this);
+		this.rnop = new RequestNotificationOutboundPort(this);
 		this.addPort(this.rnop);
 		this.rnop.publishPort();
 		this.addOfferedInterface(RequestNotificationI.class);
@@ -73,12 +72,10 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	public void registerVM(String vmUri, String requestSubmissionInboundPort) throws Exception {
 	
-		String portUri = AbstractPort.generatePortURI();
-
 		if (this.registeredVmsUri.contains(vmUri)) 
 			return;
 
-		RequestSubmissionOutboundPort rsop = new RequestSubmissionOutboundPort(portUri, this);
+		RequestSubmissionOutboundPort rsop = new RequestSubmissionOutboundPort(this);
 		this.addPort(rsop);
 		rsop.publishPort();
 
@@ -97,7 +94,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	}
 
 	@Override
-	public void acceptRequestSubmission(RequestI r) throws Exception {		
+	public void acceptRequestSubmission(RequestI r) throws Exception {
+		
 		this.logMessage(this.dispatcherUri + " : incoming request submission");
 		
 		if (registeredVmsRsop.size() == 0) {
@@ -118,6 +116,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
+		
 		this.logMessage(this.dispatcherUri + " : incoming request submission and notification.");
 
 		if (registeredVmsRsop.size() == 0) {
@@ -132,8 +131,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 			}
 
 			rsop.submitRequestAndNotify(r);
-
-
 		}
 	}
 
