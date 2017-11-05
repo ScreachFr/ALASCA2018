@@ -10,6 +10,10 @@ public class CVMOutboundPort extends AbstractOutboundPort implements CVMI {
 	public CVMOutboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, CVMI.class, owner);
 	}
+	
+	public CVMOutboundPort(ComponentI owner) throws Exception {
+		super(CVMI.class, owner);
+	}
 
 	@Override
 	public void deployComponent(ComponentI cmp) throws Exception {

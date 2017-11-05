@@ -22,7 +22,7 @@ extends AbstractComponent
 implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHandlerI {
 
 	public static enum	RDPortTypes {
-		REQUEST_SUBMISSION, REQUEST_NOTIFICATION
+		REQUEST_SUBMISSION_IN, REQUEST_NOTIFICATION_OUT
 	}
 	
 	private String dispatcherUri;
@@ -38,17 +38,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	private Integer vmCursor;
 
-	public RequestDispatcher(
-			String dispatcherUri, 
-			String requestSubmissionInboundPortUri, 
-			String reqSubmissionOutboundPortUri,
-			String requestNotificationInboundPortUri,
-			String requestNotificationOutboundPortUri) throws Exception {
+	public RequestDispatcher(String dispatcherUri) throws Exception {
 		super(1, 1);
-
-		assert requestSubmissionInboundPortUri != null;
-		assert requestNotificationInboundPortUri != null;
-		assert requestNotificationOutboundPortUri != null;
 
 		this.dispatcherUri = dispatcherUri;
 		this.registeredVmsUri = new ArrayList<>();
@@ -56,25 +47,24 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 		this.vmCursor = 0;
 
-
 		// Request submission inbound port connection.
-		this.rsip = new RequestSubmissionInboundPort(requestSubmissionInboundPortUri, this);
+		this.rsip = new RequestSubmissionInboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(this.rsip);
 		this.rsip.publishPort();
 
 		// Request submission outbound port connection.
-		this.rsop = new RequestSubmissionOutboundPort(reqSubmissionOutboundPortUri, this) ;
+		this.rsop = new RequestSubmissionOutboundPort(AbstractPort.generatePortURI(), this) ;
 		this.addPort(this.rsop);
 		this.rsop.publishPort();
 		this.addOfferedInterface(RequestSubmissionHandlerI.class) ;
 
 		// Request notification submission inbound port connection.
-		this.rnip = new RequestNotificationInboundPort(requestNotificationInboundPortUri, this);
+		this.rnip = new RequestNotificationInboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(this.rnip);
 		this.rnip.publishPort();
 
 		// Request notification submission outbound port connection.
-		this.rnop = new RequestNotificationOutboundPort(requestNotificationOutboundPortUri, this);
+		this.rnop = new RequestNotificationOutboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(this.rnop);
 		this.rnop.publishPort();
 		this.addOfferedInterface(RequestNotificationI.class);
@@ -108,15 +98,15 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void acceptRequestSubmission(RequestI r) throws Exception {		
-		this.logMessage(dispatcherUri + " : incoming request submission");
+		this.logMessage(this.dispatcherUri + " : incoming request submission");
 		
 		if (registeredVmsRsop.size() == 0) {
-			this.logMessage(dispatcherUri + " : no registered vm.");
+			this.logMessage(this.dispatcherUri + " : no registered vm.");
 		} else {
 			RequestSubmissionOutboundPort rsop = registeredVmsRsop.get(vmCursor%registeredVmsRsop.size()); 
 
 			if (!rsop.connected()) {
-				throw new Exception(dispatcherUri + " can't conect to vm.");
+				throw new Exception(this.dispatcherUri + " can't conect to vm.");
 			}
 
 			rsop.submitRequest(r);
@@ -128,17 +118,17 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
-		this.logMessage(dispatcherUri + " : incoming request submission and notification.");
+		this.logMessage(this.dispatcherUri + " : incoming request submission and notification.");
 
 		if (registeredVmsRsop.size() == 0) {
-			this.logMessage(dispatcherUri + " : no registered vm.");
+			this.logMessage(this.dispatcherUri + " : no registered vm.");
 		} else {
 			vmCursor = (vmCursor+1)%registeredVmsRsop.size();
 			RequestSubmissionOutboundPort rsop = registeredVmsRsop.get(vmCursor); 
-			this.logMessage(dispatcherUri + " is using " + registeredVmsUri.get(vmCursor));
+			this.logMessage(this.dispatcherUri + " is using " + registeredVmsUri.get(vmCursor));
 
 			if (!rsop.connected()) {
-				throw new Exception(dispatcherUri + " can't conect to vm.");
+				throw new Exception(this.dispatcherUri + " can't conect to vm.");
 			}
 
 			rsop.submitRequestAndNotify(r);
@@ -149,17 +139,17 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
-		this.logMessage(dispatcherUri + " : incoming request termination notification.");
+		this.logMessage(this.dispatcherUri + " : incoming request termination notification.");
 		// TODO
 	}
 	
 	public Map<RDPortTypes, String>	getRDPortsURI() throws Exception {
 		HashMap<RDPortTypes, String> ret =
 				new HashMap<RDPortTypes, String>() ;		
-		ret.put(RDPortTypes.REQUEST_SUBMISSION,
+		ret.put(RDPortTypes.REQUEST_SUBMISSION_IN,
 				this.rsip.getPortURI()) ;
-		ret.put(RDPortTypes.REQUEST_NOTIFICATION,
-				this.rnip.getPortURI()) ;
+		ret.put(RDPortTypes.REQUEST_NOTIFICATION_OUT,
+				this.rnop.getPortURI()) ;
 		return ret ;
 	}
 }

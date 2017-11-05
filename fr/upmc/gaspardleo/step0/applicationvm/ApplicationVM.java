@@ -45,6 +45,7 @@ import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.exceptions.ComponentShutdownException;
+import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.TimeManagement;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.processors.Processor.ProcessorPortTypes;
@@ -127,7 +128,7 @@ implements	ProcessorServicesNotificationConsumerI,
 			PushModeControllingI
 {
 	public static enum	ApplicationVMPortTypes {
-		REQUEST_SUBMISSION, MANAGEMENT, INTROSPECTION, STATIC_STATE,
+		REQUEST_SUBMISSION_IN, MANAGEMENT_IN, INTROSPECTION, STATIC_STATE,
 		DYNAMIC_STATE
 	}
 
@@ -198,12 +199,7 @@ implements	ProcessorServicesNotificationConsumerI,
 	 * @param requestNotificationOutboundPortURI	URI of the request notification outbound port.
 	 * @throws Exception
 	 */
-	public				ApplicationVM(
-		String vmURI,
-		String applicationVMManagementInboundPortURI,
-		String requestSubmissionInboundPortURI,
-		String requestNotificationOutboundPortURI
-		) throws Exception
+	public				ApplicationVM(String vmURI) throws Exception
 	{
 		// The normal thread pool is used to process component services, while
 		// the scheduled one is used to schedule the pushes of dynamic state
@@ -212,9 +208,6 @@ implements	ProcessorServicesNotificationConsumerI,
 
 		// Preconditions
 		assert	vmURI != null ;
-		assert	applicationVMManagementInboundPortURI != null ;
-		assert	requestSubmissionInboundPortURI != null ;
-		assert	requestNotificationOutboundPortURI != null ;
 
 		this.vmURI = vmURI ;
 		// hash map keeping track of the idle status of cores
@@ -230,7 +223,7 @@ implements	ProcessorServicesNotificationConsumerI,
 		this.addOfferedInterface(ApplicationVMManagementI.class) ;
 		this.applicationVMManagementInboundPort =
 				new ApplicationVMManagementInboundPort(
-						applicationVMManagementInboundPortURI,
+						AbstractPort.generatePortURI(),
 						this) ;		
 		this.addPort(this.applicationVMManagementInboundPort) ;
 		this.applicationVMManagementInboundPort.publishPort() ;
@@ -245,14 +238,14 @@ implements	ProcessorServicesNotificationConsumerI,
 		this.addOfferedInterface(RequestSubmissionI.class) ;
 		this.requestSubmissionInboundPort =
 						new RequestSubmissionInboundPort(
-										requestSubmissionInboundPortURI, this) ;
+								AbstractPort.generatePortURI(), this) ;
 		this.addPort(this.requestSubmissionInboundPort) ;
 		this.requestSubmissionInboundPort.publishPort() ;
 
 		this.addRequiredInterface(RequestNotificationI.class) ;
 		this.requestNotificationOutboundPort =
 			new RequestNotificationOutboundPort(
-									requestNotificationOutboundPortURI,
+					AbstractPort.generatePortURI(),
 									this) ;
 		this.addPort(this.requestNotificationOutboundPort) ;
 		this.requestNotificationOutboundPort.publishPort() ;
@@ -482,10 +475,10 @@ implements	ProcessorServicesNotificationConsumerI,
 	{
 		HashMap<ApplicationVMPortTypes, String> ret =
 						new HashMap<ApplicationVMPortTypes, String>() ;		
-		ret.put(ApplicationVMPortTypes.REQUEST_SUBMISSION,
+		ret.put(ApplicationVMPortTypes.REQUEST_SUBMISSION_IN,
 						//this.requestSubmissionInboundPort.getClientPortURI()) ;
 						this.requestSubmissionInboundPort.getPortURI()) ;
-		ret.put(ApplicationVMPortTypes.MANAGEMENT,
+		ret.put(ApplicationVMPortTypes.MANAGEMENT_IN,
 						this.applicationVMManagementInboundPort.getPortURI()) ;
 		/*ret.put(ApplicationVMPortTypes.INTROSPECTION,
 						this.avmIntrospectionInboundPort.getPortURI()) ;

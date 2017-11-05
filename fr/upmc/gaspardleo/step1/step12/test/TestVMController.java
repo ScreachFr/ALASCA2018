@@ -85,9 +85,7 @@ public class TestVMController {
 
 		// Dynamic ressources creation
 		String rd_rsip = this.ac.addRequestSource(
-				rg_rsop,
 				rg_rnip,
-				rg_rgmip, 
 				CVM_IPURI);
 
 		// Port connections
