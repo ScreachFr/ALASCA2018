@@ -2,7 +2,7 @@ package fr.upmc.gaspardleo.step1.step12.cvm.ports;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
-import fr.upmc.gaspardleo.step0.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.step1.step12.cvm.interfaces.CVMI;
 
 public class CVMOutboundPort extends AbstractOutboundPort implements CVMI {

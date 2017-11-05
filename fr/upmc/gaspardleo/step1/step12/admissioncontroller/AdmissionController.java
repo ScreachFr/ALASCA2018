@@ -1,10 +1,11 @@
 package fr.upmc.gaspardleo.step1.step12.admissioncontroller;
 
 import fr.upmc.components.AbstractComponent;
+import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.step0.applicationvm.ApplicationVM;
-import fr.upmc.gaspardleo.step0.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.step0.applicationvm.connectors.ApplicationVMManagementConnector;
-import fr.upmc.gaspardleo.step0.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.datacenter.software.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
+import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.gaspardleo.step1.step11.requestdispatcher.RequestDispatcher;
@@ -83,7 +84,10 @@ public class AdmissionController
 	private ApplicationVM createApplicationVM() throws Exception{
 				
 		// Vm applications creation
-		ApplicationVM vm = new ApplicationVM("vm");
+		ApplicationVM vm = new ApplicationVM("vm",
+				AbstractPort.generatePortURI(),
+				AbstractPort.generatePortURI(),
+				AbstractPort.generatePortURI());
 		
 		// VM debug
 		vm.toggleTracing();
@@ -95,7 +99,7 @@ public class AdmissionController
 		// Register application VM in Request Dispatcher
 		this.rd.registerVM(
 				"vm",
-				vm.getAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION_IN));
+				vm.getAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
 				
 		// Create a mock up port to manage the AVM component (allocate cores).
 		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(
@@ -104,7 +108,7 @@ public class AdmissionController
 		
 		avmPort.
 		doConnection(
-				vm.getAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT_IN),
+				vm.getAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT),
 				ApplicationVMManagementConnector.class.getCanonicalName());
 		
 		// Cores allocation

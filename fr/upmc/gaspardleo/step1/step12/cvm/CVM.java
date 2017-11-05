@@ -18,7 +18,7 @@ import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnecto
 import fr.upmc.datacenter.hardware.computers.ports.ComputerServicesOutboundPort;
 import fr.upmc.datacenter.hardware.processors.Processor;
 import fr.upmc.datacenter.hardware.tests.ComputerMonitor;
-import fr.upmc.gaspardleo.step0.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.step1.step12.cvm.interfaces.CVMI;
 
 public class CVM extends AbstractCVM implements CVMI {

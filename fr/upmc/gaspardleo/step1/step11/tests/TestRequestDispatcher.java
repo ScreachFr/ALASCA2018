@@ -8,6 +8,7 @@ import java.util.Set;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.connectors.DataConnector;
 import fr.upmc.components.cvm.AbstractCVM;
+import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.connectors.ControlledDataConnector;
 import fr.upmc.datacenter.hardware.computers.Computer;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
@@ -16,9 +17,9 @@ import fr.upmc.datacenter.hardware.computers.ports.ComputerServicesOutboundPort;
 import fr.upmc.datacenter.hardware.processors.Processor;
 import fr.upmc.datacenter.hardware.tests.ComputerMonitor;
 import fr.upmc.gaspardleo.step0.applicationvm.ApplicationVM;
-import fr.upmc.gaspardleo.step0.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.step0.applicationvm.connectors.ApplicationVMManagementConnector;
-import fr.upmc.gaspardleo.step0.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.datacenter.software.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
+import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenterclient.requestgenerator.RequestGenerator;
@@ -115,7 +116,10 @@ public class TestRequestDispatcher extends AbstractCVM {
 
 
 		// Vm applications creation
-		this.vm0 = new ApplicationVM("vm0") ;
+		this.vm0 = new ApplicationVM("vm0",
+				AbstractPort.generatePortURI(),
+				AbstractPort.generatePortURI(),
+				AbstractPort.generatePortURI());
 		this.addDeployedComponent(this.vm0) ;
 
 		
@@ -124,7 +128,7 @@ public class TestRequestDispatcher extends AbstractCVM {
 		this.avmPort0.publishPort() ;
 		this.avmPort0.
 		doConnection(
-				vm0.getAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT_IN),
+				vm0.getAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT),
 				ApplicationVMManagementConnector.class.getCanonicalName()) ;
 
 		// VM debug
@@ -133,7 +137,10 @@ public class TestRequestDispatcher extends AbstractCVM {
 		
 		//-------
 		
-		this.vm1 = new ApplicationVM("vm1");
+		this.vm1 = new ApplicationVM("vm1",
+				AbstractPort.generatePortURI(),
+				AbstractPort.generatePortURI(),
+				AbstractPort.generatePortURI());
 		this.addDeployedComponent(this.vm1) ;
 
 		
@@ -143,7 +150,7 @@ public class TestRequestDispatcher extends AbstractCVM {
 		this.avmPort1.publishPort() ;
 		this.avmPort1.
 		doConnection(
-				vm1.getAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT_IN),
+				vm1.getAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT),
 				ApplicationVMManagementConnector.class.getCanonicalName()) ;
 
 		// VM debug
@@ -153,7 +160,10 @@ public class TestRequestDispatcher extends AbstractCVM {
 		
 		//------
 		
-		this.vm2 = new ApplicationVM("vm2") ;
+		this.vm2 = new ApplicationVM("vm2",
+				AbstractPort.generatePortURI(),
+				AbstractPort.generatePortURI(),
+				AbstractPort.generatePortURI());
 		this.addDeployedComponent(this.vm2) ;
 
 		
@@ -163,7 +173,7 @@ public class TestRequestDispatcher extends AbstractCVM {
 		this.avmPort2.publishPort() ;
 		this.avmPort2.
 		doConnection(
-				vm2.getAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT_IN),
+				vm2.getAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT),
 				ApplicationVMManagementConnector.class.getCanonicalName()) ;
 
 		// VM debug
@@ -211,9 +221,9 @@ public class TestRequestDispatcher extends AbstractCVM {
 				RG_RequestNotificationInboundPortURI,
 				RequestNotificationConnector.class.getCanonicalName());
 		
-		this.rd.registerVM("vm0", vm0.getAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION_IN));
-		this.rd.registerVM("vm1", vm1.getAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION_IN));
-		this.rd.registerVM("vm2", vm2.getAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION_IN));
+		this.rd.registerVM("vm0", vm0.getAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
+		this.rd.registerVM("vm1", vm1.getAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
+		this.rd.registerVM("vm2", vm2.getAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
 
 		
 		// Rg management creation
