@@ -21,6 +21,9 @@ public class AdmissionController
 	private	CVMOutboundPort 	cvmop;
 	private	RequestDispatcher 	rd;
 	
+	//TODO pool de RD
+	//TODO delete RD avec unregisterVM
+	
 	public AdmissionController(){
 		super(1, 1);
 	}
@@ -56,6 +59,7 @@ public class AdmissionController
 				CVMConnector.class.getCanonicalName());
 	}
 	
+	//TODO URI RD en paramètre
 	private String createRequestDispatcher(String RG_RequestNotificationInboundPortURI) throws Exception{
 				
 		// Request Dispatcher creation
@@ -74,6 +78,7 @@ public class AdmissionController
 		this.addPort(rnop);
 		rnop.publishPort();
 		
+		//TODO déplacer dans le rd
 		rnop.doConnection(
 				RG_RequestNotificationInboundPortURI, 
 				RequestNotificationConnector.class.getCanonicalName());

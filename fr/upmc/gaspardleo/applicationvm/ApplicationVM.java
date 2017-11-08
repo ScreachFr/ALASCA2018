@@ -5,6 +5,8 @@ import java.util.Map;
 
 public class ApplicationVM extends fr.upmc.datacenter.software.applicationvm.ApplicationVM{
 
+	//TODO Constructeur sans URI et utilisation de AbstractURI directement dans le code du constructeur
+	
 	public ApplicationVM(String vmURI, String applicationVMManagementInboundPortURI,
 			String requestSubmissionInboundPortURI, String requestNotificationOutboundPortURI) throws Exception {
 		super(vmURI, applicationVMManagementInboundPortURI, requestSubmissionInboundPortURI,

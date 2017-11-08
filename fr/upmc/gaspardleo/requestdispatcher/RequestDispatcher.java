@@ -137,7 +137,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		this.logMessage(this.dispatcherUri + " : incoming request termination notification.");
-		// TODO
+		// TODO traitement de la notification de terminaison d'une requête
+		// TODO Mimer un retour client
 	}
 	
 	public Map<RDPortTypes, String>	getRDPortsURI() throws Exception {
@@ -148,5 +149,11 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		ret.put(RDPortTypes.REQUEST_NOTIFICATION_OUT,
 				this.rnop.getPortURI()) ;
 		return ret ;
+	}
+
+	@Override
+	public void connectionWithRG(String rgUri) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 }

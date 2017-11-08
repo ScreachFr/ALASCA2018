@@ -25,7 +25,7 @@ public class CVM extends AbstractCVM implements CVMI {
 	private final static int NB_CPU = 2;
 	private final static int NB_CORES = 2;
 	
-	
+	//TODO
 	// Computer ports
 	private static final String ComputerServicesInboundPortURI = "csip";
 	private static final String ComputerServicesOutboundPortURI = "csop";
@@ -67,6 +67,9 @@ public class CVM extends AbstractCVM implements CVMI {
 		Map<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
 		processingPower.put(1500, 1500000);	// 1,5 GHz executes 1,5 Mips
 		processingPower.put(3000, 3000000);	// 3 GHz executes 3 Mips
+		
+		//TODO nouvelle classe extends computer avec enum et getComputerURI
+		//TODO Alex
 		Computer c = new Computer(
 				computerURI,
 				admissibleFrequencies,
@@ -81,6 +84,8 @@ public class CVM extends AbstractCVM implements CVMI {
 				ComputerDynamicStateDataInboundPortURI);
 		this.addDeployedComponent(c);
 
+		//TODO pour les ports ne plus utiliser les uri
+		
 		this.csPort = new ComputerServicesOutboundPort(
 				ComputerServicesOutboundPortURI,
 				new AbstractComponent(0, 0) {}) ;

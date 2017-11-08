@@ -42,4 +42,10 @@ public class RequestDispatcherInboundPort
 					}});
 	}
 
+	@Override
+	public void connectionWithRG(String rgUri) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

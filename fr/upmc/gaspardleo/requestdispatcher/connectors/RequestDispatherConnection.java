@@ -17,4 +17,10 @@ public class RequestDispatherConnection
 		((RequestDispatcherI)this.offering).unregisterVM(vmUri);
 	}
 
+	@Override
+	public void connectionWithRG(String rgUri) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

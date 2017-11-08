@@ -61,9 +61,9 @@ public class Test {
 		String rg_rnip = AbstractPort.generatePortURI();
 		String rg_rgmop = AbstractPort.generatePortURI();
 		
-		
-		
 		RequestGenerator rg;
+		
+		//TODO nouvelle classe extends RG avec enum et getComputerURI
 		
 		// Request Generator creation
 		rg = new RequestGenerator(
@@ -88,17 +88,24 @@ public class Test {
 				rg_rnip,
 				CVM_IPURI);
 
+		//TODO uris inutiles
+		
 		// Port connections
 		rg.doPortConnection(
 				rg_rsop,
 				rd_rsip,
 				RequestSubmissionConnector.class.getCanonicalName());
 
+		
+		//TODO uris inutiles
+		
 		// Rg management creation
 		RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
 				rg_rgmop,
 				new AbstractComponent(0, 0) {});
 		rgmop.publishPort();
+		
+		//TODO uris inutiles
 		rgmop.doConnection(
 				rg_rgmip,
 				RequestGeneratorManagementConnector.class.getCanonicalName());
@@ -107,6 +114,8 @@ public class Test {
 
 	}
 
+	//TODO proposer un scénario qui permet de mettre en évidence le refus de requêtes
+	
 	public void testScenario() throws Exception {
 
 		// start the request generation in the request generator.
