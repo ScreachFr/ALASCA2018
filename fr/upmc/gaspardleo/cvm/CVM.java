@@ -12,27 +12,23 @@ import fr.upmc.components.ComponentI;
 import fr.upmc.components.connectors.DataConnector;
 import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.datacenter.connectors.ControlledDataConnector;
-import fr.upmc.datacenter.hardware.computers.Computer;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
 import fr.upmc.datacenter.hardware.computers.ports.ComputerServicesOutboundPort;
 import fr.upmc.datacenter.hardware.processors.Processor;
-import fr.upmc.datacenter.hardware.tests.ComputerMonitor;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.gaspardleo.computer.Computer;
+import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
+import fr.upmc.gaspardleo.computer.ComputerMonitor;
+import fr.upmc.gaspardleo.computer.ComputerMonitor.ComputerMonitorPortTypes;
 import fr.upmc.gaspardleo.cvm.interfaces.CVMI;
 
 public class CVM extends AbstractCVM implements CVMI {
 	private final static int NB_CPU = 2;
 	private final static int NB_CORES = 2;
-	
-	//TODO
-	// Computer ports
-	private static final String ComputerServicesInboundPortURI = "csip";
-	private static final String ComputerServicesOutboundPortURI = "csop";
-	private static final String ComputerStaticStateDataInboundPortURI = "cssdip";
-	private static final String ComputerStaticStateDataOutboundPortURI = "cssdop";
-	private static final String ComputerDynamicStateDataInboundPortURI = "cdsdip";
-	private static final String ComputerDynamicStateDataOutboundPortURI = "cdsdop";
+	private final static int CPU_FREQUENCY = 3000;
+	private final static int CPU_MAX_FREQUENCY_GAP = 1500;
+		
 	
 	// Components
 	private ComputerMonitor cm;
@@ -68,48 +64,41 @@ public class CVM extends AbstractCVM implements CVMI {
 		processingPower.put(1500, 1500000);	// 1,5 GHz executes 1,5 Mips
 		processingPower.put(3000, 3000000);	// 3 GHz executes 3 Mips
 		
-		//TODO nouvelle classe extends computer avec enum et getComputerURI
-		//TODO Alex
 		Computer c = new Computer(
 				computerURI,
 				admissibleFrequencies,
 				processingPower,  
-				1500,		// Test scenario 1, frequency = 1,5 GHz
-				// 3000,	// Test scenario 2, frequency = 3 GHz
-				1500,		// max frequency gap within a processor
+				CPU_FREQUENCY,			// Test scenario 1, frequency = 1,5 GHz
+				CPU_MAX_FREQUENCY_GAP,	// max frequency gap within a processor
 				numberOfProcessors,
-				numberOfCores,
-				ComputerServicesInboundPortURI,
-				ComputerStaticStateDataInboundPortURI,
-				ComputerDynamicStateDataInboundPortURI);
+				numberOfCores);
+		
 		this.addDeployedComponent(c);
 
-		//TODO pour les ports ne plus utiliser les uri
+		Map<ComputerPortsTypes, String> computerPorts = c.getComputerPortsURI();
+		
 		
 		this.csPort = new ComputerServicesOutboundPort(
-				ComputerServicesOutboundPortURI,
 				new AbstractComponent(0, 0) {}) ;
+
 		this.csPort.publishPort();
 		this.csPort.doConnection(
-				ComputerServicesInboundPortURI,
+				computerPorts.get(ComputerPortsTypes.SERVICE_IN),
 				ComputerServicesConnector.class.getCanonicalName());
 
-		
-	
-		this.cm = new ComputerMonitor(computerURI,
-				true,
-				ComputerStaticStateDataOutboundPortURI,
-				ComputerDynamicStateDataOutboundPortURI) ;
+		this.cm = new ComputerMonitor(computerURI,true);
 		this.addDeployedComponent(this.cm) ;
-
+		
+		Map<ComputerMonitorPortTypes, String> computerMonitorPorts = cm.getPortTypes();
+		
 		this.cm.doPortConnection(
-				ComputerStaticStateDataOutboundPortURI,
-				ComputerStaticStateDataInboundPortURI,
+				computerMonitorPorts.get(ComputerMonitorPortTypes.STATIC_STATE_OUT),
+				computerPorts.get(ComputerPortsTypes.STATIC_STATE_IN),
 				DataConnector.class.getCanonicalName()) ;
 
 		this.cm.doPortConnection(
-				ComputerDynamicStateDataOutboundPortURI,
-				ComputerDynamicStateDataInboundPortURI,
+				computerMonitorPorts.get(ComputerMonitorPortTypes.DYNAMIC_STATE_OUT),
+				computerPorts.get(ComputerPortsTypes.DYNAMIC_STATE_IN),
 				ControlledDataConnector.class.getCanonicalName()) ;
 		
 		super.deploy();

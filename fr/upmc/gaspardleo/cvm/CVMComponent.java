@@ -1,5 +1,8 @@
 package fr.upmc.gaspardleo.cvm;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.PortI;
@@ -12,11 +15,11 @@ public class CVMComponent extends AbstractComponent implements CVMI {
 	
 	private CVMInboundPort cvmip;
 	
-	public CVMComponent(CVM realCVM, String cvmipUri) throws Exception {
+	public CVMComponent(CVM realCVM) throws Exception {
 		super(1, 1);
 		this.realCVM = realCVM;
 		
-		this.cvmip = new CVMInboundPort(cvmipUri, this);
+		this.cvmip = new CVMInboundPort(this);
 		this.addPort(cvmip);
 		this.cvmip.publishPort();
 		
@@ -39,5 +42,17 @@ public class CVMComponent extends AbstractComponent implements CVMI {
 	
 	public void addPort(PortI cmp) throws Exception{
 		super.addPort(cmp);
+	}
+	
+	public Map<CVMPortTypes, String> getCVMPortsURI() throws Exception {
+		Map<CVMPortTypes, String> result = new HashMap<>();
+		
+		result.put(CVMPortTypes.CVM_IN, this.cvmip.getPortURI());
+		
+		return result;
+	}
+	
+	public enum CVMPortTypes {
+		CVM_IN;
 	}
 }
