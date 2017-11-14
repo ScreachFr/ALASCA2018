@@ -90,7 +90,10 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 
 	public void unregisterVM(String vmUri) throws Exception {
-		this.registeredVmsRsop.remove(vmUri);
+		int index = registeredVmsUri.indexOf(vmUri);
+		RequestSubmissionOutboundPort rsop = registeredVmsRsop.remove(index);
+		registeredVmsUri.remove(index);
+		rsop.doDisconnection();
 	}
 
 	@Override

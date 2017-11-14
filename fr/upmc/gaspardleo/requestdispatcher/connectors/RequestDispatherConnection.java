@@ -19,8 +19,7 @@ public class RequestDispatherConnection
 
 	@Override
 	public void connectionWithRG(String rgUri) throws Exception {
-		// TODO Auto-generated method stub
-		
+		((RequestDispatcherI)this.offering).connectionWithRG(rgUri);
 	}
 
 }

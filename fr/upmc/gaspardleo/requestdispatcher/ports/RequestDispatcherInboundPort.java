@@ -44,8 +44,14 @@ public class RequestDispatcherInboundPort
 
 	@Override
 	public void connectionWithRG(String rgUri) throws Exception {
-		// TODO Auto-generated method stub
-		
+		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
+		requestDispatcher.handleRequestAsync(
+				new ComponentI.ComponentService<RequestDispatcher>(){
+					@Override
+					public RequestDispatcher call() throws Exception {
+						requestDispatcher.connectionWithRG(rgUri);
+						return requestDispatcher;
+					}});
 	}
 
 }
