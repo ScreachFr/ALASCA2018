@@ -37,7 +37,7 @@ public class Test {
 			this.cvm 	= new CVM();
 
 			// CVM Component creation
-			this.cvmc 	= new CVMComponent(cvm, CVM_IPURI);
+			this.cvmc 	= new CVMComponent(cvm);
 
 			// Admission Controller creation
 			this.ac = new AdmissionController();
