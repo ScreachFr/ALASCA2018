@@ -6,4 +6,12 @@ public interface AdmissionControllerI {
 			String RD_URI,
 			String RG_RequestNotificationInboundPortURI,
 			String CVM_InboundPorURI) throws Exception;
+	
+	/**
+	 * Supprime le RequestDispatcher associé à l'URI du port donné en paramètre.
+	 * @param RD_RequestSubmissionInboundPortUri
+	 * 		Uri du port du RequestDispatcher à supprimer.
+	 * @throws Exception
+	 */
+	public void removeRequestSource(String RD_RequestSubmissionInboundPortUri) throws Exception;
 }

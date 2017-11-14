@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
+import fr.upmc.components.exceptions.ComponentShutdownException;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
@@ -26,12 +27,18 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	}
 	
 	private String 										dispatcherUri;
+	
+	// VMs
 	private ArrayList<String> 							registeredVmsUri;
 	private ArrayList<RequestSubmissionOutboundPort> 	registeredVmsRsop;
+	
+	//Ports
 	private RequestSubmissionInboundPort 				rsip;
 	private RequestNotificationOutboundPort 			rnop;
 	private RequestSubmissionOutboundPort 				rsop;
 	private RequestNotificationInboundPort 				rnip;
+	
+	//Misc
 	private Integer 									vmCursor;
 
 	public RequestDispatcher(String dispatcherUri, String RG_RequestNotificationInboundPortURI) throws Exception {
@@ -65,8 +72,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.rnop.publishPort();
 		this.addOfferedInterface(RequestNotificationI.class);
 		
-		connectionWithRG(RG_RequestNotificationInboundPortURI);
-
 	}
 
 	public void registerVM(String vmUri, String VM_requestSubmissionInboundPort) throws Exception {
@@ -160,12 +165,27 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void connectionWithRG(String RG_RequestNotificationInboundPortURI) throws Exception {
-		
 		// Connections Request Dispatcher with Request Generator		
 		RequestNotificationOutboundPort rnop = new RequestNotificationOutboundPort(this);
 		this.addPort(rnop);
 		rnop.publishPort();
 		rnop.doConnection(RG_RequestNotificationInboundPortURI, 
 			RequestNotificationConnector.class.getCanonicalName());
+	}
+	
+	@Override
+	public void shutdown() throws ComponentShutdownException {
+		for (RequestSubmissionOutboundPort rsop : registeredVmsRsop) {
+			try {
+				rsop.doDisconnection();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		registeredVmsUri.clear();
+		registeredVmsRsop.clear();
+		
+		super.shutdown();
 	}
 }

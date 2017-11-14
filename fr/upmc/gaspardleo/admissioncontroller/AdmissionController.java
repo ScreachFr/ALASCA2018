@@ -1,6 +1,9 @@
 package fr.upmc.gaspardleo.admissioncontroller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
@@ -17,14 +20,19 @@ public class AdmissionController
 		extends AbstractComponent
 		implements AdmissionControllerI{
 	
-	private	CVMOutboundPort 				cvmop;
-	private ArrayList<RequestDispatcher>	RDs;
+	// Ports
+	private	CVMOutboundPort 					cvmop;
+	
+	// RequestSource related components
+	private Map<String, RequestDispatcher>		RDs;
+	private Map<String, List<ApplicationVM>>	AVMs;
 	
 	//TODO delete RD avec unregisterVM
 	
 	public AdmissionController(){
 		super(1, 1);
-		this.RDs = new ArrayList<RequestDispatcher>();
+		this.RDs = new HashMap<String, RequestDispatcher>();
+		this.AVMs = new HashMap<>();
 	}
 	
 	@Override
@@ -43,6 +51,17 @@ public class AdmissionController
 		return RD_RequestSubmissionInboundPortURI;
 	}
 	
+	@Override
+	public void removeRequestSource(String RD_RequestSubmissionInboundPortUri) throws Exception {
+		RDs.get(RD_RequestSubmissionInboundPortUri).shutdown();
+		for (ApplicationVM vm :  AVMs.get(RD_RequestSubmissionInboundPortUri)) {
+			vm.shutdown();
+		}
+		
+		RDs.remove(RD_RequestSubmissionInboundPortUri);
+		AVMs.remove(RD_RequestSubmissionInboundPortUri);
+	}
+	
 	private void connectionWithCVM(String CVM_InboundPorURI) throws Exception{
 		
 		// Connections Admission Controller with CVM Component
@@ -59,7 +78,6 @@ public class AdmissionController
 				
 		// Request Dispatcher creation
 		RequestDispatcher rd = new RequestDispatcher(RD_URI, RG_RequestNotificationInboundPortURI);
-		this.RDs.add(rd);
 		
 		// Request Dispatcher debug
 		rd.toggleLogging();
@@ -75,6 +93,11 @@ public class AdmissionController
 		ApplicationVM vm1 = createApplicationVM("vm-" + numRD + "-1");
 		ApplicationVM vm2 = createApplicationVM("vm-" + numRD + "-2");
 		
+		ArrayList<ApplicationVM> newAVMs = new ArrayList<>();
+		newAVMs.add(vm0);
+		newAVMs.add(vm1);
+		newAVMs.add(vm2);
+		
 		// Register application VM in Request Dispatcher
 		rd.registerVM(
 				vm0.getAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
@@ -86,7 +109,11 @@ public class AdmissionController
 				vm2.getAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
 				vm2.getAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
 		
-		return rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN);
+		String result = rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN);
+		RDs.put(result, rd);
+		AVMs.put(result, newAVMs);
+		
+		return result;
 	}
 	
 	private ApplicationVM createApplicationVM(String VM_URI) throws Exception{

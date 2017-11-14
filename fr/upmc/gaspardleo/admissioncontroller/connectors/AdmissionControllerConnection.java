@@ -17,4 +17,9 @@ public class AdmissionControllerConnection
 				RG_RequestNotificationInboundPortURI,
 				CVM_InboundPorURI);
 	}
+
+	@Override
+	public void removeRequestSource(String RD_RequestSubmissionInboundPortUri) throws Exception {
+		((AdmissionControllerI)this.offering).removeRequestSource(RD_RequestSubmissionInboundPortUri);
+	}
 }
