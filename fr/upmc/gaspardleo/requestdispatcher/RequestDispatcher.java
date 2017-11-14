@@ -25,18 +25,14 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		REQUEST_SUBMISSION_IN, REQUEST_NOTIFICATION_OUT, INTROSECTION
 	}
 	
-	private String dispatcherUri;
-
-	private ArrayList<String> registeredVmsUri;
-	private ArrayList<RequestSubmissionOutboundPort> registeredVmsRsop;
-
-	private RequestSubmissionOutboundPort rsop;
-	private RequestSubmissionInboundPort rsip;
-
-	private RequestNotificationInboundPort rnip;
-	private RequestNotificationOutboundPort rnop;
-
-	private Integer vmCursor;
+	private String 										dispatcherUri;
+	private ArrayList<String> 							registeredVmsUri;
+	private ArrayList<RequestSubmissionOutboundPort> 	registeredVmsRsop;
+	private RequestSubmissionInboundPort 				rsip;
+	private RequestNotificationOutboundPort 			rnop;
+	private RequestSubmissionOutboundPort 				rsop;
+	private RequestNotificationInboundPort 				rnip;
+	private Integer 									vmCursor;
 
 	public RequestDispatcher(String dispatcherUri, String RG_RequestNotificationInboundPortURI) throws Exception {
 		super(1, 1);
@@ -53,32 +49,28 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.rsip.publishPort();
 
 		// Request submission outbound port connection.
-		this.rsop = new RequestSubmissionOutboundPort(this) ;
+        this.rsop = new RequestSubmissionOutboundPort(this) ;
 		this.addPort(this.rsop);
 		this.rsop.publishPort();
 		this.addOfferedInterface(RequestSubmissionHandlerI.class) ;
-
+		
 		// Request notification submission inbound port connection.
 		this.rnip = new RequestNotificationInboundPort(this);
 		this.addPort(this.rnip);
 		this.rnip.publishPort();
 
+		
 		// Request notification submission outbound port connection.
 		this.rnop = new RequestNotificationOutboundPort(this);
 		this.addPort(this.rnop);
 		this.rnop.publishPort();
 		this.addOfferedInterface(RequestNotificationI.class);
 		
-		// Connections Request Dispatcher with Request Generator		
-		RequestNotificationOutboundPort rnop = new RequestNotificationOutboundPort(this);
-		this.addPort(rnop);
-		rnop.publishPort();
-		rnop.doConnection(RG_RequestNotificationInboundPortURI, 
-			RequestNotificationConnector.class.getCanonicalName());
+		connectionWithRG(RG_RequestNotificationInboundPortURI);
 
 	}
 
-	public void registerVM(String vmUri, String requestSubmissionInboundPort) throws Exception {
+	public void registerVM(String vmUri, String VM_requestSubmissionInboundPort) throws Exception {
 	
 		if (this.registeredVmsUri.contains(vmUri)) 
 			return;
@@ -87,18 +79,19 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.addPort(rsop);
 		rsop.publishPort();
 
-		rsop.doConnection(requestSubmissionInboundPort, RequestSubmissionConnector.class.getCanonicalName());
+		rsop.doConnection(
+				VM_requestSubmissionInboundPort, 
+				RequestSubmissionConnector.class.getCanonicalName());
 
-		registeredVmsRsop.add(rsop);
-		registeredVmsUri.add(registeredVmsUri.size(), vmUri);
+		this.registeredVmsRsop.add(rsop);
+		this.registeredVmsUri.add(this.registeredVmsUri.size(), vmUri);
 		
 		this.logMessage(this.dispatcherUri + " : " + vmUri + " has been added.");
 	}
 
 
 	public void unregisterVM(String vmUri) throws Exception {
-		// TODO
-		registeredVmsRsop.remove(vmUri);
+		this.registeredVmsRsop.remove(vmUri);
 	}
 
 	@Override
@@ -106,10 +99,12 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		
 		this.logMessage(this.dispatcherUri + " : incoming request submission");
 		
-		if (registeredVmsRsop.size() == 0) {
+		if (this.registeredVmsRsop.size() == 0) {
 			this.logMessage(this.dispatcherUri + " : no registered vm.");
+			
 		} else {
-			RequestSubmissionOutboundPort rsop = registeredVmsRsop.get(vmCursor%registeredVmsRsop.size()); 
+			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(
+					vmCursor%this.registeredVmsRsop.size()); 
 
 			if (!rsop.connected()) {
 				throw new Exception(this.dispatcherUri + " can't conect to vm.");
@@ -127,12 +122,12 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		
 		this.logMessage(this.dispatcherUri + " : incoming request submission and notification.");
 
-		if (registeredVmsRsop.size() == 0) {
+		if (this.registeredVmsRsop.size() == 0) {
 			this.logMessage(this.dispatcherUri + " : no registered vm.");
 		} else {
-			vmCursor = (vmCursor+1)%registeredVmsRsop.size();
-			RequestSubmissionOutboundPort rsop = registeredVmsRsop.get(vmCursor); 
-			this.logMessage(this.dispatcherUri + " is using " + registeredVmsUri.get(vmCursor));
+			vmCursor = (vmCursor+1)%this.registeredVmsRsop.size();
+			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(vmCursor); 
+			this.logMessage(this.dispatcherUri + " is using " + this.registeredVmsUri.get(vmCursor));
 
 			if (!rsop.connected()) {
 				throw new Exception(this.dispatcherUri + " can't conect to vm.");
@@ -162,8 +157,13 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	}
 
 	@Override
-	public void connectionWithRG(String rgUri) throws Exception {
-		// TODO Auto-generated method stub
+	public void connectionWithRG(String RG_RequestNotificationInboundPortURI) throws Exception {
 		
+		// Connections Request Dispatcher with Request Generator		
+		RequestNotificationOutboundPort rnop = new RequestNotificationOutboundPort(this);
+		this.addPort(rnop);
+		rnop.publishPort();
+		rnop.doConnection(RG_RequestNotificationInboundPortURI, 
+			RequestNotificationConnector.class.getCanonicalName());
 	}
 }
