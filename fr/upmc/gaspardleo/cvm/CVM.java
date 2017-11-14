@@ -12,38 +12,28 @@ import fr.upmc.components.ComponentI;
 import fr.upmc.components.connectors.DataConnector;
 import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.datacenter.connectors.ControlledDataConnector;
-import fr.upmc.datacenter.hardware.computers.Computer;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
 import fr.upmc.datacenter.hardware.computers.ports.ComputerServicesOutboundPort;
 import fr.upmc.datacenter.hardware.processors.Processor;
-import fr.upmc.datacenter.hardware.tests.ComputerMonitor;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.gaspardleo.computer.Computer;
+import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
+import fr.upmc.gaspardleo.computer.ComputerMonitor;
+import fr.upmc.gaspardleo.computer.ComputerMonitor.ComputerMonitorPortTypes;
 import fr.upmc.gaspardleo.cvm.interfaces.CVMI;
 
 public class CVM extends AbstractCVM implements CVMI {
-	private final static int NB_CPU = 2;
-	private final static int NB_CORES = 2;
 	
-	//TODO
-	// Computer ports
-	private static final String ComputerServicesInboundPortURI = "csip";
-	private static final String ComputerServicesOutboundPortURI = "csop";
-	private static final String ComputerStaticStateDataInboundPortURI = "cssdip";
-	private static final String ComputerStaticStateDataOutboundPortURI = "cssdop";
-	private static final String ComputerDynamicStateDataInboundPortURI = "cdsdip";
-	private static final String ComputerDynamicStateDataOutboundPortURI = "cdsdop";
-	
-	// Components
-	private ComputerMonitor cm;
-
-	// Ports
-	private ComputerServicesOutboundPort csPort;
-	
-	private AllocatedCore[] cores;
-	private int currentCore;
-	
-	private List<ApplicationVMManagementOutboundPort> avmPorts;
+	private final static int NB_CPU 				= 2;
+	private final static int NB_CORES 				= 2;
+	private final static int CPU_FREQUENCY 			= 3000;
+	private final static int CPU_MAX_FREQUENCY_GAP 	= 1500;
+		
+	private ComputerServicesOutboundPort 				csPort;	// Ports
+	private AllocatedCore[] 							cores;
+	private int 										currentCore;
+	private List<ApplicationVMManagementOutboundPort> 	avmPorts;
 
 	public CVM() throws Exception {
 		super();
@@ -57,75 +47,95 @@ public class CVM extends AbstractCVM implements CVMI {
 		AbstractComponent.configureLogging("", "", 0, '|');
 		Processor.DEBUG = true;
 		
-		// Computer creation
-		String computerURI = "computer0";
-		int numberOfProcessors = NB_CPU;
-		int numberOfCores = NB_CORES;
-		Set<Integer> admissibleFrequencies = new HashSet<Integer>() ;
-		admissibleFrequencies.add(1500);	// Cores can run at 1,5 GHz
-		admissibleFrequencies.add(3000);	// and at 3 GHz
-		Map<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
-		processingPower.put(1500, 1500000);	// 1,5 GHz executes 1,5 Mips
-		processingPower.put(3000, 3000000);	// 3 GHz executes 3 Mips
+		Computer c = createComputer();
+		Map<ComputerPortsTypes, String> computerPorts = createComputerServicesOutboundPort(c);
 		
-		//TODO nouvelle classe extends computer avec enum et getComputerURI
-		//TODO Alex
-		Computer c = new Computer(
-				computerURI,
-				admissibleFrequencies,
-				processingPower,  
-				1500,		// Test scenario 1, frequency = 1,5 GHz
-				// 3000,	// Test scenario 2, frequency = 3 GHz
-				1500,		// max frequency gap within a processor
-				numberOfProcessors,
-				numberOfCores,
-				ComputerServicesInboundPortURI,
-				ComputerStaticStateDataInboundPortURI,
-				ComputerDynamicStateDataInboundPortURI);
-		this.addDeployedComponent(c);
-
-		//TODO pour les ports ne plus utiliser les uri
-		
-		this.csPort = new ComputerServicesOutboundPort(
-				ComputerServicesOutboundPortURI,
-				new AbstractComponent(0, 0) {}) ;
-		this.csPort.publishPort();
-		this.csPort.doConnection(
-				ComputerServicesInboundPortURI,
-				ComputerServicesConnector.class.getCanonicalName());
-
-		
-	
-		this.cm = new ComputerMonitor(computerURI,
-				true,
-				ComputerStaticStateDataOutboundPortURI,
-				ComputerDynamicStateDataOutboundPortURI) ;
-		this.addDeployedComponent(this.cm) ;
-
-		this.cm.doPortConnection(
-				ComputerStaticStateDataOutboundPortURI,
-				ComputerStaticStateDataInboundPortURI,
-				DataConnector.class.getCanonicalName()) ;
-
-		this.cm.doPortConnection(
-				ComputerDynamicStateDataOutboundPortURI,
-				ComputerDynamicStateDataInboundPortURI,
-				ControlledDataConnector.class.getCanonicalName()) ;
+		ComputerMonitor cm = createComputerMonitor(c);
+		connexionComputerMonitorWithComputer(cm,computerPorts);
 		
 		super.deploy();
 	}
+	
+	private Computer createComputer() throws Exception{
+		
+		// Computer creation
+		Set<Integer> admissibleFrequencies = new HashSet<Integer>() ;
+		admissibleFrequencies.add(1500);	// Cores can run at 1,5 GHz
+		admissibleFrequencies.add(3000);	// and at 3 GHz
+		
+		Map<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
+		processingPower.put(1500, 1500000);	// 1,5 GHz executes 1,5 Mips
+		processingPower.put(3000, 3000000);	// 3 GHz executes 3 Mips
+				
+		Computer c = new Computer(
+				"computer0",
+				admissibleFrequencies,
+				processingPower,  
+				CPU_FREQUENCY,			// Test scenario 1, frequency = 1,5 GHz
+				CPU_MAX_FREQUENCY_GAP,	// max frequency gap within a processor
+				NB_CPU,
+				NB_CORES);
+		
+		this.addDeployedComponent(c);
+		
+		return c;
+	}
+	
+	private Map<ComputerPortsTypes, String> createComputerServicesOutboundPort(Computer c) 
+			throws Exception{
+		
+		Map<ComputerPortsTypes, String> computerPorts = c.getComputerPortsURI();
+		
+		this.csPort = new ComputerServicesOutboundPort(
+				new AbstractComponent(0, 0) {}) ;
+
+		this.csPort.publishPort();
+		this.csPort.doConnection(
+				computerPorts.get(ComputerPortsTypes.SERVICE_IN),
+				ComputerServicesConnector.class.getCanonicalName());
+		
+		return computerPorts;
+	}
+	
+	private ComputerMonitor createComputerMonitor(Computer c) throws Exception{
+		
+		ComputerMonitor cm = new ComputerMonitor(
+				c.getComputerPortsURI().get(ComputerPortsTypes.INTROSEPTION),true);
+		
+		this.addDeployedComponent(cm);
+		
+		return cm;
+	}
+	
+	private void connexionComputerMonitorWithComputer(
+			ComputerMonitor cm, Map<ComputerPortsTypes, String> computerPorts) throws Exception{
+		
+		Map<ComputerMonitorPortTypes, String> computerMonitorPorts = cm.getPortTypes();
+		
+		cm.doPortConnection(
+				computerMonitorPorts.get(ComputerMonitorPortTypes.STATIC_STATE_OUT),
+				computerPorts.get(ComputerPortsTypes.STATIC_STATE_IN),
+				DataConnector.class.getCanonicalName()) ;
+
+		cm.doPortConnection(
+				computerMonitorPorts.get(ComputerMonitorPortTypes.DYNAMIC_STATE_OUT),
+				computerPorts.get(ComputerPortsTypes.DYNAMIC_STATE_IN),
+				ControlledDataConnector.class.getCanonicalName()) ;
+	}
 
 	public void addAVMPort(ApplicationVMManagementOutboundPort avmPort) {
+		
 		this.avmPorts.add(avmPort);
 	}
 	
 	@Override
 	public void start() throws Exception {
+		
 		super.start();
 		
-		this.cores = csPort.allocateCores(NB_CPU * NB_CORES);
+		this.cores = this.csPort.allocateCores(NB_CPU * NB_CORES);
 		
-		avmPorts.forEach(avmPort -> {
+		this.avmPorts.forEach(avmPort -> {
 			try {
 				avmPort.allocateCores(getAllocatedCore());
 			} catch (Exception e) {
@@ -136,22 +146,24 @@ public class CVM extends AbstractCVM implements CVMI {
 	
 	@Override
 	public void deployComponent(ComponentI cmp) throws Exception {
+		
 		this.addDeployedComponent(cmp);
 	}
 
 	private AllocatedCore[] getAllocatedCore() {
+		
 		AllocatedCore[] result = new AllocatedCore[1];
 		
-		result[0] = cores[currentCore];
+		result[0] = this.cores[this.currentCore];
 		
-		currentCore = (currentCore + 1) % cores.length;
+		this.currentCore = (this.currentCore + 1) % this.cores.length;
 		
 		return result;
 	}
 	
 	@Override
 	public void allocateCores(ApplicationVMManagementOutboundPort avmPort) throws Exception {
+		
 		avmPort.allocateCores(getAllocatedCore()) ;
 	}
-	
 }

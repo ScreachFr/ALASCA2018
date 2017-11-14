@@ -37,11 +37,10 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	public RequestDispatcher(String dispatcherUri, String RG_RequestNotificationInboundPortURI) throws Exception {
 		super(1, 1);
 
-		this.dispatcherUri = dispatcherUri;
-		this.registeredVmsUri = new ArrayList<>();
-		this.registeredVmsRsop = new ArrayList<>();
-
-		this.vmCursor = 0;
+		this.dispatcherUri 		= dispatcherUri;
+		this.registeredVmsUri 	= new ArrayList<>();
+		this.registeredVmsRsop 	= new ArrayList<>();
+		this.vmCursor 			= 0;
 
 		// Request submission inbound port connection.
 		this.rsip = new RequestSubmissionInboundPort(this);
@@ -141,7 +140,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		this.logMessage(this.dispatcherUri + " : incoming request termination notification.");
 		// TODO traitement de la notification de terminaison d'une requête
-		// TODO Mimer un retour client
+		//      Mimer un retour client
 	}
 	
 	public Map<RDPortTypes, String>	getRDPortsURI() throws Exception {

@@ -11,6 +11,7 @@ import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagemen
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.cvm.CVM;
 import fr.upmc.gaspardleo.cvm.CVMComponent;
+import fr.upmc.gaspardleo.cvm.CVMComponent.CVMPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
@@ -18,7 +19,6 @@ public class Test {
 	
 	private final static int 	NB_DATASOURCE = 10;
 	
-	private static String 		CVM_IPURI = AbstractPort.generatePortURI();
 	private CVMComponent 		cvmc;
 	private CVM 				cvm;
 	private AdmissionController	ac;
@@ -37,7 +37,7 @@ public class Test {
 			this.cvm 	= new CVM();
 
 			// CVM Component creation
-			this.cvmc 	= new CVMComponent(cvm, CVM_IPURI);
+			this.cvmc 	= new CVMComponent(cvm);
 
 			// Admission Controller creation
 			this.ac = new AdmissionController();
@@ -62,7 +62,7 @@ public class Test {
 		String rd_rsip = this.ac.addRequestSource(
 			"rd-"+i,
 			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN),
-			CVM_IPURI);
+			this.cvmc.getCVMPortsURI().get(CVMPortTypes.CVM_IN));
 		
 		// Port connections
 		rg.doPortConnection(
