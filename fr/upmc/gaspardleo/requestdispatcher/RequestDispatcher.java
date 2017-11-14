@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
+import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
@@ -21,7 +22,7 @@ extends AbstractComponent
 implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHandlerI {
 
 	public static enum	RDPortTypes {
-		REQUEST_SUBMISSION_IN, REQUEST_NOTIFICATION_OUT
+		REQUEST_SUBMISSION_IN, REQUEST_NOTIFICATION_OUT, INTROSECTION
 	}
 	
 	private String dispatcherUri;
@@ -37,7 +38,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	private Integer vmCursor;
 
-	public RequestDispatcher(String dispatcherUri) throws Exception {
+	public RequestDispatcher(String dispatcherUri, String RG_RequestNotificationInboundPortURI) throws Exception {
 		super(1, 1);
 
 		this.dispatcherUri = dispatcherUri;
@@ -67,6 +68,13 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.addPort(this.rnop);
 		this.rnop.publishPort();
 		this.addOfferedInterface(RequestNotificationI.class);
+		
+		// Connections Request Dispatcher with Request Generator		
+		RequestNotificationOutboundPort rnop = new RequestNotificationOutboundPort(this);
+		this.addPort(rnop);
+		rnop.publishPort();
+		rnop.doConnection(RG_RequestNotificationInboundPortURI, 
+			RequestNotificationConnector.class.getCanonicalName());
 
 	}
 
@@ -148,6 +156,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 				this.rsip.getPortURI()) ;
 		ret.put(RDPortTypes.REQUEST_NOTIFICATION_OUT,
 				this.rnop.getPortURI()) ;
+		ret.put(RDPortTypes.INTROSECTION,
+				this.dispatcherUri);
 		return ret ;
 	}
 

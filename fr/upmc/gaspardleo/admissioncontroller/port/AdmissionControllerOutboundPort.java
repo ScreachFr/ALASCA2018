@@ -14,11 +14,13 @@ public class AdmissionControllerOutboundPort
 
 	@Override
 	public String addRequestSource(
-					String RG_RequestNotificationInboundPortURI,
-					String CVM_InboundPorURI) throws Exception { 
+			String RD_URI,
+			String RG_RequestNotificationInboundPortURI,
+			String CVM_InboundPorURI) throws Exception { 
 		
 		return ((AdmissionControllerI)this.connector).addRequestSource(
-						RG_RequestNotificationInboundPortURI,
-						CVM_InboundPorURI);	
+				RD_URI,
+				RG_RequestNotificationInboundPortURI,
+				CVM_InboundPorURI);	
 	}
 }

@@ -85,6 +85,7 @@ public class Test {
 
 		// Dynamic ressources creation
 		String rd_rsip = this.ac.addRequestSource(
+				"rd-"+i,
 				rg_rnip,
 				CVM_IPURI);
 

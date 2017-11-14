@@ -3,14 +3,18 @@ package fr.upmc.gaspardleo.applicationvm;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.upmc.components.ports.AbstractPort;
+
 public class ApplicationVM extends fr.upmc.datacenter.software.applicationvm.ApplicationVM{
 
-	//TODO Constructeur sans URI et utilisation de AbstractURI directement dans le code du constructeur
-	
-	public ApplicationVM(String vmURI, String applicationVMManagementInboundPortURI,
-			String requestSubmissionInboundPortURI, String requestNotificationOutboundPortURI) throws Exception {
-		super(vmURI, applicationVMManagementInboundPortURI, requestSubmissionInboundPortURI,
-				requestNotificationOutboundPortURI);
+	private String vmURI;
+	public ApplicationVM(String vmURI) throws Exception {
+		super(
+			vmURI, 
+			AbstractPort.generatePortURI(), 
+			AbstractPort.generatePortURI(),
+			AbstractPort.generatePortURI());
+		this.vmURI = vmURI;
 	}
 	
 	public Map<ApplicationVMPortTypes, String>	getAVMPortsURI() throws Exception {
@@ -20,6 +24,8 @@ public class ApplicationVM extends fr.upmc.datacenter.software.applicationvm.App
 						this.requestSubmissionInboundPort.getPortURI());
 		ret.put(ApplicationVMPortTypes.MANAGEMENT,
 						this.applicationVMManagementInboundPort.getPortURI());
+		ret.put(ApplicationVMPortTypes.INTROSPECTION,
+				this.vmURI);
 		return ret;
 	}
 
