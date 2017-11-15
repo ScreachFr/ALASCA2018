@@ -22,19 +22,20 @@ public class AdmissionController
 	
 	//TODO delete RD avec unregisterVM
 	
-	public AdmissionController(){
+	public AdmissionController(String CVM_InboundPorURI) throws Exception{
 		super(1, 1);
 		this.RDs = new ArrayList<RequestDispatcher>();
+		
+		//TODO via connecteur ?
+		
+		// Connect Admission Controller with CVM Component
+		connectionWithCVM(CVM_InboundPorURI);
 	}
 	
 	@Override
 	public String addRequestSource(
 			String RD_URI,
-			String RG_RequestNotificationInboundPortURI,
-			String CVM_InboundPorURI) throws Exception {
-								
-		// Connect Admission Controller with CVM Component
-		connectionWithCVM(CVM_InboundPorURI);
+			String RG_RequestNotificationInboundPortURI) throws Exception {
 		
 		// Request Dispatcher creation	
 		String RD_RequestSubmissionInboundPortURI = createRequestDispatcher(

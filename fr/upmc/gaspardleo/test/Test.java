@@ -40,7 +40,8 @@ public class Test {
 			this.cvmc 	= new CVMComponent(cvm);
 
 			// Admission Controller creation
-			this.ac = new AdmissionController();
+			this.ac = new AdmissionController(
+				this.cvmc.getCVMPortsURI().get(CVMPortTypes.CVM_IN));
 			
 			// Simply adds some request generators to the current admission controller.
 			for (int i = 0; i < NB_DATASOURCE; i++) {
@@ -61,8 +62,7 @@ public class Test {
 		// Dynamic ressources creation
 		String rd_rsip = this.ac.addRequestSource(
 			"rd-"+i,
-			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN),
-			this.cvmc.getCVMPortsURI().get(CVMPortTypes.CVM_IN));
+			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN));
 		
 		// Port connections
 		rg.doPortConnection(

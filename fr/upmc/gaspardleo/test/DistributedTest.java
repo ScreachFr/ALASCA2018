@@ -1,21 +1,36 @@
-package fr.upmc.gaspardleo.distributedcvm;
+package fr.upmc.gaspardleo.test;
 
 import fr.upmc.components.cvm.AbstractDistributedCVM;
+import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
+import fr.upmc.gaspardleo.cvm.CVM;
+import fr.upmc.gaspardleo.cvm.CVMComponent;
+import fr.upmc.gaspardleo.cvm.CVMComponent.CVMPortTypes;
 
-public class DistributedCVM 
+public class DistributedTest 
 	extends	AbstractDistributedCVM{
 	
 	private static final String Datacenter 			= "datacenter";
 	private static final String Datacenterclient 	= "datacenterclient";
 	
-	public DistributedCVM(String[] args) throws Exception {
+	public DistributedTest(String[] args) throws Exception {
 		super(args);
 	}
+	
+	private CVMComponent 		cvmc;
+	private CVM 				cvm;
+	private AdmissionController	ac;
 	
 	@Override
 	public void instantiateAndPublish() throws Exception {
 		
 		if(thisJVMURI.equals(Datacenter)){
+			
+			this.cvm = new CVM();
+			this.cvmc = new CVMComponent(cvm);
+			this.cvm.deploy();
+			
+			this.ac = new AdmissionController(
+					this.cvmc.getCVMPortsURI().get(CVMPortTypes.CVM_IN));
 			
 		} else {
 			if (thisJVMURI.equals(Datacenterclient)){
