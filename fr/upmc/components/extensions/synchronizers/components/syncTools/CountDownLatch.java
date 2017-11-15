@@ -46,6 +46,7 @@ extends AbstractComponent
 	 * @param isDistributed
 	 * @throws Exception
 	 */
+	@SuppressWarnings("deprecation")
 	public		CountDownLatch(
 		String coutdownLatchURI,
 		Integer nbComponentsToSync,

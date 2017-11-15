@@ -15,6 +15,7 @@ public class Semaphore extends AbstractComponent {
 	protected String 		barrierURI ;
 	protected boolean 		isDistributed ;
 
+	@SuppressWarnings("deprecation")
 	public Semaphore(String barrierURI,
 			Integer permits,
 			Boolean isDistributed

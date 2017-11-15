@@ -38,6 +38,7 @@ extends AbstractComponent
 	 * @param isDistributed
 	 * @throws Exception
 	 */
+	@SuppressWarnings("deprecation")
 	public		ArrayBlockingQueue(
 		String arrayBlockingQueueURI,
 		Integer arraySize,

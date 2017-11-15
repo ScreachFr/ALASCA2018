@@ -114,6 +114,7 @@ public class CyclicBarrier extends AbstractComponent {
 	 * @param isDistributed
 	 * @throws Exception
 	 */
+	@SuppressWarnings("deprecation")
 	public CyclicBarrier(
 		String barrierURI,
 		Integer nbComponentsToSync,
