@@ -1,0 +1,62 @@
+<project name="ALASCA2018" default="stubs.compilation">
+    <target name="stubs.compilation">
+        <echo message="Recompiling stubs..."/>
+                
+        <echo message="Recompiling fr.upmc.datacenter.hardware.computers.ports.ComputerServicesInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.datacenter.hardware.computers.ports.ComputerServicesInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="Recompiling fr.upmc.datacenter.hardware.computers.ports.ComputerStaticStateDataInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.datacenter.hardware.computers.ports.ComputerStaticStateDataInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="Recompiling fr.upmc.components.ports.AbstractDataInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.components.ports.AbstractDataInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="Recompiling fr.upmc.datacenter.ports.AbstractControlledDataInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.datacenter.ports.AbstractControlledDataInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="Recompiling fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMDynamicStateDataInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMDynamicStateDataInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="Recompiling fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMIntrospectionInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMIntrospectionInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="Recompiling fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="Recompiling fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMStaticStateDataInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMStaticStateDataInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="Recompiling fr.upmc.datacenter.software.ports.RequestNotificationInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.datacenter.software.ports.RequestNotificationInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="Recompiling fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="Recompiling fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementInboundPort" />
+        <rmic classpath="${classpath}:../ALASCA2018/bin"
+            classname="fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementInboundPort"
+            base="../ALASCA2018"/>
+            
+        <echo message="stubs recompiled!"/>
+    </target>
+</project>

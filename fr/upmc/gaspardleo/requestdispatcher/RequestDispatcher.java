@@ -155,6 +155,9 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		return ret ;
 	}
 
+	//TODO faire le connecteur et passer par lui pour l'appel de cette fonction 
+	//     et non pas dans le contstructeur du RD
+	
 	@Override
 	public void connectionWithRG(String RG_RequestNotificationInboundPortURI) throws Exception {
 		
