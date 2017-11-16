@@ -1,4 +1,4 @@
 #!/bin/bash
 java -ea -Xms2m -cp 'jars/*' -Djava.security.manager \
-     -Djava.security.policy=dcvm.policy \
+     -Djava.security.policy=policies/dcvm.policy \
      fr.upmc.components.cvm.utils.DCVMCyclicBarrier config.xml

@@ -4,5 +4,5 @@ if [ -z "$1" ]; then
   exit
  fi
 java -ea -cp 'jars/*' -Djava.security.manager \
-     -Djava.security.policy=dcvm.policy \
-     fr.upmc.components.testdistributed.DCVM $1 config.xml
+     -Djava.security.policy=policies/dcvm.policy \
+     fr.upmc.gaspardleo.test.DistributedTest $1 config.xml

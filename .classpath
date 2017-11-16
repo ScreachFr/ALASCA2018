@@ -5,7 +5,7 @@
 	<classpathentry kind="lib" path="jars/javassist-3.9.0.GA.jar"/>
 	<classpathentry kind="lib" path="jars/jcip-annotations.jar"/>
 	<classpathentry kind="lib" path="jars/jing-20171006VNU.jar"/>
-	<classpathentry kind="lib" path="jars/BasicComponentModel-27102017.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-8-openjdk-amd64"/>
+	<classpathentry kind="lib" path="jars/BasicComponentModel-27102017.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
