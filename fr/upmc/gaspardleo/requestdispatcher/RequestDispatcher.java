@@ -6,7 +6,6 @@ import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.exceptions.ComponentShutdownException;
-import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
@@ -23,7 +22,7 @@ extends AbstractComponent
 implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHandlerI {
 
 	public static enum	RDPortTypes {
-		REQUEST_SUBMISSION_IN, REQUEST_NOTIFICATION_OUT, INTROSECTION
+		REQUEST_SUBMISSION_IN, REQUEST_NOTIFICATION_OUT, INTROSPECTION
 	}
 	
 	private String 										dispatcherUri;
@@ -160,22 +159,9 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 				this.rsip.getPortURI()) ;
 		ret.put(RDPortTypes.REQUEST_NOTIFICATION_OUT,
 				this.rnop.getPortURI()) ;
-		ret.put(RDPortTypes.INTROSECTION,
+		ret.put(RDPortTypes.INTROSPECTION,
 				this.dispatcherUri);
 		return ret ;
-	}
-
-	//TODO faire le connecteur et passer par lui pour l'appel de cette fonction 
-	//     et non pas dans le contstructeur du RD
-	
-	@Override
-	public void connectionWithRG(String RG_RequestNotificationInboundPortURI) throws Exception {
-		// Connections Request Dispatcher with Request Generator		
-//		RequestNotificationOutboundPort rnop = new RequestNotificationOutboundPort(this);
-//		this.addPort(rnop);
-//		rnop.publishPort();
-//		rnop.doConnection(RG_RequestNotificationInboundPortURI, 
-//			RequestNotificationConnector.class.getCanonicalName());
 	}
 	
 	@Override

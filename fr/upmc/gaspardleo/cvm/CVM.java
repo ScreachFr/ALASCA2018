@@ -35,10 +35,12 @@ public class CVM extends AbstractCVM implements CVMI {
 	private int 										currentCore;
 	private List<ApplicationVMManagementOutboundPort> 	avmPorts;
 	
-	public CVM() throws Exception {
+	public CVM() throws Exception {		
 		super();
+				
 		this.currentCore = 0;
 		this.avmPorts = new ArrayList<>();
+		
 	}
 
 	@Override

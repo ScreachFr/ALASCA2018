@@ -41,17 +41,4 @@ public class RequestDispatcherInboundPort
 						return requestDispatcher;
 					}});
 	}
-
-	@Override
-	public void connectionWithRG(String rgUri) throws Exception {
-		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
-		requestDispatcher.handleRequestAsync(
-				new ComponentI.ComponentService<RequestDispatcher>(){
-					@Override
-					public RequestDispatcher call() throws Exception {
-						requestDispatcher.connectionWithRG(rgUri);
-						return requestDispatcher;
-					}});
-	}
-
 }

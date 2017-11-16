@@ -13,8 +13,6 @@ import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOu
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.cvm.connectors.CVMConnector;
-import fr.upmc.gaspardleo.cvm.ports.CVMOutboundPort;
 
 public class AdmissionController 
 		extends AbstractComponent
@@ -24,69 +22,29 @@ public class AdmissionController
 		INTROSECTION
 	}
 	
-	// Ports
-	private	CVMOutboundPort 					cvmop;
-	
 	// RequestSource related components
-	private Map<String, RequestDispatcher>		RDs;
-	private Map<String, List<ApplicationVM>>	AVMs;
-
-	private String								uri;
+	private Map<String, RequestDispatcher>					RDs;
+	private Map<String, List<ApplicationVM>>				AVMs;
+	private ArrayList<ApplicationVMManagementOutboundPort> 	avmPorts;
+	private String											uri;
 	
 	public AdmissionController(String CVM_InboundPorURI) throws Exception{
 		
 		super(1, 1);
 
-		this.RDs = new HashMap<String, RequestDispatcher>();
-		this.AVMs = new HashMap<>();
+		this.RDs 		= new HashMap<String, RequestDispatcher>();
+		this.AVMs 		= new HashMap<>();
+		this.avmPorts 	= new ArrayList<ApplicationVMManagementOutboundPort>();
+		
 		this.toggleLogging();
 		this.toggleTracing();
-		
-		//TODO via connecteur ?
-		
-		// Connect Admission Controller with CVM Component
-		connectionWithCVM(CVM_InboundPorURI);
-		
 	}
 	
 	@Override
-	public String addRequestSource(
+	public RequestDispatcher addRequestDispatcher(
 			String RD_URI,
 			String RG_RequestNotificationInboundPortURI) throws Exception {
 		
-		// Request Dispatcher creation	
-		String RD_RequestSubmissionInboundPortURI = createRequestDispatcher(
-				RD_URI, RG_RequestNotificationInboundPortURI);
-
-		return RD_RequestSubmissionInboundPortURI;
-	}
-	
-	//TODO delete RD avec unregisterVM
-	@Override
-	public void removeRequestSource(String RD_RequestSubmissionInboundPortUri) throws Exception {
-		RDs.get(RD_RequestSubmissionInboundPortUri).shutdown();
-		for (ApplicationVM vm :  AVMs.get(RD_RequestSubmissionInboundPortUri)) {
-			vm.shutdown();
-		}
-		
-		RDs.remove(RD_RequestSubmissionInboundPortUri);
-		AVMs.remove(RD_RequestSubmissionInboundPortUri);
-	}
-	
-	private void connectionWithCVM(String CVM_InboundPorURI) throws Exception{
-		
-		// Connections Admission Controller with CVM Component
-		this.cvmop = new CVMOutboundPort(this);
-		this.addPort(this.cvmop);
-		this.cvmop.publishPort();
-		this.cvmop.doConnection(
-				CVM_InboundPorURI,
-				CVMConnector.class.getCanonicalName());
-	}
-	
-	private String createRequestDispatcher(
-			String RD_URI, String RG_RequestNotificationInboundPortURI) throws Exception{
-				
 		// Request Dispatcher creation
 		RequestDispatcher rd = new RequestDispatcher(RD_URI, RG_RequestNotificationInboundPortURI);
 		
@@ -94,10 +52,17 @@ public class AdmissionController
 		rd.toggleLogging();
 		rd.toggleTracing();
 		
-		// Deploy Request Dispatcher
-		this.cvmop.deployComponent(rd);
+		String result = rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN);
 		
-		String numRD = RD_URI.split("-")[1];
+		RDs.put(result, rd);
+
+		return rd;
+	}
+	
+	@Override
+	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd) throws Exception {
+		
+		String numRD = rd.getRDPortsURI().get(RDPortTypes.INTROSPECTION).split("-")[1];
 		
 		// Vm applications creation
 		ApplicationVM vm0 = createApplicationVM("vm-" + numRD + "-0");
@@ -119,12 +84,22 @@ public class AdmissionController
 		rd.registerVM(
 				vm2.getAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
 				vm2.getAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
+
+		AVMs.put(rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN), newAVMs);
 		
-		String result = rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN);
-		RDs.put(result, rd);
-		AVMs.put(result, newAVMs);
+		return newAVMs;
+	}
+	
+	//TODO delete RD avec unregisterVM
+	@Override
+	public void removeRequestSource(String RD_RequestSubmissionInboundPortUri) throws Exception {
+		RDs.get(RD_RequestSubmissionInboundPortUri).shutdown();
+		for (ApplicationVM vm :  AVMs.get(RD_RequestSubmissionInboundPortUri)) {
+			vm.shutdown();
+		}
 		
-		return result;
+		RDs.remove(RD_RequestSubmissionInboundPortUri);
+		AVMs.remove(RD_RequestSubmissionInboundPortUri);
 	}
 	
 	private ApplicationVM createApplicationVM(String VM_URI) throws Exception{
@@ -135,9 +110,6 @@ public class AdmissionController
 		// VM debug
 		vm.toggleTracing();
 		vm.toggleLogging();
-		
-		// Deploy VM
-		this.cvmop.deployComponent(vm);
 				
 		// Create a mock up port to manage the AVM component (allocate cores).
 		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(
@@ -149,8 +121,7 @@ public class AdmissionController
 				ApplicationVMManagementConnector.class.getCanonicalName());
 		
 		// Cores allocation
-		this.cvmop.addAVMPort(avmPort);
-				
+		this.avmPorts.add(avmPort);
 		return vm;
 	}
 	
@@ -160,5 +131,11 @@ public class AdmissionController
 		ret.put(ACPortTypes.INTROSECTION,
 				this.uri);
 		return ret ;
+	}
+
+	@Override
+	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() {
+
+		return this.avmPorts;
 	}
 }

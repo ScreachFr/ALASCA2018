@@ -16,10 +16,4 @@ public class RequestDispatherConnection
 	public void unregisterVM(String vmUri) throws Exception {
 		((RequestDispatcherI)this.offering).unregisterVM(vmUri);
 	}
-
-	@Override
-	public void connectionWithRG(String rgUri) throws Exception {
-		((RequestDispatcherI)this.offering).connectionWithRG(rgUri);
-	}
-
 }

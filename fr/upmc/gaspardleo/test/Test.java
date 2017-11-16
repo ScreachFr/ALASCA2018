@@ -9,9 +9,12 @@ import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
+import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.cvm.CVM;
 import fr.upmc.gaspardleo.cvm.CVMComponent;
 import fr.upmc.gaspardleo.cvm.CVMComponent.CVMPortTypes;
+import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
+import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
@@ -43,6 +46,14 @@ public class Test {
 			this.ac = new AdmissionController(
 				this.cvmc.getCVMPortsURI().get(CVMPortTypes.INTROSPECTION));
 			
+//			AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(
+//					this.ac.getACPortsURI().get(ACPortTypes.INTROSECTION),
+//					new AbstractComponent(0, 0) {});
+//			acop.publishPort();
+//			acop.doConnection(
+//					this.cvmc.getCVMPortsURI().get(CVMPortTypes.INTROSPECTION),
+//					AdmissionControllerConnector.class.getCanonicalName());
+			
 			// Simply adds some request generators to the current admission controller.
 			for (int i = 0; i < NB_DATASOURCE; i++) {
 				this.addDataSource(i);
@@ -60,14 +71,22 @@ public class Test {
 		RequestGenerator rg  = createRequestGenerator("rg-"+i);
 
 		// Dynamic ressources creation
-		String rd_rsip = this.ac.addRequestSource(
+		RequestDispatcher rd = this.ac.addRequestDispatcher(
 			"rd-"+i,
 			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN));
+		
+		this.cvm.deployComponent(rd);
+		
+		ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd);
+		
+		for (int j = 0; j < vms.size(); j++){
+			this.cvm.deployComponent(vms.get(j));
+		}
 		
 		// Port connections
 		rg.doPortConnection(
 			rg.getRGPortsURI().get(RGPortTypes.REQUEST_SUBMISSION_OUT),
-			rd_rsip,
+			rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN),
 			RequestSubmissionConnector.class.getCanonicalName());
 	}
 	
