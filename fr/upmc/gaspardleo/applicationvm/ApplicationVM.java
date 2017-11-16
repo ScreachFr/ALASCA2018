@@ -17,6 +17,7 @@ public class ApplicationVM extends fr.upmc.datacenter.software.applicationvm.App
 		this.vmURI = vmURI;
 	}
 	
+	@Override
 	public Map<ApplicationVMPortTypes, String>	getAVMPortsURI() throws Exception {
 		HashMap<ApplicationVMPortTypes, String> ret =
 						new HashMap<ApplicationVMPortTypes, String>();		

@@ -33,6 +33,10 @@ public class RequestGenerator
 			rg_rnip);
 		
 		this.rgURI = rgURI;
+		
+		// Rg debug
+		this.toggleTracing();
+		this.toggleLogging();
 	}
 
 	public Map<RGPortTypes, String>	getRGPortsURI() throws Exception {

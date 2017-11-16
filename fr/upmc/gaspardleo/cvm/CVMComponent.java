@@ -11,6 +11,11 @@ import fr.upmc.gaspardleo.cvm.interfaces.CVMI;
 import fr.upmc.gaspardleo.cvm.ports.CVMInboundPort;
 
 public class CVMComponent extends AbstractComponent implements CVMI {
+	
+	public enum CVMPortTypes {
+		INTROSPECTION;
+	}
+	
 	private CVM realCVM;
 	
 	private CVMInboundPort cvmip;
@@ -36,10 +41,12 @@ public class CVMComponent extends AbstractComponent implements CVMI {
 		realCVM.allocateCores(avmPort);
 	}
 	
+	@Override
 	public void addAVMPort(ApplicationVMManagementOutboundPort avmPort) {
 		this.realCVM.addAVMPort(avmPort);
 	}
 	
+	@Override
 	public void addPort(PortI cmp) throws Exception{
 		super.addPort(cmp);
 	}
@@ -47,12 +54,8 @@ public class CVMComponent extends AbstractComponent implements CVMI {
 	public Map<CVMPortTypes, String> getCVMPortsURI() throws Exception {
 		Map<CVMPortTypes, String> result = new HashMap<>();
 		
-		result.put(CVMPortTypes.CVM_IN, this.cvmip.getPortURI());
+		result.put(CVMPortTypes.INTROSPECTION, this.cvmip.getPortURI());
 		
 		return result;
-	}
-	
-	public enum CVMPortTypes {
-		CVM_IN;
 	}
 }

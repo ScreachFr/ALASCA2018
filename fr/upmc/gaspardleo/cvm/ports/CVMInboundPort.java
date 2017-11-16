@@ -20,8 +20,8 @@ public class CVMInboundPort extends AbstractInboundPort implements CVMI {
 	}
 
 	@Override
-	public void deployComponent(ComponentI cmp) throws Exception {
-		CVMComponent cvmc = (CVMComponent) this.owner;
+	public void deployComponent(final ComponentI cmp) throws Exception {
+		final CVMComponent cvmc = (CVMComponent) this.owner;
 
 
 		cvmc.handleRequestAsync(new ComponentService<CVMI>() {
@@ -36,8 +36,8 @@ public class CVMInboundPort extends AbstractInboundPort implements CVMI {
 
 
 	@Override
-	public void allocateCores(ApplicationVMManagementOutboundPort avmPort) throws Exception {
-		CVMComponent cvmc = (CVMComponent) this.owner;
+	public void allocateCores(final ApplicationVMManagementOutboundPort avmPort) throws Exception {
+		final CVMComponent cvmc = (CVMComponent) this.owner;
 
 		cvmc.handleRequestAsync(new ComponentService<CVMI>() {
 
@@ -53,7 +53,7 @@ public class CVMInboundPort extends AbstractInboundPort implements CVMI {
 
 	@Override
 	public void start() throws Exception {
-		CVMComponent cvmc = (CVMComponent) this.owner;
+		final CVMComponent cvmc = (CVMComponent) this.owner;
 
 		cvmc.handleRequestAsync(new ComponentService<CVMI>() {
 
@@ -67,8 +67,8 @@ public class CVMInboundPort extends AbstractInboundPort implements CVMI {
 
 
 	@Override
-	public void addAVMPort(ApplicationVMManagementOutboundPort avmPort) throws Exception {
-		CVMComponent cvmc = (CVMComponent) this.owner;
+	public void addAVMPort(final ApplicationVMManagementOutboundPort avmPort) throws Exception {
+		final CVMComponent cvmc = (CVMComponent) this.owner;
 
 		cvmc.handleRequestAsync(new ComponentService<CVMI>() {
 

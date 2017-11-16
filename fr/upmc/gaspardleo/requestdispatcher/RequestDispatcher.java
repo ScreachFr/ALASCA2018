@@ -69,6 +69,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	}
 
+	@Override
 	public void registerVM(String vmUri, String VM_requestSubmissionInboundPort) throws Exception {
 	
 		if (this.registeredVmsUri.contains(vmUri)) 
@@ -89,6 +90,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	}
 
 
+	@Override
 	public void unregisterVM(String vmUri) throws Exception {
 		this.registeredVmsRsop.remove(vmUri);
 	}

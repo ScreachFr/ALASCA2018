@@ -1,6 +1,8 @@
 package fr.upmc.gaspardleo.admissioncontroller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
@@ -17,14 +19,22 @@ public class AdmissionController
 		extends AbstractComponent
 		implements AdmissionControllerI{
 	
+	public static enum	ACPortTypes {
+		INTROSECTION
+	}
+	
 	private	CVMOutboundPort 				cvmop;
 	private ArrayList<RequestDispatcher>	RDs;
+	private String							uri;
 	
 	//TODO delete RD avec unregisterVM
 	
 	public AdmissionController(String CVM_InboundPorURI) throws Exception{
 		super(1, 1);
 		this.RDs = new ArrayList<RequestDispatcher>();
+		
+		this.toggleLogging();
+		this.toggleTracing();
 		
 		//TODO via connecteur ?
 		
@@ -115,5 +125,13 @@ public class AdmissionController
 		this.cvmop.addAVMPort(avmPort);
 				
 		return vm;
+	}
+	
+	public Map<ACPortTypes, String>	getACPortsURI() throws Exception {
+		HashMap<ACPortTypes, String> ret =
+				new HashMap<ACPortTypes, String>();		
+		ret.put(ACPortTypes.INTROSECTION,
+				this.uri);
+		return ret ;
 	}
 }

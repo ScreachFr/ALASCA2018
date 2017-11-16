@@ -41,7 +41,7 @@ public class Test {
 
 			// Admission Controller creation
 			this.ac = new AdmissionController(
-				this.cvmc.getCVMPortsURI().get(CVMPortTypes.CVM_IN));
+				this.cvmc.getCVMPortsURI().get(CVMPortTypes.INTROSPECTION));
 			
 			// Simply adds some request generators to the current admission controller.
 			for (int i = 0; i < NB_DATASOURCE; i++) {
@@ -110,25 +110,21 @@ public class Test {
 	public void testScenario() throws Exception {
 
 		// start the request generation in the request generator.
-		this.rgmops.forEach(rgmop -> {
-			try {
-				rgmop.startGeneration();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		});
+		
+		for(int i = 0; i < this.rgmops.size(); i++){
+			RequestGeneratorManagementOutboundPort rgmop = this.rgmops.get(i);
+			rgmop.startGeneration();
+		}
 		
 		// wait 20 seconds
 		Thread.sleep(20000L);
 		// then stop the generation.
 
-		this.rgmops.forEach(rgmop -> {
-			try {
-				rgmop.stopGeneration();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		});
+		for(int i = 0; i < this.rgmops.size(); i++){
+			RequestGeneratorManagementOutboundPort rgmop = this.rgmops.get(i);
+			rgmop.stopGeneration();
+		}
+		
 	}
 
 	public CVM getCvm() {
@@ -153,11 +149,14 @@ public class Test {
 
 			// Execute the chosen request generation test scenario in a
 			// separate thread.
-			new Thread(() -> {
-				try {
-					tvmc.testScenario();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						tvmc.testScenario();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
 				}
 			}).start();;
 

@@ -98,7 +98,7 @@ extends		AbstractCVM
 		super();
 		this.admissibleFrequencies = new HashSet<Integer>() ;
 		for (Integer f : admissibleFrequencies) {
-			this.admissibleFrequencies.add((Integer) f) ;
+			this.admissibleFrequencies.add(f) ;
 		}
 		this.defautFrequency = defautFrequency ;
 		this.maxFrequencyGap = maxFrequencyGap ;
