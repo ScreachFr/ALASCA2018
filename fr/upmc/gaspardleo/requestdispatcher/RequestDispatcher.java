@@ -171,11 +171,11 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	@Override
 	public void connectionWithRG(String RG_RequestNotificationInboundPortURI) throws Exception {
 		// Connections Request Dispatcher with Request Generator		
-		RequestNotificationOutboundPort rnop = new RequestNotificationOutboundPort(this);
-		this.addPort(rnop);
-		rnop.publishPort();
-		rnop.doConnection(RG_RequestNotificationInboundPortURI, 
-			RequestNotificationConnector.class.getCanonicalName());
+//		RequestNotificationOutboundPort rnop = new RequestNotificationOutboundPort(this);
+//		this.addPort(rnop);
+//		rnop.publishPort();
+//		rnop.doConnection(RG_RequestNotificationInboundPortURI, 
+//			RequestNotificationConnector.class.getCanonicalName());
 	}
 	
 	@Override

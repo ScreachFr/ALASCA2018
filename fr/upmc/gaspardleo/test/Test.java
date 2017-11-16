@@ -158,7 +158,7 @@ public class Test {
 						throw new RuntimeException(e);
 					}
 				}
-			}).start();;
+			}).start();
 
 			// Sleep to let the test scenario execute to completion.
 			Thread.sleep(90000L) ;

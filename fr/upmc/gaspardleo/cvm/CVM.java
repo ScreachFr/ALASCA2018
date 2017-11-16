@@ -138,20 +138,8 @@ public class CVM extends AbstractCVM implements CVMI {
 		
 		for (int i = 0; i < this.avmPorts.size(); i++){
 			ApplicationVMManagementOutboundPort avmPort = this.avmPorts.get(i);
-			try {
 				avmPort.allocateCores(getAllocatedCore());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
 		}
-		
-//		this.avmPorts.forEach(avmPort -> {
-//			try {
-//				avmPort.allocateCores(getAllocatedCore());
-//			} catch (Exception e) {
-//				throw new RuntimeException(e);
-//			}
-//		});
 	}
 	
 	@Override

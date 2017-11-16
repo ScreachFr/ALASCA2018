@@ -33,8 +33,6 @@ public class AdmissionController
 
 	private String								uri;
 	
-	//TODO delete RD avec unregisterVM
-	
 	public AdmissionController(String CVM_InboundPorURI) throws Exception{
 		
 		super(1, 1);
@@ -63,6 +61,7 @@ public class AdmissionController
 		return RD_RequestSubmissionInboundPortURI;
 	}
 	
+	//TODO delete RD avec unregisterVM
 	@Override
 	public void removeRequestSource(String RD_RequestSubmissionInboundPortUri) throws Exception {
 		RDs.get(RD_RequestSubmissionInboundPortUri).shutdown();
