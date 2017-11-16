@@ -74,6 +74,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		
 	}
 
+	@Override
 	public void registerVM(String vmUri, String VM_requestSubmissionInboundPort) throws Exception {
 	
 		if (this.registeredVmsUri.contains(vmUri)) 
@@ -94,6 +95,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	}
 
 
+	@Override
 	public void unregisterVM(String vmUri) throws Exception {
 		int index = registeredVmsUri.indexOf(vmUri);
 		RequestSubmissionOutboundPort rsop = registeredVmsRsop.remove(index);
@@ -163,6 +165,9 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		return ret ;
 	}
 
+	//TODO faire le connecteur et passer par lui pour l'appel de cette fonction 
+	//     et non pas dans le contstructeur du RD
+	
 	@Override
 	public void connectionWithRG(String RG_RequestNotificationInboundPortURI) throws Exception {
 		// Connections Request Dispatcher with Request Generator		

@@ -19,6 +19,10 @@ import fr.upmc.gaspardleo.cvm.ports.CVMOutboundPort;
 public class AdmissionController 
 		extends AbstractComponent
 		implements AdmissionControllerI{
+
+	public static enum	ACPortTypes {
+		INTROSECTION
+	}
 	
 	// Ports
 	private	CVMOutboundPort 					cvmop;
@@ -26,23 +30,31 @@ public class AdmissionController
 	// RequestSource related components
 	private Map<String, RequestDispatcher>		RDs;
 	private Map<String, List<ApplicationVM>>	AVMs;
+
+	private String								uri;
 	
 	//TODO delete RD avec unregisterVM
 	
-	public AdmissionController(){
+	public AdmissionController(String CVM_InboundPorURI) throws Exception{
+		
 		super(1, 1);
+
 		this.RDs = new HashMap<String, RequestDispatcher>();
 		this.AVMs = new HashMap<>();
+		this.toggleLogging();
+		this.toggleTracing();
+		
+		//TODO via connecteur ?
+		
+		// Connect Admission Controller with CVM Component
+		connectionWithCVM(CVM_InboundPorURI);
+		
 	}
 	
 	@Override
 	public String addRequestSource(
 			String RD_URI,
-			String RG_RequestNotificationInboundPortURI,
-			String CVM_InboundPorURI) throws Exception {
-								
-		// Connect Admission Controller with CVM Component
-		connectionWithCVM(CVM_InboundPorURI);
+			String RG_RequestNotificationInboundPortURI) throws Exception {
 		
 		// Request Dispatcher creation	
 		String RD_RequestSubmissionInboundPortURI = createRequestDispatcher(
@@ -141,5 +153,13 @@ public class AdmissionController
 		this.cvmop.addAVMPort(avmPort);
 				
 		return vm;
+	}
+	
+	public Map<ACPortTypes, String>	getACPortsURI() throws Exception {
+		HashMap<ACPortTypes, String> ret =
+				new HashMap<ACPortTypes, String>();		
+		ret.put(ACPortTypes.INTROSECTION,
+				this.uri);
+		return ret ;
 	}
 }

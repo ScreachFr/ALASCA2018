@@ -19,7 +19,7 @@ public class RequestDispatcherInboundPort
 	}
 
 	@Override
-	public void registerVM(String vmUri, String requestSubmissionOutboundPort) throws Exception {
+	public void registerVM(final String vmUri, final String requestSubmissionOutboundPort) throws Exception {
 		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
 		requestDispatcher.handleRequestAsync(
 				new ComponentI.ComponentService<RequestDispatcher>(){
@@ -31,7 +31,7 @@ public class RequestDispatcherInboundPort
 	}
 
 	@Override
-	public void unregisterVM(String vmUri) throws Exception {
+	public void unregisterVM(final String vmUri) throws Exception {
 		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
 		requestDispatcher.handleRequestAsync(
 				new ComponentI.ComponentService<RequestDispatcher>(){

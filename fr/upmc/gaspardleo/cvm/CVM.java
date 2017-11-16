@@ -34,7 +34,7 @@ public class CVM extends AbstractCVM implements CVMI {
 	private AllocatedCore[] 							cores;
 	private int 										currentCore;
 	private List<ApplicationVMManagementOutboundPort> 	avmPorts;
-
+	
 	public CVM() throws Exception {
 		super();
 		this.currentCore = 0;
@@ -123,6 +123,7 @@ public class CVM extends AbstractCVM implements CVMI {
 				ControlledDataConnector.class.getCanonicalName()) ;
 	}
 
+	@Override
 	public void addAVMPort(ApplicationVMManagementOutboundPort avmPort) {
 		
 		this.avmPorts.add(avmPort);
@@ -135,13 +136,22 @@ public class CVM extends AbstractCVM implements CVMI {
 		
 		this.cores = this.csPort.allocateCores(NB_CPU * NB_CORES);
 		
-		this.avmPorts.forEach(avmPort -> {
+		for (int i = 0; i < this.avmPorts.size(); i++){
+			ApplicationVMManagementOutboundPort avmPort = this.avmPorts.get(i);
 			try {
 				avmPort.allocateCores(getAllocatedCore());
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-		});
+		}
+		
+//		this.avmPorts.forEach(avmPort -> {
+//			try {
+//				avmPort.allocateCores(getAllocatedCore());
+//			} catch (Exception e) {
+//				throw new RuntimeException(e);
+//			}
+//		});
 	}
 	
 	@Override
