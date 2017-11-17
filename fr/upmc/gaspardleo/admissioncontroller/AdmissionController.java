@@ -10,16 +10,18 @@ import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.datacenter.software.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
+import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 
 public class AdmissionController 
 		extends AbstractComponent
 		implements AdmissionControllerI{
 
 	public static enum	ACPortTypes {
-		INTROSECTION
+		INTROSPECTION
 	}
 	
 	// RequestSource related components
@@ -27,11 +29,14 @@ public class AdmissionController
 	private Map<String, List<ApplicationVM>>				AVMs;
 	private ArrayList<ApplicationVMManagementOutboundPort> 	avmPorts;
 	private String											uri;
+	private AdmissionControllerOutboundPort 				acop;
 	
-	public AdmissionController(String CVM_InboundPorURI) throws Exception{
+	public AdmissionController(String ac_uri) throws Exception{
 		
 		super(1, 1);
 
+		this.uri = ac_uri;
+		
 		this.RDs 		= new HashMap<String, RequestDispatcher>();
 		this.AVMs 		= new HashMap<>();
 		this.avmPorts 	= new ArrayList<ApplicationVMManagementOutboundPort>();
@@ -128,7 +133,7 @@ public class AdmissionController
 	public Map<ACPortTypes, String>	getACPortsURI() throws Exception {
 		HashMap<ACPortTypes, String> ret =
 				new HashMap<ACPortTypes, String>();		
-		ret.put(ACPortTypes.INTROSECTION,
+		ret.put(ACPortTypes.INTROSPECTION,
 				this.uri);
 		return ret ;
 	}

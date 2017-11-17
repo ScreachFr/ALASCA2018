@@ -15,6 +15,12 @@ public class AdmissionControllerOutboundPort
 
 	public AdmissionControllerOutboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, AdmissionControllerI.class, owner);
+		
+		if (uri == null){
+			System.out.println("uri NULL");
+		}
+		
+		assert	uri != null ;
 	}
 
 	@Override

@@ -7,7 +7,10 @@ import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOu
 import fr.upmc.gaspardleo.cvm.CVMComponent;
 import fr.upmc.gaspardleo.cvm.interfaces.CVMI;
 
-public class CVMInboundPort extends AbstractInboundPort implements CVMI {
+public class CVMInboundPort 
+		extends AbstractInboundPort 
+		implements CVMI {
+	
 	private static final long serialVersionUID = 7849610987533143498L;
 
 

@@ -12,7 +12,6 @@ import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.cvm.CVM;
 import fr.upmc.gaspardleo.cvm.CVMComponent;
-import fr.upmc.gaspardleo.cvm.CVMComponent.CVMPortTypes;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator;
@@ -43,16 +42,7 @@ public class Test {
 			this.cvmc 	= new CVMComponent(cvm);
 
 			// Admission Controller creation
-			this.ac = new AdmissionController(
-				this.cvmc.getCVMPortsURI().get(CVMPortTypes.INTROSPECTION));
-			
-//			AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(
-//					this.ac.getACPortsURI().get(ACPortTypes.INTROSECTION),
-//					new AbstractComponent(0, 0) {});
-//			acop.publishPort();
-//			acop.doConnection(
-//					this.cvmc.getCVMPortsURI().get(CVMPortTypes.INTROSPECTION),
-//					AdmissionControllerConnector.class.getCanonicalName());
+			this.ac = new AdmissionController("ac");
 			
 			// Simply adds some request generators to the current admission controller.
 			for (int i = 0; i < NB_DATASOURCE; i++) {

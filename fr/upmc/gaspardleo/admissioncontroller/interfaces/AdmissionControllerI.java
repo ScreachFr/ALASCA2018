@@ -2,11 +2,14 @@ package fr.upmc.gaspardleo.admissioncontroller.interfaces;
 
 import java.util.ArrayList;
 
+import fr.upmc.components.interfaces.OfferedI;
+import fr.upmc.components.interfaces.RequiredI;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 
-public interface AdmissionControllerI {
+public interface AdmissionControllerI 
+	extends	OfferedI, RequiredI{
 
 	public RequestDispatcher addRequestDispatcher(
 			String RD_URI,

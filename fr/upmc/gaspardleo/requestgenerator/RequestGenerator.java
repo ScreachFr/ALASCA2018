@@ -9,7 +9,7 @@ public class RequestGenerator
 	extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
 
 	public static enum	RGPortTypes {
-		INTROSECTION, MANAGEMENT_IN, REQUEST_SUBMISSION_OUT, REQUEST_NOTIFICATION_IN
+		INTROSPECTION, MANAGEMENT_IN, REQUEST_SUBMISSION_OUT, REQUEST_NOTIFICATION_IN
 	}
 	
 	private static double MEAN_INTER_ARRIVAL_TIME 	= 500.0;
@@ -42,7 +42,7 @@ public class RequestGenerator
 	public Map<RGPortTypes, String>	getRGPortsURI() throws Exception {
 		HashMap<RGPortTypes, String> ret =
 				new HashMap<RGPortTypes, String>();		
-		ret.put(RGPortTypes.INTROSECTION,
+		ret.put(RGPortTypes.INTROSPECTION,
 				this.rgURI);
 		ret.put(RGPortTypes.MANAGEMENT_IN,
 				RequestGenerator.rg_rgmip) ;
