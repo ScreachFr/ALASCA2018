@@ -4,12 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.upmc.components.ports.AbstractPort;
+import fr.upmc.datacenter.software.interfaces.RequestI;
+import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
+import fr.upmc.gaspardleo.requestdispatcher.ports.RequestNotificationHandlerInboundPort;
 
 public class RequestGenerator 
 	extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
 
 	public static enum	RGPortTypes {
-		INTROSPECTION, MANAGEMENT_IN, REQUEST_SUBMISSION_OUT, REQUEST_NOTIFICATION_IN
+		INTROSPECTION, MANAGEMENT_IN, REQUEST_SUBMISSION_OUT, REQUEST_NOTIFICATION_IN, REQUEST_NOTIFICATION_HANDLER_IN
 	}
 	
 	private static double MEAN_INTER_ARRIVAL_TIME 	= 500.0;
@@ -20,6 +23,8 @@ public class RequestGenerator
 	private static String rg_rnip 	= AbstractPort.generatePortURI();
 	
 	private String rgURI;
+	
+	private RequestNotificationHandlerInboundPort 		rnhip;	
 	
 	public RequestGenerator(
 			String rgURI) throws Exception {
@@ -34,11 +39,22 @@ public class RequestGenerator
 		
 		this.rgURI = rgURI;
 		
+		this.rnhip = new RequestNotificationHandlerInboundPort(this);
+		this.addPort(rnhip);
+		this.rnhip.publishPort();
+		this.addRequiredInterface(RequestNotificationHandlerI.class);
+		
 		// Rg debug
 		this.toggleTracing();
 		this.toggleLogging();
 	}
 
+	@Override
+	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
+		super.logMessage(rgURI  + " : gettting an answer for " + r.getRequestURI());
+		super.acceptRequestTerminationNotification(r);
+	}
+	
 	public Map<RGPortTypes, String>	getRGPortsURI() throws Exception {
 		HashMap<RGPortTypes, String> ret =
 				new HashMap<RGPortTypes, String>();		
@@ -50,6 +66,9 @@ public class RequestGenerator
 				RequestGenerator.rg_rsop);
 		ret.put(RGPortTypes.REQUEST_NOTIFICATION_IN,
 				RequestGenerator.rg_rnip);
+		ret.put(RGPortTypes.REQUEST_NOTIFICATION_HANDLER_IN,
+				this.rnhip.getPortURI());
 		return ret ;
 	}
+	
 }

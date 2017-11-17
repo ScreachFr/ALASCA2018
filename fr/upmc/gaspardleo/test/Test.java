@@ -19,7 +19,7 @@ import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class Test {
 	
-	private final static int 	NB_DATASOURCE = 10;
+	private final static int 	NB_DATASOURCE = 1;
 	
 	private CVMComponent 		cvmc;
 	private CVM 				cvm;
@@ -63,11 +63,12 @@ public class Test {
 		// Dynamic ressources creation
 		RequestDispatcher rd = this.ac.addRequestDispatcher(
 			"rd-"+i,
-			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN));
+			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN),
+			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_HANDLER_IN));
 		
 		this.cvm.deployComponent(rd);
 		
-		ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd);
+		ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd, cvmc);
 		
 		for (int j = 0; j < vms.size(); j++){
 			this.cvm.deployComponent(vms.get(j));

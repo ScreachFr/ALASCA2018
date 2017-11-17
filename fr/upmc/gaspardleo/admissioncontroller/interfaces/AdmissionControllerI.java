@@ -6,6 +6,7 @@ import fr.upmc.components.interfaces.OfferedI;
 import fr.upmc.components.interfaces.RequiredI;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
+import fr.upmc.gaspardleo.cvm.CVMComponent;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 
 public interface AdmissionControllerI 
@@ -13,9 +14,10 @@ public interface AdmissionControllerI
 
 	public RequestDispatcher addRequestDispatcher(
 			String RD_URI,
-			String RG_RequestNotificationInboundPortURI) throws Exception;
+			String RG_RequestNotificationInboundPortURI,
+			String RG_RequestNotificationHandlerInboundPortURI) throws Exception;
 	
-	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd) throws Exception;
+	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd, CVMComponent cvm) throws Exception;
 	
 	/**
 	 * Supprime le RequestDispatcher associé à l'URI du port donné en paramètre.

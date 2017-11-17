@@ -6,6 +6,7 @@ import fr.upmc.components.connectors.AbstractConnector;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
+import fr.upmc.gaspardleo.cvm.CVMComponent;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 
 public class AdmissionControllerConnector 
@@ -15,10 +16,12 @@ public class AdmissionControllerConnector
 	@Override
 	public RequestDispatcher addRequestDispatcher(
 			String RD_URI,
-			String RG_RequestNotificationInboundPortURI) throws Exception {
+			String RG_RequestNotificationInboundPortURI,
+			String RG_RequestNotificationHandlerInboundPortURI) throws Exception {
 		return ((AdmissionControllerI)this.offering).addRequestDispatcher(
 				RD_URI,
-				RG_RequestNotificationInboundPortURI);
+				RG_RequestNotificationInboundPortURI,
+				RG_RequestNotificationHandlerInboundPortURI);
 	}
 
 	@Override
@@ -32,7 +35,7 @@ public class AdmissionControllerConnector
 	}
 
 	@Override
-	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd) throws Exception {
-		return ((AdmissionControllerI)this.offering).addApplicationVMs(rd);
+	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd, CVMComponent cvm) throws Exception {
+		return ((AdmissionControllerI)this.offering).addApplicationVMs(rd, cvm);
 	}
 }

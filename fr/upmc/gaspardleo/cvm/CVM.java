@@ -80,6 +80,9 @@ public class CVM extends AbstractCVM implements CVMI {
 		
 		this.addDeployedComponent(c);
 		
+		
+		cores = c.allocateCores(NB_CPU * NB_CORES);
+		
 		return c;
 	}
 	
