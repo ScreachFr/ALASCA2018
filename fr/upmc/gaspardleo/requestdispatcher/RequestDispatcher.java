@@ -16,6 +16,7 @@ import fr.upmc.datacenter.software.ports.RequestNotificationInboundPort;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 //import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestNotificationHandlerInboundPort;
@@ -103,7 +104,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	}
 
 	@Override
-	public String registerVM(String vmUri, String VM_requestSubmissionInboundPort) throws Exception {
+	public String registerVM(String vmUri, String VM_requestSubmissionInboundPort, Class<?> vmInterface) throws Exception {
 	
 		if (this.registeredVmsUri.contains(vmUri)) 
 			return null; // TODO retourner l'uri qui existe déjà.
@@ -112,9 +113,12 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.addPort(rsop);
 		rsop.publishPort();
 		
-		rsop.doConnection(
-				VM_requestSubmissionInboundPort, 
-				RequestSubmissionConnector.class.getCanonicalName());
+//		rsop.doConnection(
+//				VM_requestSubmissionInboundPort, 
+//				RequestSubmissionConnector.class.getCanonicalName());
+		
+		rsop.doConnection(VM_requestSubmissionInboundPort, 
+				ClassFactory.newConnector(vmInterface).getCanonicalName());
 		
 		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
 		this.addPort(rnip);

@@ -8,8 +8,8 @@ public class RequestDispatherConnection
 	implements RequestDispatcherI{
 
 	@Override
-	public String registerVM(String vmUri, String requestSubmissionOutboundPort) throws Exception {
-		return ((RequestDispatcherI)this.offering).registerVM(vmUri, requestSubmissionOutboundPort);		
+	public String registerVM(String vmUri, String requestSubmissionOutboundPort, Class<?> vmInterface) throws Exception {
+		return ((RequestDispatcherI)this.offering).registerVM(vmUri, requestSubmissionOutboundPort, vmInterface);		
 	}
 
 	@Override

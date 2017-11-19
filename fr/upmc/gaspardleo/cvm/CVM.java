@@ -59,6 +59,7 @@ public class CVM extends AbstractCVM implements CVMI {
 	}
 	
 	private Computer createComputer() throws Exception{
+		System.out.println("Computer creation and core allocation.");
 		
 		// Computer creation
 		Set<Integer> admissibleFrequencies = new HashSet<Integer>() ;
@@ -82,6 +83,7 @@ public class CVM extends AbstractCVM implements CVMI {
 		
 		
 		cores = c.allocateCores(NB_CPU * NB_CORES);
+		
 		
 		return c;
 	}
@@ -160,6 +162,7 @@ public class CVM extends AbstractCVM implements CVMI {
 		result[0] = this.cores[this.currentCore];
 		
 		this.currentCore = (this.currentCore + 1) % this.cores.length;
+		
 		
 		return result;
 	}

@@ -38,7 +38,8 @@ public class Test {
 
 			// CVM creation
 			this.cvm 	= new CVM();
-
+			this.cvm.deploy();
+			
 			// CVM Component creation
 			this.cvmc 	= new CVMComponent(cvm);
 
@@ -99,7 +100,6 @@ public class Test {
 		rg.toggleLogging();
 
 		// Components deployment
-		this.cvm.deploy();
 		this.cvm.deployComponent(rg);
 		
 		createRGManagement(rg);
@@ -159,7 +159,7 @@ public class Test {
 		try {
 			final Test tvmc = new Test() ;
 			// Deploy the components
-			tvmc.getCvm().deploy() ;
+//			tvmc.getCvm().deploy() ;
 
 			System.out.println("starting...") ;
 			// Start them.

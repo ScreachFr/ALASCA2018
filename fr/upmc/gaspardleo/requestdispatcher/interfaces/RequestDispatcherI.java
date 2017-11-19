@@ -13,7 +13,7 @@ public interface RequestDispatcherI{
 	 * @throws Exception
 	 */
 	public String registerVM(String vmUri, 
-			String requestSubmissionOutboundPort) throws Exception;
+			String requestSubmissionOutboundPort, Class<?> vmInterface) throws Exception;
 	
 	public void unregisterVM(String vmUri) throws Exception;
 }

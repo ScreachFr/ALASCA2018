@@ -10,6 +10,7 @@ import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
@@ -95,16 +96,19 @@ public class AdmissionController
 		// Register application VM in Request Dispatcher
 		currentNotifPortUri = rd.registerVM(
 				vm0.getNewAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
-				vm0.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
+				vm0.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION),
+				RequestSubmissionI.class);
 		
 		vm0.doRequestNotificationConnection(currentNotifPortUri);
 		currentNotifPortUri = rd.registerVM(
 				vm1.getNewAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
-				vm1.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
+				vm1.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION),
+				RequestSubmissionI.class);
 		vm1.doRequestNotificationConnection(currentNotifPortUri);
 		currentNotifPortUri = rd.registerVM(
 				vm2.getNewAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
-				vm2.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
+				vm2.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION),
+				RequestSubmissionI.class);
 		vm2.doRequestNotificationConnection(currentNotifPortUri);
 				
 		AVMs.put(rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN), newAVMs);
