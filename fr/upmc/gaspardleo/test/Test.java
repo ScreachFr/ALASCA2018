@@ -39,7 +39,7 @@ public class Test {
 			// CVM creation
 			this.cvm 	= new CVM();
 			this.cvm.deploy();
-			
+
 			// CVM Component creation
 			this.cvmc 	= new CVMComponent(cvm);
 
