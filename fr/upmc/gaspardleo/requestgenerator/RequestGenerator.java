@@ -5,7 +5,9 @@ import java.util.Map;
 
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.interfaces.RequestI;
-import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
+import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorI;
+import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
+//import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
 //import fr.upmc.gaspardleo.requestdispatcher.ports.RequestNotificationHandlerInboundPort;
 
 public class RequestGenerator 
@@ -24,6 +26,8 @@ public class RequestGenerator
 	
 	private String rgURI;
 	
+	private RequestGeneratorInboundPort inPort;
+	
 	//private RequestNotificationHandlerInboundPort 		rnhip;	
 	
 	public RequestGenerator(
@@ -38,6 +42,11 @@ public class RequestGenerator
 			rg_rnip);
 		
 		this.rgURI = rgURI;
+		
+		this.addRequiredInterface(RequestGeneratorI.class);
+		this.inPort = new RequestGeneratorInboundPort(rgURI, this);
+		this.addPort(inPort);
+		this.inPort.publishPort();
 		
 //		System.out.println("[DEBUG LEO] rnhip ...");
 //		

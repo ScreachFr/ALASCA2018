@@ -46,7 +46,7 @@ public class DistributedTest
 	private int 									currentCore;
 	
 	private AdmissionController						ac;
-	private AdmissionControllerOutboundPort 		acop;
+//	private AdmissionControllerOutboundPort 		acop;
 	
 	private RequestGenerator 						rg;
 	private RequestGeneratorManagementOutboundPort 	rgmop;
@@ -96,22 +96,16 @@ public class DistributedTest
 				System.out.println("### Creation RG ...");
 				this.rg  = new RequestGenerator("rg");
 				this.addDeployedComponent(rg);
-				System.out.println("### RG created");
-				System.out.println("");
 				
-				System.out.println("### Creation Management Outbound Port for RG ...");
 				this.rgmop = new RequestGeneratorManagementOutboundPort(
 					AbstractPort.generatePortURI(),
 					new AbstractComponent(0, 0) {});
 				this.rgmop.publishPort();
-				System.out.println("### Management Outbound Port for RG created");
-				System.out.println("");
 				
-				System.out.println("### Connection RG with his Manager ...");
 				this.rgmop.doConnection(
 					rg.getRGPortsURI().get(RGPortTypes.MANAGEMENT_IN),
 					RequestGeneratorManagementConnector.class.getCanonicalName());
-				System.out.println("### RG and his Manager connected");
+				System.out.println("### RG created");
 				System.out.println("");
 				
 				System.out.println("### DatacenterClient instantiated and published");
@@ -195,24 +189,34 @@ public class DistributedTest
 		} else {
 			if (thisJVMURI.equals(DatacenterClient)){
 				
-//				System.out.println("### Connection RG with AC ...");
-//				
+				System.out.println("### Interconnect ...");
+				
+				System.out.println("### Connection RG with AC ...");
 //				this.acop = new AdmissionControllerOutboundPort(ac_uri,new AbstractComponent(0, 0) {});
 //				acop.publishPort();
+//				
+//				System.out.println("[DEBUG LEO] doConnection ...");
 //				acop.doConnection(
 //						this.rg.getRGPortsURI().get(RGPortTypes.INTROSPECTION),
 //						AdmissionControllerConnector.class.getCanonicalName());
-//				System.out.println("### RG and AC connected");
-//				System.out.println("");
-//							
+//				System.out.println("[DEBUG LEO] doConnection ok");
+
+				this.rg.doPortConnection(
+						this.rg.getRGPortsURI().get(RGPortTypes.INTROSPECTION), 
+						ac_uri, 
+						AdmissionControllerConnector.class.getCanonicalName());
+				System.out.println("### RG and AC connected");
+				System.out.println("");
+				
+				
 //				System.out.println("### Creation RD ...");
-//				RequestDispatcher rd = ((AdmissionControllerI) this.acop).addRequestDispatcher(
-//						"rd-",
+//				RequestDispatcher rd = acc.addRequestDispatcher(
+//						"rd",
 //						rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN));
 //				this.addDeployedComponent(rd);
 //				System.out.println("### RD Created");
 //				System.out.println("");
-//				
+				
 //				System.out.println("### Creation AVMs ...");
 //				ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd);
 //				for (int j = 0; j < vms.size(); j++){
@@ -228,6 +232,8 @@ public class DistributedTest
 //					RequestSubmissionConnector.class.getCanonicalName());
 //				System.out.println("### RG and AC connected");
 //				System.out.println("");
+				
+				System.out.println("### Interconnection done");
 				
 			} else {
 				throw new RuntimeException("unknown JVM " + thisJVMURI);
@@ -246,13 +252,13 @@ public class DistributedTest
 				
 				this.cores = this.csPort.allocateCores(NB_CPU * NB_CORES);
 				
-				ArrayList<ApplicationVMManagementOutboundPort> avmPorts = 
-						((AdmissionControllerI) this.acop).getApplicationVMManagementOutboundPorts();
-				
-				for (int i = 0; i < avmPorts.size(); i++){
-					ApplicationVMManagementOutboundPort avmPort = avmPorts.get(i);
-						avmPort.allocateCores(getAllocatedCore());
-				}
+//				ArrayList<ApplicationVMManagementOutboundPort> avmPorts = 
+//						((AdmissionControllerI) this.acop).getApplicationVMManagementOutboundPorts();
+//				
+//				for (int i = 0; i < avmPorts.size(); i++){
+//					ApplicationVMManagementOutboundPort avmPort = avmPorts.get(i);
+//						avmPort.allocateCores(getAllocatedCore());
+//				}
 				
 			} else {
 				throw new RuntimeException("unknown JVM " + thisJVMURI);

@@ -64,8 +64,8 @@ public class Test {
 		// Dynamic ressources creation
 		RequestDispatcher rd = this.ac.addRequestDispatcher(
 			"rd-"+i,
-			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN),
-			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_HANDLER_IN));
+			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN)/*,
+			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_HANDLER_IN)*/);
 		
 		this.cvm.deployComponent(rd);
 		

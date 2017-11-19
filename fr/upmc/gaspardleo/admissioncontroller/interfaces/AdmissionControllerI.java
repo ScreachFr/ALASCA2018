@@ -13,8 +13,8 @@ public interface AdmissionControllerI
 
 	public RequestDispatcher addRequestDispatcher(
 			String RD_URI,
-			String RG_RequestNotificationInboundPortURI,
-			String RG_RequestNotificationHandlerInboundPortURI) throws Exception;
+			String RG_RequestNotificationInboundPortURI/*,
+			String RG_RequestNotificationHandlerInboundPortURI*/) throws Exception;
 	
 	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd) throws Exception;
 	

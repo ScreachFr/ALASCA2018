@@ -16,9 +16,9 @@ public class AdmissionControllerOutboundPort
 	public AdmissionControllerOutboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, AdmissionControllerI.class, owner);
 		
-		if (uri == null){
-			System.out.println("uri NULL");
-		}
+//		if (uri == null){
+//			System.out.println("uri NULL");
+//		}
 		
 		assert	uri != null ;
 	}
@@ -26,13 +26,13 @@ public class AdmissionControllerOutboundPort
 	@Override
 	public RequestDispatcher addRequestDispatcher(
 			String RD_URI,
-			String RG_RequestNotificationInboundPortURI,
-			String RG_RequestNotificationHandlerInboundPortURI) throws Exception { 
+			String RG_RequestNotificationInboundPortURI/*,
+			String RG_RequestNotificationHandlerInboundPortURI*/) throws Exception { 
 		
 		return ((AdmissionControllerI)this.connector).addRequestDispatcher(
 				RD_URI,
-				RG_RequestNotificationInboundPortURI,
-				RG_RequestNotificationHandlerInboundPortURI);	
+				RG_RequestNotificationInboundPortURI/*,
+				RG_RequestNotificationHandlerInboundPortURI*/);	
 	}
 
 	@Override

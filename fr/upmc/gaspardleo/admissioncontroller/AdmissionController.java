@@ -13,6 +13,7 @@ import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOu
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
+import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 
 public class AdmissionController 
 		extends AbstractComponent
@@ -26,7 +27,7 @@ public class AdmissionController
 	private String											uri;
 
 	// Ports
-//	private AdmissionControllerOutboundPort 				acop;
+	private AdmissionControllerOutboundPort 				acop;
 	
 	// RequestSource related components
 	private Map<String, RequestDispatcher>					RDs;
@@ -43,6 +44,11 @@ public class AdmissionController
 		this.AVMs 		= new HashMap<>();
 		this.avmPorts 	= new ArrayList<ApplicationVMManagementOutboundPort>();
 		
+		this.addOfferedInterface(AdmissionControllerI.class);
+		this.acop = new AdmissionControllerOutboundPort(ac_uri, this);
+		this.addPort(this.acop);
+		this.acop.publishPort();
+		
 		this.toggleLogging();
 		this.toggleTracing();
 	}
@@ -50,12 +56,13 @@ public class AdmissionController
 	@Override
 	public RequestDispatcher addRequestDispatcher(
 			String RD_URI,
-			String RG_RequestNotificationInboundPortURI, String RG_RequestNotificationHandlerInboundPortURI) throws Exception {
+			String RG_RequestNotificationInboundPortURI/*, 
+			String RG_RequestNotificationHandlerInboundPortURI*/) throws Exception {
 		
 		// Request Dispatcher creation
 		RequestDispatcher rd = new RequestDispatcher(RD_URI, 
-				RG_RequestNotificationInboundPortURI,
-				RG_RequestNotificationHandlerInboundPortURI);
+				RG_RequestNotificationInboundPortURI/*,
+				RG_RequestNotificationHandlerInboundPortURI*/);
 		
 		// Request Dispatcher debug
 		rd.toggleLogging();

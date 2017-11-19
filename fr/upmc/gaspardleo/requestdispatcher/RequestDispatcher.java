@@ -49,8 +49,9 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	public RequestDispatcher(
 			String dispatcherUri, 
-			String RG_RequestNotificationInboundPortURI, 
-			String RG_RequestNotificationHandlerInboundPortURI) throws Exception {
+			String RG_RequestNotificationInboundPortURI/*, 
+			String RG_RequestNotificationHandlerInboundPortURI*/
+			) throws Exception {
 		
 		super(1, 1);
 
