@@ -205,7 +205,5 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		registeredVmsRsop.clear();
 		
 		super.shutdown();
-	}
-
-	
+	}	
 }

@@ -80,11 +80,9 @@ public class CVM extends AbstractCVM implements CVMI {
 				NB_CORES);
 		
 		this.addDeployedComponent(c);
-		
-		
+				
 		cores = c.allocateCores(NB_CPU * NB_CORES);
-		
-		
+				
 		return c;
 	}
 	
@@ -162,8 +160,7 @@ public class CVM extends AbstractCVM implements CVMI {
 		result[0] = this.cores[this.currentCore];
 		
 		this.currentCore = (this.currentCore + 1) % this.cores.length;
-		
-		
+				
 		return result;
 	}
 	

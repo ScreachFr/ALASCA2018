@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.upmc.components.ports.AbstractPort;
+import fr.upmc.components.ports.PortI;
 import fr.upmc.datacenter.software.interfaces.RequestI;
-import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorI;
-import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
 
 public class RequestGenerator 
 	extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
@@ -23,9 +22,7 @@ public class RequestGenerator
 	private static String rg_rnip 	= AbstractPort.generatePortURI();
 	
 	private String rgURI;
-	
-	private RequestGeneratorInboundPort inPort;
-	
+		
 	public RequestGenerator(
 			String rgURI) throws Exception {
 		
@@ -38,11 +35,6 @@ public class RequestGenerator
 			rg_rnip);
 		
 		this.rgURI = rgURI;
-		
-		this.addRequiredInterface(RequestGeneratorI.class);
-		this.inPort = new RequestGeneratorInboundPort(rgURI, this);
-		this.addPort(inPort);
-		this.inPort.publishPort();
 		
 		// Rg debug
 		this.toggleTracing();
@@ -69,6 +61,10 @@ public class RequestGenerator
 				RequestGenerator.rg_rnip);
 
 		return ret ;
+	}
+	
+	public void addPort(PortI p) throws Exception{
+		super.addPort(p);
 	}
 	
 }

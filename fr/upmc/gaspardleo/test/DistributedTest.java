@@ -1,6 +1,5 @@
 package fr.upmc.gaspardleo.test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,27 +10,21 @@ import fr.upmc.components.connectors.DataConnector;
 import fr.upmc.components.cvm.AbstractDistributedCVM;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.connectors.ControlledDataConnector;
-import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
 import fr.upmc.datacenter.hardware.computers.ports.ComputerServicesOutboundPort;
 import fr.upmc.datacenter.hardware.processors.Processor;
-import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
-import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.connectors.AdmissionControllerConnector;
-import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.computer.Computer;
 import fr.upmc.gaspardleo.computer.ComputerMonitor;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computer.ComputerMonitor.ComputerMonitorPortTypes;
-import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
-import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
+import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorI;
+import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
 
 public class DistributedTest 
 	extends	AbstractDistributedCVM{
@@ -42,11 +35,8 @@ public class DistributedTest
 	
 	private Computer 								c;
 	private ComputerServicesOutboundPort 			csPort;
-	private AllocatedCore[] 						cores;
-	private int 									currentCore;
 	
 	private AdmissionController						ac;
-//	private AdmissionControllerOutboundPort 		acop;
 	
 	private RequestGenerator 						rg;
 	private RequestGeneratorManagementOutboundPort 	rgmop;
@@ -191,47 +181,24 @@ public class DistributedTest
 				
 				System.out.println("### Interconnect ...");
 				
+				
 				System.out.println("### Connection RG with AC ...");
-//				this.acop = new AdmissionControllerOutboundPort(ac_uri,new AbstractComponent(0, 0) {});
-//				acop.publishPort();
-//				
-//				System.out.println("[DEBUG LEO] doConnection ...");
-//				acop.doConnection(
-//						this.rg.getRGPortsURI().get(RGPortTypes.INTROSPECTION),
-//						AdmissionControllerConnector.class.getCanonicalName());
-//				System.out.println("[DEBUG LEO] doConnection ok");
+				
+				this.rg.addRequiredInterface(RequestGeneratorI.class);
+				RequestGeneratorInboundPort inPort = new RequestGeneratorInboundPort("rg_ac", this.rg);
+				this.rg.addPort(inPort);
+				inPort.publishPort();
+				
+				System.out.println("### Connection RG with AC ...");
 
 				this.rg.doPortConnection(
-						this.rg.getRGPortsURI().get(RGPortTypes.INTROSPECTION), 
 						ac_uri, 
+						"rg_ac", 
 						AdmissionControllerConnector.class.getCanonicalName());
 				System.out.println("### RG and AC connected");
 				System.out.println("");
-				
-				
-//				System.out.println("### Creation RD ...");
-//				RequestDispatcher rd = acc.addRequestDispatcher(
-//						"rd",
-//						rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN));
-//				this.addDeployedComponent(rd);
-//				System.out.println("### RD Created");
-//				System.out.println("");
-				
-//				System.out.println("### Creation AVMs ...");
-//				ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd);
-//				for (int j = 0; j < vms.size(); j++){
-//					this.addDeployedComponent(vms.get(j));
-//				}
-//				System.out.println("### AVMs Created");
-//				System.out.println("");
-//				
-//				System.out.println("### Connection RG with RD ...");
-//				rg.doPortConnection(
-//					rg.getRGPortsURI().get(RGPortTypes.REQUEST_SUBMISSION_OUT),
-//					rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN),
-//					RequestSubmissionConnector.class.getCanonicalName());
-//				System.out.println("### RG and AC connected");
-//				System.out.println("");
+	
+				//TODO
 				
 				System.out.println("### Interconnection done");
 				
@@ -250,32 +217,13 @@ public class DistributedTest
 		} else {
 			if (thisJVMURI.equals(DatacenterClient)){
 				
-				this.cores = this.csPort.allocateCores(NB_CPU * NB_CORES);
-				
-//				ArrayList<ApplicationVMManagementOutboundPort> avmPorts = 
-//						((AdmissionControllerI) this.acop).getApplicationVMManagementOutboundPorts();
-//				
-//				for (int i = 0; i < avmPorts.size(); i++){
-//					ApplicationVMManagementOutboundPort avmPort = avmPorts.get(i);
-//						avmPort.allocateCores(getAllocatedCore());
-//				}
+				//TODO
 				
 			} else {
 				throw new RuntimeException("unknown JVM " + thisJVMURI);
 			}
 		}
 		super.start();
-	}
-	
-	private AllocatedCore[] getAllocatedCore() {
-		
-		AllocatedCore[] result = new AllocatedCore[1];
-		
-		result[0] = this.cores[this.currentCore];
-		
-		this.currentCore = (this.currentCore + 1) % this.cores.length;
-		
-		return result;
 	}
 	
 	public void testScenario() throws Exception {
