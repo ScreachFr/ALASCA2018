@@ -7,7 +7,6 @@ import java.util.Map;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.exceptions.ComponentShutdownException;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
-import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
@@ -17,17 +16,14 @@ import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
-//import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
-import fr.upmc.gaspardleo.requestdispatcher.ports.RequestNotificationHandlerInboundPort;
-import fr.upmc.gaspardleo.requestdispatcher.ports.RequestNotificationHandlerOutboundPort;
 
 public class RequestDispatcher 
 extends AbstractComponent 
 implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHandlerI, RequestNotificationI {
 
 	public static enum	RDPortTypes {
-		REQUEST_SUBMISSION_IN, REQUEST_NOTIFICATION_OUT, INTROSPECTION, REQUEST_NOTIFICATION_HANDLER_IN, REQUEST_NOTIFICATION_HANDLER_OUT
+		REQUEST_SUBMISSION_IN, REQUEST_NOTIFICATION_OUT, INTROSPECTION;
 	}
 	
 	private String 										dispatcherUri;
@@ -42,8 +38,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	private RequestNotificationOutboundPort 			rnop;
 	private RequestSubmissionOutboundPort 				rsop;
 	private RequestNotificationInboundPort 				rnip;
-	private RequestNotificationHandlerOutboundPort 		rnhop;
-	private RequestNotificationHandlerInboundPort 		rnhip;
 	
 	//Misc
 	private Integer 									vmCursor;
@@ -84,23 +78,10 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.rnop.publishPort();
 		this.addOfferedInterface(RequestNotificationI.class);
 				
-		// Request notification Handler
-		this.rnhop = new RequestNotificationHandlerOutboundPort(this);
-		this.addPort(this.rnhop);
-		this.rnhop.publishPort();
-				
-		this.rnhip = new RequestNotificationHandlerInboundPort(this);
-		this.addPort(rnhip);
-		this.rnhip.publishPort();
-		this.addRequiredInterface(RequestNotificationHandlerI.class);
-				
-		rnop.doConnection(
+		this.rnop.doConnection(
 				RG_RequestNotificationInboundPortURI, 
 				RequestNotificationConnector.class.getCanonicalName());
-				
-//		rnhop.doConnection(
-//				RG_RequestNotificationHandlerInboundPortURI, 
-//				ClassFactory.newConnector(RequestNotificationHandlerI.class).getCanonicalName());		
+			
 	}
 
 	@Override
@@ -113,16 +94,13 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.addPort(rsop);
 		rsop.publishPort();
 		
-//		rsop.doConnection(
-//				VM_requestSubmissionInboundPort, 
-//				RequestSubmissionConnector.class.getCanonicalName());
-		
 		rsop.doConnection(VM_requestSubmissionInboundPort, 
 				ClassFactory.newConnector(vmInterface).getCanonicalName());
 		
 		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
 		this.addPort(rnip);
 		rnip.publishPort();
+		
 		
 		
 		this.registeredVmsRnip.add(rnip);
@@ -168,7 +146,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
-		
 		this.logMessage(this.dispatcherUri + " : incoming request submission and notification.");
 
 		if (this.registeredVmsRsop.size() == 0) {
@@ -191,30 +168,26 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.logMessage(this.dispatcherUri + " : incoming request termination notification.");
 
 		rnop.notifyRequestTermination(r);
-		rnhop.acceptRequestTerminationNotification(r);
 	}
 	
 	@Override
 	public void notifyRequestTermination(RequestI r) throws Exception {
 		this.logMessage(this.dispatcherUri + " : incoming request termination notification.");
-		
-		rnhop.acceptRequestTerminationNotification(r);
+		// XXX Pas utilisé.
 		rnop.notifyRequestTermination(r);
 	}
 	
 	public Map<RDPortTypes, String>	getRDPortsURI() throws Exception {
 		HashMap<RDPortTypes, String> ret =
 				new HashMap<RDPortTypes, String>() ;		
+
 		ret.put(RDPortTypes.REQUEST_SUBMISSION_IN,
 				this.rsip.getPortURI()) ;
 		ret.put(RDPortTypes.REQUEST_NOTIFICATION_OUT,
 				this.rnop.getPortURI()) ;
 		ret.put(RDPortTypes.INTROSPECTION,
 				this.dispatcherUri);
-		ret.put(RDPortTypes.REQUEST_NOTIFICATION_HANDLER_IN,
-				this.rnhip.getPortURI());
-		ret.put(RDPortTypes.REQUEST_NOTIFICATION_HANDLER_OUT,
-				this.rnhop.getPortURI());
+
 		return ret ;
 	}
 	

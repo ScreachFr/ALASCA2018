@@ -7,8 +7,6 @@ import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
-//import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
-//import fr.upmc.gaspardleo.requestdispatcher.ports.RequestNotificationHandlerInboundPort;
 
 public class RequestGenerator 
 	extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
@@ -28,8 +26,6 @@ public class RequestGenerator
 	
 	private RequestGeneratorInboundPort inPort;
 	
-	//private RequestNotificationHandlerInboundPort 		rnhip;	
-	
 	public RequestGenerator(
 			String rgURI) throws Exception {
 		
@@ -48,18 +44,6 @@ public class RequestGenerator
 		this.addPort(inPort);
 		this.inPort.publishPort();
 		
-//		System.out.println("[DEBUG LEO] rnhip ...");
-//		
-//		this.rnhip = new RequestNotificationHandlerInboundPort(this);
-//		this.addPort(rnhip);
-//		this.rnhip.publishPort();
-//		
-//		System.out.println("[DEBUG LEO] rnhip ok");
-//		
-//		this.addRequiredInterface(RequestNotificationHandlerI.class);
-//		
-//		System.out.println("[DEBUG LEO] add");
-		
 		// Rg debug
 		this.toggleTracing();
 		this.toggleLogging();
@@ -68,6 +52,7 @@ public class RequestGenerator
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		super.logMessage(rgURI  + " : gettting an answer for " + r.getRequestURI());
+		System.out.println(rgURI  + " : gettting an answer for " + r.getRequestURI());
 		super.acceptRequestTerminationNotification(r);
 	}
 	
@@ -82,8 +67,7 @@ public class RequestGenerator
 				RequestGenerator.rg_rsop);
 		ret.put(RGPortTypes.REQUEST_NOTIFICATION_IN,
 				RequestGenerator.rg_rnip);
-//		ret.put(RGPortTypes.REQUEST_NOTIFICATION_HANDLER_IN,
-//				this.rnhip.getPortURI());
+
 		return ret ;
 	}
 	
