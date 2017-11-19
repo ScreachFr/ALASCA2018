@@ -16,7 +16,7 @@ import fr.upmc.datacenter.software.ports.RequestNotificationInboundPort;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
-import fr.upmc.gaspardleo.classfactory.ClassFactory;
+//import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestNotificationHandlerInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestNotificationHandlerOutboundPort;
@@ -47,8 +47,11 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	//Misc
 	private Integer 									vmCursor;
 
-	public RequestDispatcher(String dispatcherUri, 
-			String RG_RequestNotificationInboundPortURI, String RG_RequestNotificationHandlerInboundPortURI) throws Exception {
+	public RequestDispatcher(
+			String dispatcherUri, 
+			String RG_RequestNotificationInboundPortURI, 
+			String RG_RequestNotificationHandlerInboundPortURI) throws Exception {
+		
 		super(1, 1);
 
 		this.dispatcherUri 		= dispatcherUri;
@@ -61,43 +64,41 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.rsip = new RequestSubmissionInboundPort(this);
 		this.addPort(this.rsip);
 		this.rsip.publishPort();
-
+		
 		// Request submission outbound port connection.
         this.rsop = new RequestSubmissionOutboundPort(this) ;
 		this.addPort(this.rsop);
 		this.rsop.publishPort();
 		this.addOfferedInterface(RequestSubmissionHandlerI.class) ;
-		
+				
 		// Request notification submission inbound port connection.
 		this.rnip = new RequestNotificationInboundPort(this);
 		this.addPort(this.rnip);
 		this.rnip.publishPort();
-
 		
 		// Request notification submission outbound port connection.
 		this.rnop = new RequestNotificationOutboundPort(this);
 		this.addPort(this.rnop);
 		this.rnop.publishPort();
 		this.addOfferedInterface(RequestNotificationI.class);
-		
-		
+				
 		// Request notification Handler
 		this.rnhop = new RequestNotificationHandlerOutboundPort(this);
 		this.addPort(this.rnhop);
 		this.rnhop.publishPort();
-		
+				
 		this.rnhip = new RequestNotificationHandlerInboundPort(this);
 		this.addPort(rnhip);
 		this.rnhip.publishPort();
 		this.addRequiredInterface(RequestNotificationHandlerI.class);
-		
-		
-		rnop.doConnection(RG_RequestNotificationInboundPortURI, RequestNotificationConnector.class.getCanonicalName());
-		rnhop.doConnection(RG_RequestNotificationHandlerInboundPortURI, 
-				ClassFactory.newConnector(RequestNotificationHandlerI.class).getCanonicalName());
-		System.out.println("rnop is connected ? " + rnop.connected());
-		System.out.println("rnhop is connected ? " + rnhop.connected());
-		
+				
+		rnop.doConnection(
+				RG_RequestNotificationInboundPortURI, 
+				RequestNotificationConnector.class.getCanonicalName());
+				
+//		rnhop.doConnection(
+//				RG_RequestNotificationHandlerInboundPortURI, 
+//				ClassFactory.newConnector(RequestNotificationHandlerI.class).getCanonicalName());		
 	}
 
 	@Override

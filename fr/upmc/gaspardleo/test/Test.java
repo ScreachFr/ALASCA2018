@@ -20,7 +20,7 @@ import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class Test {
 	
-	private final static int 	NB_DATASOURCE = 1;
+	private final static int 	NB_DATASOURCE = 10;
 	
 	private CVMComponent 		cvmc;
 	private CVM 				cvm;

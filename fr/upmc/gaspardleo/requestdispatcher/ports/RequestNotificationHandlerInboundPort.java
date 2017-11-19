@@ -5,14 +5,17 @@ import fr.upmc.components.ports.AbstractInboundPort;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
 
-public class RequestNotificationHandlerInboundPort extends AbstractInboundPort implements RequestNotificationHandlerI {
+public class RequestNotificationHandlerInboundPort 
+		extends AbstractInboundPort 
+		implements RequestNotificationHandlerI {
+	
 	private static final long serialVersionUID = -9221552749755323867L;
 
-	public RequestNotificationHandlerInboundPort(String uri, ComponentI owner) throws Exception {
-		super(uri, RequestNotificationHandlerI.class, owner);
-	}
+//	public RequestNotificationHandlerInboundPort(String uri, ComponentI owner) throws Exception {
+//		super(uri, RequestNotificationHandlerI.class, owner);
+//	}
 
-	public RequestNotificationHandlerInboundPort(ComponentI owner) throws Exception {
+	public RequestNotificationHandlerInboundPort(ComponentI owner) throws Exception {		
 		super(RequestNotificationHandlerI.class, owner);
 	}
 

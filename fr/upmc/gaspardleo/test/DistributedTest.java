@@ -96,15 +96,22 @@ public class DistributedTest
 				System.out.println("### Creation RG ...");
 				this.rg  = new RequestGenerator("rg");
 				this.addDeployedComponent(rg);
+				System.out.println("### RG created");
+				System.out.println("");
 				
+				System.out.println("### Creation Management Outbound Port for RG ...");
 				this.rgmop = new RequestGeneratorManagementOutboundPort(
 					AbstractPort.generatePortURI(),
 					new AbstractComponent(0, 0) {});
 				this.rgmop.publishPort();
+				System.out.println("### Management Outbound Port for RG created");
+				System.out.println("");
+				
+				System.out.println("### Connection RG with his Manager ...");
 				this.rgmop.doConnection(
 					rg.getRGPortsURI().get(RGPortTypes.MANAGEMENT_IN),
 					RequestGeneratorManagementConnector.class.getCanonicalName());
-				System.out.println("### RG created");
+				System.out.println("### RG and his Manager connected");
 				System.out.println("");
 				
 				System.out.println("### DatacenterClient instantiated and published");
@@ -188,16 +195,16 @@ public class DistributedTest
 		} else {
 			if (thisJVMURI.equals(DatacenterClient)){
 				
-				System.out.println("### Connection RG with AC ...");
-				
-				this.acop = new AdmissionControllerOutboundPort(ac_uri,new AbstractComponent(0, 0) {});
-				acop.publishPort();
+//				System.out.println("### Connection RG with AC ...");
+//				
+//				this.acop = new AdmissionControllerOutboundPort(ac_uri,new AbstractComponent(0, 0) {});
+//				acop.publishPort();
 //				acop.doConnection(
 //						this.rg.getRGPortsURI().get(RGPortTypes.INTROSPECTION),
 //						AdmissionControllerConnector.class.getCanonicalName());
 //				System.out.println("### RG and AC connected");
 //				System.out.println("");
-//				
+//							
 //				System.out.println("### Creation RD ...");
 //				RequestDispatcher rd = ((AdmissionControllerI) this.acop).addRequestDispatcher(
 //						"rd-",

@@ -6,7 +6,7 @@ import java.util.Map;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
-import fr.upmc.gaspardleo.requestdispatcher.ports.RequestNotificationHandlerInboundPort;
+//import fr.upmc.gaspardleo.requestdispatcher.ports.RequestNotificationHandlerInboundPort;
 
 public class RequestGenerator 
 	extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
@@ -24,7 +24,7 @@ public class RequestGenerator
 	
 	private String rgURI;
 	
-	private RequestNotificationHandlerInboundPort 		rnhip;	
+	//private RequestNotificationHandlerInboundPort 		rnhip;	
 	
 	public RequestGenerator(
 			String rgURI) throws Exception {
@@ -39,10 +39,17 @@ public class RequestGenerator
 		
 		this.rgURI = rgURI;
 		
-		this.rnhip = new RequestNotificationHandlerInboundPort(this);
-		this.addPort(rnhip);
-		this.rnhip.publishPort();
-		this.addRequiredInterface(RequestNotificationHandlerI.class);
+//		System.out.println("[DEBUG LEO] rnhip ...");
+//		
+//		this.rnhip = new RequestNotificationHandlerInboundPort(this);
+//		this.addPort(rnhip);
+//		this.rnhip.publishPort();
+//		
+//		System.out.println("[DEBUG LEO] rnhip ok");
+//		
+//		this.addRequiredInterface(RequestNotificationHandlerI.class);
+//		
+//		System.out.println("[DEBUG LEO] add");
 		
 		// Rg debug
 		this.toggleTracing();
@@ -66,8 +73,8 @@ public class RequestGenerator
 				RequestGenerator.rg_rsop);
 		ret.put(RGPortTypes.REQUEST_NOTIFICATION_IN,
 				RequestGenerator.rg_rnip);
-		ret.put(RGPortTypes.REQUEST_NOTIFICATION_HANDLER_IN,
-				this.rnhip.getPortURI());
+//		ret.put(RGPortTypes.REQUEST_NOTIFICATION_HANDLER_IN,
+//				this.rnhip.getPortURI());
 		return ret ;
 	}
 	
