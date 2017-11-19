@@ -8,14 +8,11 @@ import java.util.Map;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.cvm.CVMComponent;
-import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 
 public class AdmissionController 
 		extends AbstractComponent
@@ -29,7 +26,7 @@ public class AdmissionController
 	private String											uri;
 
 	// Ports
-	private AdmissionControllerOutboundPort 				acop;
+//	private AdmissionControllerOutboundPort 				acop;
 	
 	// RequestSource related components
 	private Map<String, RequestDispatcher>					RDs;
@@ -72,19 +69,19 @@ public class AdmissionController
 	}
 	
 	@Override
-	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd, CVMComponent cvm) throws Exception {
+	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd) throws Exception {
 		
 		String numRD = rd.getRDPortsURI().get(RDPortTypes.INTROSPECTION).split("-")[1];
 		
 		// Vm applications creation
-		ApplicationVM vm0 = createApplicationVM("vm-" + numRD + "-0", cvm);
-//		ApplicationVM vm1 = createApplicationVM("vm-" + numRD + "-1");
-//		ApplicationVM vm2 = createApplicationVM("vm-" + numRD + "-2");
+		ApplicationVM vm0 = createApplicationVM("vm-" + numRD + "-0");
+		ApplicationVM vm1 = createApplicationVM("vm-" + numRD + "-1");
+		ApplicationVM vm2 = createApplicationVM("vm-" + numRD + "-2");
 		
 		ArrayList<ApplicationVM> newAVMs = new ArrayList<>();
 		newAVMs.add(vm0);
-//		newAVMs.add(vm1);
-//		newAVMs.add(vm2);
+		newAVMs.add(vm1);
+		newAVMs.add(vm2);
 		
 		String currentNotifPortUri;
 		
@@ -94,35 +91,18 @@ public class AdmissionController
 				vm0.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
 		
 		vm0.doRequestNotificationConnection(currentNotifPortUri);
-		
-		
-		
-//		currentNotifPortUri = rd.registerVM(
-//				vm1.getNewAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
-//				vm1.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
-//		vm1.doRequestNotificationConnection(currentNotifPortUri);
-//		currentNotifPortUri = rd.registerVM(
-//				vm2.getNewAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
-//				vm2.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
-//		vm2.doRequestNotificationConnection(currentNotifPortUri);
-		
-		
-		
+		currentNotifPortUri = rd.registerVM(
+				vm1.getNewAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
+				vm1.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
+		vm1.doRequestNotificationConnection(currentNotifPortUri);
+		currentNotifPortUri = rd.registerVM(
+				vm2.getNewAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
+				vm2.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION));
+		vm2.doRequestNotificationConnection(currentNotifPortUri);
+				
 		AVMs.put(rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN), newAVMs);
 		
 		return newAVMs;
-	}
-	
-	//TODO delete RD avec unregisterVM
-	@Override
-	public void removeRequestSource(String RD_RequestSubmissionInboundPortUri) throws Exception {
-		RDs.get(RD_RequestSubmissionInboundPortUri).shutdown();
-		for (ApplicationVM vm :  AVMs.get(RD_RequestSubmissionInboundPortUri)) {
-			vm.shutdown();
-		}
-		
-		RDs.remove(RD_RequestSubmissionInboundPortUri);
-		AVMs.remove(RD_RequestSubmissionInboundPortUri);
 	}
 	
 	/**
@@ -135,7 +115,7 @@ public class AdmissionController
 	 * 		L'AVM créée.
 	 * @throws Exception
 	 */
-	private ApplicationVM createApplicationVM(String VM_URI, CVMComponent cvm) throws Exception{
+	private ApplicationVM createApplicationVM(String VM_URI) throws Exception{
 				
 		// Vm applications creation
 		ApplicationVM vm = new ApplicationVM(VM_URI);
@@ -154,10 +134,20 @@ public class AdmissionController
 				ApplicationVMManagementConnector.class.getCanonicalName());
 		
 		this.avmPorts.add(avmPort);
-		
-		cvm.allocateCores(avmPort);
-		
+				
 		return vm;
+	}
+	
+	//TODO delete RD avec unregisterVM
+	@Override
+	public void removeRequestSource(String RD_RequestSubmissionInboundPortUri) throws Exception {
+		RDs.get(RD_RequestSubmissionInboundPortUri).shutdown();
+		for (ApplicationVM vm :  AVMs.get(RD_RequestSubmissionInboundPortUri)) {
+			vm.shutdown();
+		}
+		
+		RDs.remove(RD_RequestSubmissionInboundPortUri);
+		AVMs.remove(RD_RequestSubmissionInboundPortUri);
 	}
 	
 	public Map<ACPortTypes, String>	getACPortsURI() throws Exception {

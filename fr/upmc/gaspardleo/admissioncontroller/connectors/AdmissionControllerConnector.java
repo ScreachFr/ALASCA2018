@@ -6,7 +6,6 @@ import fr.upmc.components.connectors.AbstractConnector;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
-import fr.upmc.gaspardleo.cvm.CVMComponent;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 
 public class AdmissionControllerConnector 
@@ -35,7 +34,7 @@ public class AdmissionControllerConnector
 	}
 
 	@Override
-	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd, CVMComponent cvm) throws Exception {
-		return ((AdmissionControllerI)this.offering).addApplicationVMs(rd, cvm);
+	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd) throws Exception {
+		return ((AdmissionControllerI)this.offering).addApplicationVMs(rd);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ports.AbstractPort;
+import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
@@ -68,10 +69,17 @@ public class Test {
 		
 		this.cvm.deployComponent(rd);
 		
-		ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd, cvmc);
+		ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd);
 		
 		for (int j = 0; j < vms.size(); j++){
 			this.cvm.deployComponent(vms.get(j));
+		}
+		
+		ArrayList<ApplicationVMManagementOutboundPort> avmPorts = this.ac.getApplicationVMManagementOutboundPorts();
+		
+		for (int j = avmPorts.size() - vms.size(); j < avmPorts.size(); j++){
+			ApplicationVMManagementOutboundPort avmPort = avmPorts.get(j);
+			this.cvm.allocateCores(avmPort);
 		}
 		
 		// Port connections
