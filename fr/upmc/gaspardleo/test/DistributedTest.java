@@ -17,13 +17,13 @@ import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorMana
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.connectors.AdmissionControllerConnector;
+import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.computer.Computer;
 import fr.upmc.gaspardleo.computer.ComputerMonitor;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computer.ComputerMonitor.ComputerMonitorPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
-import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
 
 public class DistributedTest 
@@ -32,6 +32,7 @@ public class DistributedTest
 	private static final String Datacenter 			= "datacenter";
 	private static final String DatacenterClient 	= "datacenterclient";
 	private static String		ac_uri				= "ac_uri";
+	private static String		rg_uri				= "rg_uri";
 	
 	private Computer 								c;
 	private ComputerServicesOutboundPort 			csPort;
@@ -60,6 +61,7 @@ public class DistributedTest
 			
 			System.out.println("### Creation Computer ...");
 			this.c = createComputer();
+			c.toggleLogging();
 			this.addDeployedComponent(c);
 			Map<ComputerPortsTypes, String> computerPorts = createComputerServicesOutboundPort(c);
 			System.out.println("### Computer created");
@@ -84,7 +86,7 @@ public class DistributedTest
 			if (thisJVMURI.equals(DatacenterClient)){
 				
 				System.out.println("### Creation RG ...");
-				this.rg  = new RequestGenerator("rg");
+				this.rg  = new RequestGenerator("rg", rg_uri);
 				this.addDeployedComponent(rg);
 				
 				this.rgmop = new RequestGeneratorManagementOutboundPort(
@@ -176,32 +178,18 @@ public class DistributedTest
 		
 		if(thisJVMURI.equals(Datacenter)){
 			
+			System.out.println("### Interconnect ...");
+			System.out.println("");
+			
+			System.out.println("### Connection AC with RG ...");
+			ac.doPortConnection(ac_uri, rg_uri, RequestGeneratorInboundPort.class.getCanonicalName());
+			System.out.println("### AC and RG connected");
+			System.out.println("");
+			
+			System.out.println("### Interconnection done");
+			
 		} else {
-			if (thisJVMURI.equals(DatacenterClient)){
-				
-				System.out.println("### Interconnect ...");
-				
-				
-				System.out.println("### Connection RG with AC ...");
-				
-				this.rg.addRequiredInterface(RequestGeneratorI.class);
-				RequestGeneratorInboundPort inPort = new RequestGeneratorInboundPort("rg_ac", this.rg);
-				this.rg.addPort(inPort);
-				inPort.publishPort();
-				
-				System.out.println("### Connection RG with AC ...");
-
-				this.rg.doPortConnection(
-						ac_uri, 
-						"rg_ac", 
-						AdmissionControllerConnector.class.getCanonicalName());
-				System.out.println("### RG and AC connected");
-				System.out.println("");
-	
-				//TODO
-				
-				System.out.println("### Interconnection done");
-				
+			if (thisJVMURI.equals(DatacenterClient)){	
 			} else {
 				throw new RuntimeException("unknown JVM " + thisJVMURI);
 			}

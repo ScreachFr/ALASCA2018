@@ -93,7 +93,7 @@ public class Test {
 	private RequestGenerator createRequestGenerator(String RG_URI) throws Exception{
 		
 		// Request Generator creation
-		RequestGenerator rg  = new RequestGenerator(RG_URI);
+		RequestGenerator rg  = new RequestGenerator(RG_URI, "");
 
 		// Rg debug
 		rg.toggleTracing();

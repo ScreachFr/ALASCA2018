@@ -50,8 +50,14 @@ public class AdmissionController
 		this.addPort(this.acop);
 		this.acop.publishPort();
 		
+		System.out.println("[DEBUG LEO] this.acop.isDistributedlyPublished() : " + this.acop.isDistributedlyPublished());
+		
 		this.toggleLogging();
 		this.toggleTracing();
+	}
+	
+	public AdmissionControllerOutboundPort getProtToConnectWithRG(){
+		return acop;
 	}
 	
 	@Override

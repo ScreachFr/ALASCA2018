@@ -60,6 +60,7 @@ public class				RequestSubmissionOutboundPort
 extends		AbstractOutboundPort
 implements	RequestSubmissionI
 {
+	//private static final long serialVersionUID = 2L;
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------

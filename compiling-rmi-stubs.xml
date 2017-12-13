@@ -3,60 +3,65 @@
         <echo message="Recompiling stubs..."/>
                 
         <echo message="Recompiling fr.upmc.datacenter.hardware.computers.ports.ComputerServicesInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.datacenter.hardware.computers.ports.ComputerServicesInboundPort"
             base="../GaspardLeo"/>
             
         <echo message="Recompiling fr.upmc.datacenter.hardware.computers.ports.ComputerStaticStateDataInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.datacenter.hardware.computers.ports.ComputerStaticStateDataInboundPort"
             base="../GaspardLeo"/>
             
         <echo message="Recompiling fr.upmc.components.ports.AbstractDataInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.components.ports.AbstractDataInboundPort"
             base="../GaspardLeo"/>
             
         <echo message="Recompiling fr.upmc.datacenter.ports.AbstractControlledDataInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.datacenter.ports.AbstractControlledDataInboundPort"
             base="../GaspardLeo"/>
             
         <echo message="Recompiling fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMDynamicStateDataInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMDynamicStateDataInboundPort"
             base="../GaspardLeo"/>
             
         <echo message="Recompiling fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMIntrospectionInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMIntrospectionInboundPort"
             base="../GaspardLeo"/>
             
         <echo message="Recompiling fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementInboundPort"
             base="../GaspardLeo"/>
             
         <echo message="Recompiling fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMStaticStateDataInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMStaticStateDataInboundPort"
             base="../GaspardLeo"/>
             
         <echo message="Recompiling fr.upmc.datacenter.software.ports.RequestNotificationInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.datacenter.software.ports.RequestNotificationInboundPort"
             base="../GaspardLeo"/>
             
         <echo message="Recompiling fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort"
             base="../GaspardLeo"/>
             
         <echo message="Recompiling fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementInboundPort" />
-        <rmic classpath="${classpath}:../GaspardLeo/bin:../BCM/src"
+        <rmic classpath="${classpath}:../GaspardLeo/bin"
             classname="fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementInboundPort"
             base="../GaspardLeo"/>
-            
+
+    	<echo message="Recompiling fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort" />
+    	        <rmic classpath="${classpath}:../GaspardLeo/bin"
+    	            classname="fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort"
+    	            base="../GaspardLeo"/>
+
         <echo message="stubs recompiled!"/>
     </target>
 </project>

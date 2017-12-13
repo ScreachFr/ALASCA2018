@@ -6,6 +6,8 @@ import java.util.Map;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.components.ports.PortI;
 import fr.upmc.datacenter.software.interfaces.RequestI;
+import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorI;
+import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
 
 public class RequestGenerator 
 	extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
@@ -24,7 +26,7 @@ public class RequestGenerator
 	private String rgURI;
 		
 	public RequestGenerator(
-			String rgURI) throws Exception {
+			String rgURI, String RG_to_AC) throws Exception {
 		
 		super(
 			rgURI, 
@@ -35,6 +37,11 @@ public class RequestGenerator
 			rg_rnip);
 		
 		this.rgURI = rgURI;
+		
+		this.addRequiredInterface(RequestGeneratorI.class);
+		RequestGeneratorInboundPort inPort = new RequestGeneratorInboundPort(RG_to_AC, this);
+		this.addPort(inPort);
+		inPort.publishPort();
 		
 		// Rg debug
 		this.toggleTracing();

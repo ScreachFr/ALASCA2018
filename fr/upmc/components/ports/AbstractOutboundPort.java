@@ -183,7 +183,12 @@ implements	OutboundPortI
 	public void			publishPort() throws Exception
 	{
 		// an outbound port never needs to be published distributedly
+
+		// DEBUG LEO
+		
 		super.localPublishPort() ;
+		
+		//super.publishPort();
 	}
 
 	// ------------------------------------------------------------------------
@@ -313,18 +318,32 @@ implements	OutboundPortI
 	public void			obeyConnection(String otherPortURI, String ccname)
 	throws	Exception
 	{
+				System.err.println("otherPortURI != null : " + (otherPortURI != null));
+				System.out.flush();
+				System.err.println("\nccname != null : " + (ccname != null));;
+				System.out.flush();
+				System.err.println("\n!this.connected() : " + !this.connected());
+		
+				
+				System.err.println("\notherPortURI : " + otherPortURI +
+						"\nccname : " + ccname);
+				
 		assert	otherPortURI != null && ccname != null && !this.connected() ;
 
 		// FIXME: should use a proper state machine model to implement the
 		// connection and disconnection protocol
 
+		System.out.println("1");
 		Class<?> cc = Class.forName(ccname) ;
+		System.out.println("2");
 		Constructor<?> c = cc.getConstructor(new Class<?>[]{}) ;
+		System.out.println("3");
 		ConnectorI connector = (ConnectorI) c.newInstance() ;
+		System.out.println("4");
 		ConnectionBuilder.SINGLETON.connectWith(otherPortURI,
 												this.getPortURI(),
 												connector) ;
-
+		System.out.println("5");
 		assert	this.connected() ;
 	}
 
@@ -343,6 +362,7 @@ implements	OutboundPortI
 	public void			obeyConnection(String otherPortURI, ConnectorI connector)
 	throws	Exception
 	{
+		System.out.println("obeyConnection(String otherPortURI, ConnectorI connector)");
 		assert	otherPortURI != null && connector != null && !this.connected() ;
 
 		// FIXME: should use a proper state machine model to implement the
