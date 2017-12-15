@@ -2,17 +2,21 @@ package fr.upmc.gaspardleo.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
+import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
+import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationInboundPort;
 import fr.upmc.components.ports.AbstractPort;
+import fr.upmc.components.ports.PortI;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
+import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.cvm.CVM;
-import fr.upmc.gaspardleo.cvm.CVMComponent;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator;
@@ -20,31 +24,34 @@ import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class Test {
 	
-	private final static int 	NB_DATASOURCE = 10;
-	
-	private CVMComponent 		cvmc;
+	private final static int 	NB_DATASOURCE 	= 10;	
+	private final static String AC_URI 			= "AC_URI";
+	private final static String URI_DCC 		= "uri_dcc";
+
 	private CVM 				cvm;
 	private AdmissionController	ac;
-
+	
 	private List<RequestGeneratorManagementOutboundPort> rgmops;
 
+	private Map<ACPortTypes, String> ac_uris;
+	
 	public Test(){
 		rgmops = new ArrayList<>();
 		initTest();
 	}
 
 	private void initTest(){
-		try {	
-
+		try {
+			
+			DynamicComponentCreator dcc = new DynamicComponentCreator(URI_DCC);			
+			
+			//TODO
 			// CVM creation
 			this.cvm 	= new CVM();
 			this.cvm.deploy();
 
-			// CVM Component creation
-			this.cvmc 	= new CVMComponent(cvm);
-
 			// Admission Controller creation
-			this.ac = new AdmissionController("ac");
+			ac_uris = AdmissionController.newInstance(dcc, AC_URI);
 			
 			// Simply adds some request generators to the current admission controller.
 			for (int i = 0; i < NB_DATASOURCE; i++) {
@@ -61,14 +68,14 @@ public class Test {
 						
 		// Request Generator creation
 		RequestGenerator rg  = createRequestGenerator("rg-"+i);
-
+		
 		// Dynamic ressources creation
-		RequestDispatcher rd = this.ac.addRequestDispatcher(
+		this.ac.addRequestDispatcher(
 			"rd-"+i,
 			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN)/*,
 			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_HANDLER_IN)*/);
 		
-		this.cvm.deployComponent(rd);
+		//this.cvm.deployComponent(rd);
 		
 		ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd);
 		

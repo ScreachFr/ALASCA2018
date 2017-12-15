@@ -13,14 +13,14 @@ public class AdmissionControllerConnector
 		implements AdmissionControllerI{
 
 	@Override
-	public RequestDispatcher addRequestDispatcher(
+	public void addRequestDispatcher(
 			String RD_URI,
 			String RG_RequestNotificationInboundPortURI/*,
 			String RG_RequestNotificationHandlerInboundPortURI*/) throws Exception {
 		
 		System.out.println("[DEBUG LEO] (AdmissionControllerI)this.offering " + (AdmissionControllerI)this.offering);
 		
-		return ((AdmissionControllerI)this.offering).addRequestDispatcher(
+		((AdmissionControllerI)this.offering).addRequestDispatcher(
 				RD_URI,
 				RG_RequestNotificationInboundPortURI/*,
 				RG_RequestNotificationHandlerInboundPortURI*/);
@@ -34,10 +34,5 @@ public class AdmissionControllerConnector
 	@Override
 	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() {
 		return ((AdmissionControllerI)this.offering).getApplicationVMManagementOutboundPorts();
-	}
-
-	@Override
-	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd) throws Exception {
-		return ((AdmissionControllerI)this.offering).addApplicationVMs(rd);
 	}
 }

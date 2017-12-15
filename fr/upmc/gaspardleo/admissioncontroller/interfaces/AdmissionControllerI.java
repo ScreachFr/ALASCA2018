@@ -11,13 +11,11 @@ import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 public interface AdmissionControllerI 
 	extends	OfferedI, RequiredI{
 
-	public RequestDispatcher addRequestDispatcher(
+	public void addRequestDispatcher(
 			String RD_URI,
 			String RG_RequestNotificationInboundPortURI/*,
 			String RG_RequestNotificationHandlerInboundPortURI*/) throws Exception;
-	
-	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd) throws Exception;
-	
+		
 	/**
 	 * Supprime le RequestDispatcher associé à l'URI du port donné en paramètre.
 	 * @param RD_RequestSubmissionInboundPortUri

@@ -77,6 +77,9 @@ extends		AbstractComponent
 	 * @param dynamicComponentCreationInboundPortURI	URI of the port offering the service
 	 * @throws Exception
 	 */
+	
+	private DynamicComponentCreationInboundPort p;
+	
 	public				DynamicComponentCreator(
 		String dynamicComponentCreationInboundPortURI
 		) throws Exception
@@ -86,7 +89,7 @@ extends		AbstractComponent
 		assert	dynamicComponentCreationInboundPortURI != null ;
 
 		this.addOfferedInterface(DynamicComponentCreationI.class) ;
-		PortI p = new DynamicComponentCreationInboundPort(
+		p = new DynamicComponentCreationInboundPort(
 								dynamicComponentCreationInboundPortURI, this) ;
 		this.addPort(p) ;
 		if (AbstractCVM.isDistributed) {
@@ -140,5 +143,9 @@ extends		AbstractComponent
 					(AbstractComponent) cons.newInstance(constructorParams) ;
 		AbstractCVM.theCVM.addDeployedComponent(component) ;
 		component.start() ;
+	}
+	
+	public DynamicComponentCreationInboundPort getPort(){
+		return p;
 	}
 }

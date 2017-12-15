@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.ComponentI;
 import fr.upmc.components.connectors.DataConnector;
 import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.datacenter.connectors.ControlledDataConnector;
@@ -21,9 +20,8 @@ import fr.upmc.gaspardleo.computer.Computer;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computer.ComputerMonitor;
 import fr.upmc.gaspardleo.computer.ComputerMonitor.ComputerMonitorPortTypes;
-import fr.upmc.gaspardleo.cvm.interfaces.CVMI;
 
-public class CVM extends AbstractCVM implements CVMI {
+public class CVM extends AbstractCVM {
 	
 	private final static int NB_CPU 				= 2;
 	private final static int NB_CORES 				= 2;
@@ -128,11 +126,11 @@ public class CVM extends AbstractCVM implements CVMI {
 				ControlledDataConnector.class.getCanonicalName()) ;
 	}
 
-	@Override
+	/*@Override
 	public void addAVMPort(ApplicationVMManagementOutboundPort avmPort) {
 		
 		this.avmPorts.add(avmPort);
-	}
+	}*/
 	
 	@Override
 	public void start() throws Exception {
@@ -146,12 +144,6 @@ public class CVM extends AbstractCVM implements CVMI {
 				avmPort.allocateCores(getAllocatedCore());
 		}
 	}
-	
-	@Override
-	public void deployComponent(ComponentI cmp) throws Exception {
-		
-		this.addDeployedComponent(cmp);
-	}
 
 	private AllocatedCore[] getAllocatedCore() {
 		
@@ -164,7 +156,6 @@ public class CVM extends AbstractCVM implements CVMI {
 		return result;
 	}
 	
-	@Override
 	public void allocateCores(ApplicationVMManagementOutboundPort avmPort) throws Exception {
 		
 		avmPort.allocateCores(getAllocatedCore()) ;

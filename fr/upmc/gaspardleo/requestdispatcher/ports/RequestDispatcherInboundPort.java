@@ -14,6 +14,9 @@ public class RequestDispatcherInboundPort
 	 */
 	private static final long serialVersionUID = 1L;
 		
+	public RequestDispatcherInboundPort(ComponentI owner) throws Exception {
+		super(RequestDispatcherI.class, owner);
+	}
 	public RequestDispatcherInboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, RequestDispatcherI.class, owner);
 	}

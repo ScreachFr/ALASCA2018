@@ -24,12 +24,12 @@ public class AdmissionControllerOutboundPort
 	}
 
 	@Override
-	public RequestDispatcher addRequestDispatcher(
+	public void addRequestDispatcher(
 			String RD_URI,
 			String RG_RequestNotificationInboundPortURI/*,
 			String RG_RequestNotificationHandlerInboundPortURI*/) throws Exception { 
 		
-		return ((AdmissionControllerI)this.connector).addRequestDispatcher(
+		((AdmissionControllerI)this.connector).addRequestDispatcher(
 				RD_URI,
 				RG_RequestNotificationInboundPortURI/*,
 				RG_RequestNotificationHandlerInboundPortURI*/);	
@@ -43,10 +43,5 @@ public class AdmissionControllerOutboundPort
 	@Override
 	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() {
 		return ((AdmissionControllerI)this.connector).getApplicationVMManagementOutboundPorts();
-	}
-
-	@Override
-	public ArrayList<ApplicationVM> addApplicationVMs(RequestDispatcher rd) throws Exception {
-		return ((AdmissionControllerI)this.connector).addApplicationVMs(rd);
 	}
 }
