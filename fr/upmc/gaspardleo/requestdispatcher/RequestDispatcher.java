@@ -222,15 +222,16 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		String RequestNotification_Out = AbstractPort.generatePortURI();
 		String RequestDispatcher_In = AbstractPort.generatePortURI();
 		
-		dcc.createComponent(RequestDispatcher.class.getCanonicalName(), 
-				new Object[]{ 
-						Component_URI, 
-						RG_RequestNotification_In,
-						RequestSubmission_In,
-						RequestSubmission_Out,
-						RequestNotification_In,
-						RequestNotification_Out,
-						RequestDispatcher_In});
+		Object[] args = new Object[]{ 
+				Component_URI, 
+				RG_RequestNotification_In,
+				RequestSubmission_In,
+				RequestSubmission_Out,
+				RequestNotification_In,
+				RequestNotification_Out,
+				RequestDispatcher_In};
+		
+		dcc.createComponent(RequestDispatcher.class.getCanonicalName(), args);
 		
 		HashMap<RDPortTypes, String> ret = new HashMap<RDPortTypes, String>() ;		
 		ret.put(RDPortTypes.INTROSPECTION, Component_URI);

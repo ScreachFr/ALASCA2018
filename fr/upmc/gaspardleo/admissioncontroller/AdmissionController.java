@@ -108,27 +108,19 @@ public class AdmissionController
 	 * 		L'AVM créée.
 	 * @throws Exception
 	 */
-	private ApplicationVM createApplicationVM(String VM_URI) throws Exception{
+	private void createApplicationVM(String VM_URI) throws Exception{
 				
 		// Vm applications creation
-		ApplicationVM vm = new ApplicationVM(VM_URI);
-		
-		// VM debug
-		vm.toggleTracing();
-		vm.toggleLogging();
+		Map<ApplicationVMPortTypes, String> AVM_uris = ApplicationVM.newInstance(dcc, VM_URI);
 				
 		// Create a mock up port to manage the AVM component (allocate cores).
-		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(
-				new AbstractComponent(0, 0) {});
+		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(new AbstractComponent(0, 0) {});
 		avmPort.publishPort();
+		this.avmPorts.add(avmPort);
 		
 		avmPort.doConnection(
-				vm.getNewAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT),
+				AVM_uris.get(ApplicationVMPortTypes.MANAGEMENT),
 				ApplicationVMManagementConnector.class.getCanonicalName());
-		
-		this.avmPorts.add(avmPort);
-				
-		return vm;
 	}
 	
 	@Override
@@ -144,7 +136,8 @@ public class AdmissionController
 	
 	public static Map<ACPortTypes, String> newInstance(DynamicComponentCreator dcc, String AC_URI) throws Exception{
 
-		dcc.createComponent(AdmissionController.class.getCanonicalName(), new Object[]{AC_URI, dcc});
+		Object[] args = new Object[]{AC_URI, dcc};
+		dcc.createComponent(AdmissionController.class.getCanonicalName(), args);
 		
 		HashMap<ACPortTypes, String> ret = new HashMap<ACPortTypes, String>();		
 		ret.put(ACPortTypes.INTROSPECTION, AC_URI);
