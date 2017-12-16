@@ -1,4 +1,4 @@
-# Éléments utils à l'Étape 2
+# Éléments utiles à l'Étape 2
 
 ## Accès aux caractèristiques du hardware
 
