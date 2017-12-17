@@ -6,6 +6,7 @@ import java.util.Set;
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
+import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 
 public class ComputerPooOutboundPort extends AbstractOutboundPort implements ComputerPoolI {
@@ -24,7 +25,7 @@ public class ComputerPooOutboundPort extends AbstractOutboundPort implements Com
 	}
 
 	@Override
-	public ApplicationVM createNewApplicationVM(String avmURI, int numberOfCoreToAllocate) throws Exception {
+	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, int numberOfCoreToAllocate) throws Exception {
 		return ((ComputerPoolI)(this.connector)).createNewApplicationVM(avmURI, numberOfCoreToAllocate);
 	}
 

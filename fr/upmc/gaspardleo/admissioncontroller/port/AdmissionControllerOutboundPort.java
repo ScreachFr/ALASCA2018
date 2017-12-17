@@ -1,13 +1,13 @@
 package fr.upmc.gaspardleo.admissioncontroller.port;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
-import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
+import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class AdmissionControllerOutboundPort 
 	extends AbstractOutboundPort
@@ -16,23 +16,17 @@ public class AdmissionControllerOutboundPort
 	public AdmissionControllerOutboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, AdmissionControllerI.class, owner);
 		
-//		if (uri == null){
-//			System.out.println("uri NULL");
-//		}
-		
 		assert	uri != null ;
 	}
 
 	@Override
 	public void addRequestDispatcher(
 			String RD_URI,
-			String RG_RequestNotificationInboundPortURI/*,
-			String RG_RequestNotificationHandlerInboundPortURI*/) throws Exception { 
+			Map<RGPortTypes, String> requestGeneratorURIs) throws Exception { 
 		
 		((AdmissionControllerI)this.connector).addRequestDispatcher(
 				RD_URI,
-				RG_RequestNotificationInboundPortURI/*,
-				RG_RequestNotificationHandlerInboundPortURI*/);	
+				requestGeneratorURIs);	
 	}
 
 	@Override

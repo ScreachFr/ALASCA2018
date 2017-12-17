@@ -1,12 +1,12 @@
 package fr.upmc.gaspardleo.admissioncontroller.connectors;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import fr.upmc.components.connectors.AbstractConnector;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
-import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
+import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class AdmissionControllerConnector 
 		extends AbstractConnector
@@ -15,15 +15,13 @@ public class AdmissionControllerConnector
 	@Override
 	public void addRequestDispatcher(
 			String RD_URI,
-			String RG_RequestNotificationInboundPortURI/*,
-			String RG_RequestNotificationHandlerInboundPortURI*/) throws Exception {
+			Map<RGPortTypes, String> requestGeneratorURIs) throws Exception {
 		
 		System.out.println("[DEBUG LEO] (AdmissionControllerI)this.offering " + (AdmissionControllerI)this.offering);
 		
 		((AdmissionControllerI)this.offering).addRequestDispatcher(
 				RD_URI,
-				RG_RequestNotificationInboundPortURI/*,
-				RG_RequestNotificationHandlerInboundPortURI*/);
+				requestGeneratorURIs);
 	}
 
 	@Override

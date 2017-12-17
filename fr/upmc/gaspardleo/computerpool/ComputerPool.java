@@ -35,7 +35,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	
 	private List<Computer> computers;
 	private List<AllocatedCore[]> availableCores;
-	private Map<ApplicationVM, AllocatedCore[]> avmInUse;
+	private Map<Map<ApplicationVMPortTypes, String>, AllocatedCore[]> avmInUse;
 
 	public ComputerPool(String componentURI, String ComputerPoolPort_IN, DynamicComponentCreator dcc) throws Exception {
 		super(1, 1);
@@ -77,25 +77,26 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	}
 
 	@Override
-	public ApplicationVM createNewApplicationVM(String avmURI, int numberOfCoreToAllocate)  throws Exception{
-		ApplicationVM result = new ApplicationVM(avmURI);
+	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, int numberOfCoreToAllocate)  throws Exception{
+		// Pas de core sous la main.
+		if (availableCores.size() == 0)
+			throw new NoAvailableResourceException();
 
+		Map<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(avmURI, dcc);
+		
 		// Create a mock up port to manage the AVM component (allocate cores).
 		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(
 				new AbstractComponent(0, 0) {});
 		avmPort.publishPort();
 
 		avmPort.doConnection(
-				result.getNewAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT),
+				result.get(ApplicationVMPortTypes.MANAGEMENT),
 				ApplicationVMManagementConnector.class.getCanonicalName());
-
 		
-		// Pas de core sous la main.
-		if (availableCores.size() == 0)
-			throw new NoAvailableResourceException();
+		
 		
 		AllocatedCore[] cores = availableCores.remove(0);
-		result.allocateCores(cores);
+		avmPort.allocateCores(cores);
 		
 		avmInUse.put(result, cores);
 		

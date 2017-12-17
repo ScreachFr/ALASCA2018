@@ -13,25 +13,47 @@ import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
+import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
+import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 
 
 public class ApplicationVM extends fr.upmc.datacenter.software.applicationvm.ApplicationVM
-implements ApplicationVMConnectionsI {
+implements ApplicationVMConnectionsI, ShutdownableI {
 
 
 
 	public static enum	ApplicationVMPortTypes {
-		REQUEST_SUBMISSION, REQUEST_NOTIFICATION, MANAGEMENT, INTROSPECTION, STATIC_STATE,
-		DYNAMIC_STATE
+		REQUEST_SUBMISSION,
+		REQUEST_NOTIFICATION,
+		MANAGEMENT,
+		INTROSPECTION,
+		STATIC_STATE,
+		DYNAMIC_STATE,
+		SHUTDOWNABLE;
 	}
 
+	// Misc
 	private String vmURI;
 
-	public ApplicationVM(String vmURI, String applicationVMManagementInboundPortURI,
-			String requestSubmissionInboundPortURI, String requestNotificationOutboundPortURI) throws Exception {
-		super(vmURI, applicationVMManagementInboundPortURI, requestSubmissionInboundPortURI,
+	// Ports
+	private ShutdownableInboundPort sip;
+	
+	public ApplicationVM(String vmURI,
+			String applicationVMManagementInboundPortURI,
+			String requestSubmissionInboundPortURI,
+			String requestNotificationOutboundPortURI,
+			String shutdownableInboundPort_URI) throws Exception {
+		super(vmURI, 
+				applicationVMManagementInboundPortURI,
+				requestSubmissionInboundPortURI,
 				requestNotificationOutboundPortURI);
 		this.vmURI = vmURI;
+		
+		this.addOfferedInterface(ShutdownableI.class);
+		this.sip = new ShutdownableInboundPort(shutdownableInboundPort_URI, this);
+		this.addPort(this.sip);
+		this.sip.publishPort();
+		
 	}
 
 	@Override
@@ -94,15 +116,19 @@ implements ApplicationVMConnectionsI {
 
 	public static Map<ApplicationVMPortTypes, String> newInstance(
 			String vmURI,
-			String requestNotificationOutboundPortURI,
 			DynamicComponentCreator dcc) throws Exception {
 
 		String applicationVMManagementInboundPortURI = AbstractPort.generatePortURI();
 		String requestSubmissionInboundPortURI = AbstractPort.generatePortURI();
-
+		String requestNotificationOutboundPortURI = AbstractPort.generatePortURI();
+		String shutdownableInboundPort = AbstractPort.generatePortURI();
+		
 		Object[] args = new Object[] {
-				vmURI, applicationVMManagementInboundPortURI,
-				requestSubmissionInboundPortURI, requestNotificationOutboundPortURI
+				vmURI,
+				applicationVMManagementInboundPortURI,
+				requestSubmissionInboundPortURI,
+				requestNotificationOutboundPortURI,
+				shutdownableInboundPort
 		};
 
 		dcc.createComponent(ApplicationVM.class.getCanonicalName(), args);
@@ -117,6 +143,8 @@ implements ApplicationVMConnectionsI {
 				vmURI);
 		ret.put(ApplicationVMPortTypes.REQUEST_NOTIFICATION, 
 				requestNotificationOutboundPortURI);
+		ret.put(ApplicationVMPortTypes.SHUTDOWNABLE, shutdownableInboundPort);
+		
 		return ret;
 
 	}

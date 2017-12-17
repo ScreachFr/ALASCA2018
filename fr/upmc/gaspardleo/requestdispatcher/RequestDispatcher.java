@@ -18,12 +18,14 @@ import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
+import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
+import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
 
 public class RequestDispatcher 
 extends AbstractComponent 
-implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHandlerI, RequestNotificationI {
+implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHandlerI, RequestNotificationI, ShutdownableI {
 
 	public static enum	RDPortTypes {
 		REQUEST_SUBMISSION_IN, 
@@ -31,7 +33,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		REQUEST_NOTIFICATION_OUT,
 		REQUEST_NOTIFICATION_IN,
 		REQUEST_DISPATCHER_IN,
-		INTROSPECTION;
+		INTROSPECTION,
+		SHUTDOWNABLE_IN;
 	}
 	
 	private String 										Component_URI;
@@ -47,6 +50,9 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	private RequestSubmissionOutboundPort 				rsop;
 	private RequestNotificationInboundPort 				rnip;
 	private RequestDispatcherInboundPort				rdip;
+	private ShutdownableInboundPort						sip;
+	
+	
 	//Misc
 	private Integer 									vmCursor;
 
@@ -56,7 +62,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 			String RequestSubmission_In,
 			String RequestSubmission_Out,
 			String RequestNotification_In,
-			String RequestNotification_Out) throws Exception {
+			String RequestNotification_Out,
+			String ShutDownable_In) throws Exception {
 		
 		super(1, 1);
 
@@ -92,10 +99,18 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.addPort(this.rnop);
 		this.rnop.publishPort();
 		this.addOfferedInterface(RequestNotificationI.class);
+		this.addRequiredInterface(RequestNotificationI.class);
 				
 		this.rnop.doConnection(
 				RG_RequestNotification_In, 
 				RequestNotificationConnector.class.getCanonicalName());
+		
+		// Shutdown port
+		this.sip = new ShutdownableInboundPort(ShutDownable_In, this);
+		this.addPort(this.sip);
+		this.sip.publishPort();
+		this.addOfferedInterface(ShutdownableI.class);
+		
 		
 		// Request Dispatcher debug
 		this.toggleLogging();
@@ -214,13 +229,14 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	public static Map<RDPortTypes, String> newInstance(
 			DynamicComponentCreator dcc, 
 			String Component_URI, 
-			String RG_RequestNotification_In) throws Exception{
+			String RG_RequestNotification_In) throws Exception {
 		
 		String RequestSubmission_In = AbstractPort.generatePortURI();
 		String RequestSubmission_Out = AbstractPort.generatePortURI();
 		String RequestNotification_In = AbstractPort.generatePortURI();
 		String RequestNotification_Out = AbstractPort.generatePortURI();
 		String RequestDispatcher_In = AbstractPort.generatePortURI();
+		String Shutdownable_In = AbstractPort.generatePortURI();
 		
 		dcc.createComponent(RequestDispatcher.class.getCanonicalName(), 
 				new Object[]{ 
@@ -230,7 +246,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 						RequestSubmission_Out,
 						RequestNotification_In,
 						RequestNotification_Out,
-						RequestDispatcher_In});
+						RequestDispatcher_In,
+						Shutdownable_In});
 		
 		HashMap<RDPortTypes, String> ret = new HashMap<RDPortTypes, String>() ;		
 		ret.put(RDPortTypes.INTROSPECTION, Component_URI);
@@ -239,7 +256,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		ret.put(RDPortTypes.REQUEST_NOTIFICATION_IN, RequestNotification_In);
 		ret.put(RDPortTypes.REQUEST_NOTIFICATION_OUT, RequestNotification_Out);
 		ret.put(RDPortTypes.REQUEST_DISPATCHER_IN, RequestDispatcher_In);
-				
+		ret.put(RDPortTypes.SHUTDOWNABLE_IN, Shutdownable_In);
+		
 		return ret;
 	}
 }

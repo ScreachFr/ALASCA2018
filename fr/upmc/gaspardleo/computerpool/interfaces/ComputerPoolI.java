@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
+import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.computer.Computer;
 
 public interface ComputerPoolI {
@@ -27,5 +28,5 @@ public interface ComputerPoolI {
 	 * @return
 	 * 		La nouvelle ApplicationVM.
 	 */
-	public ApplicationVM createNewApplicationVM(String avmURI, int numberOfCoreToAllocate) throws Exception;
+	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, int numberOfCoreToAllocate) throws Exception;
 }
