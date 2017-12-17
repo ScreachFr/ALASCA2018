@@ -1,6 +1,8 @@
 package fr.upmc.gaspardleo.test;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +17,11 @@ import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorMana
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
+import fr.upmc.gaspardleo.admissioncontroller.connectors.AdmissionControllerConnector;
+import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
+import fr.upmc.gaspardleo.computerpool.ComputerPool;
+import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.cvm.CVM;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
@@ -24,16 +30,18 @@ import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class Test {
 	
-	private final static int 	NB_DATASOURCE 	= 10;	
+	private final static int 	NB_DATASOURCE 	= 1;	
 	private final static String AC_URI 			= "AC_URI";
 	private final static String URI_DCC 		= "uri_dcc";
+	private final static String CP_URI			= "CP_URI";
 
 	private CVM 				cvm;
-	private AdmissionController	ac;
+//	private AdmissionController	ac;
 	
 	private List<RequestGeneratorManagementOutboundPort> rgmops;
 
 	private Map<ACPortTypes, String> ac_uris;
+	private Map<ComputerPoolPorts, String> cp_uris;
 	
 	public Test(){
 		rgmops = new ArrayList<>();
@@ -49,13 +57,15 @@ public class Test {
 			// CVM creation
 			this.cvm 	= new CVM();
 			this.cvm.deploy();
-
+			
+			cp_uris = ComputerPool.newInstance(CP_URI, dcc);
+			
 			// Admission Controller creation
-			ac_uris = AdmissionController.newInstance(dcc, AC_URI);
+			ac_uris = AdmissionController.newInstance(AC_URI, cp_uris, dcc);
 			
 			// Simply adds some request generators to the current admission controller.
 			for (int i = 0; i < NB_DATASOURCE; i++) {
-				this.addDataSource(i);
+				this.addDataSource(i, dcc);
 			}
 			
 		} catch (Exception e) {
@@ -64,57 +74,50 @@ public class Test {
 	}
 
 
-	private void addDataSource(int i) throws Exception {
+	private void addDataSource(int i, DynamicComponentCreator dcc) throws Exception {
 						
 		// Request Generator creation
-		RequestGenerator rg  = createRequestGenerator("rg-"+i);
+		Map<RGPortTypes, String> rg  = createRequestGenerator("rg-"+i, dcc);
 		
 		// Dynamic ressources creation
-		this.ac.addRequestDispatcher(
-			"rd-"+i,
-			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_IN)/*,
-			rg.getRGPortsURI().get(RGPortTypes.REQUEST_NOTIFICATION_HANDLER_IN)*/);
+		AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(AbstractPort.generatePortURI(), dcc);
+		acop.publishPort();
+		acop.doConnection(ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), AdmissionControllerConnector.class.getCanonicalName());
+		acop.addRequestDispatcher("rd-"+i, rg);
+//		this.ac.addRequestDispatcher("rd-"+i, rg);
 		
 		//this.cvm.deployComponent(rd);
 		
-		ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd);
+//		ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd);
 		
-		for (int j = 0; j < vms.size(); j++){
-			this.cvm.deployComponent(vms.get(j));
-		}
+//		for (int j = 0; j < vms.size(); j++){
+//			this.cvm.deployComponent(vms.get(j));
+//		}
 		
-		ArrayList<ApplicationVMManagementOutboundPort> avmPorts = this.ac.getApplicationVMManagementOutboundPorts();
-		
-		for (int j = avmPorts.size() - vms.size(); j < avmPorts.size(); j++){
-			ApplicationVMManagementOutboundPort avmPort = avmPorts.get(j);
-			this.cvm.allocateCores(avmPort);
-		}
+//		ArrayList<ApplicationVMManagementOutboundPort> avmPorts = this.ac.getApplicationVMManagementOutboundPorts();
+//		
+//		for (int j = avmPorts.size() - vms.size(); j < avmPorts.size(); j++){
+//			ApplicationVMManagementOutboundPort avmPort = avmPorts.get(j);
+//			this.cvm.allocateCores(avmPort);
+//		}
 		
 		// Port connections
-		rg.doPortConnection(
-			rg.getRGPortsURI().get(RGPortTypes.REQUEST_SUBMISSION_OUT),
-			rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN),
-			RequestSubmissionConnector.class.getCanonicalName());
+//		rg.doPortConnection(
+//			rg.getRGPortsURI().get(RGPortTypes.REQUEST_SUBMISSION_OUT),
+//			rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN),
+//			RequestSubmissionConnector.class.getCanonicalName());
 	}
 	
-	private RequestGenerator createRequestGenerator(String RG_URI) throws Exception{
+	private Map<RGPortTypes, String> createRequestGenerator(String RG_URI, DynamicComponentCreator dcc) throws Exception{
+		Map<RGPortTypes, String> result = RequestGenerator.newInstance(RG_URI, 500.0, 6000000000L, dcc);
 		
-		// Request Generator creation
-		RequestGenerator rg  = new RequestGenerator(RG_URI, "");
-
-		// Rg debug
-		rg.toggleTracing();
-		rg.toggleLogging();
-
-		// Components deployment
-		this.cvm.deployComponent(rg);
+		createRGManagement(result.get(RGPortTypes.MANAGEMENT_IN));
 		
-		createRGManagement(rg);
 		
-		return rg;
+		return result;
 	}
 	
-	private void createRGManagement(RequestGenerator rg) throws Exception{
+	private void createRGManagement(String rg_management_in) throws Exception{
 		
 		// Rg management creation
 		RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
@@ -124,7 +127,7 @@ public class Test {
 		rgmop.publishPort();
 		
 		rgmop.doConnection(
-			rg.getRGPortsURI().get(RGPortTypes.MANAGEMENT_IN),
+			rg_management_in,
 			RequestGeneratorManagementConnector.class.getCanonicalName());
 		
 		this.rgmops.add(rgmop);
@@ -154,10 +157,6 @@ public class Test {
 
 	public CVM getCvm() {
 		return cvm;
-	}
-	
-	public CVMComponent getCvmc() {
-		return cvmc;
 	}
 	
 	public static void main(String[] args){

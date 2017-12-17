@@ -35,7 +35,7 @@ public class AdmissionControllerOutboundPort
 	}
 
 	@Override
-	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() {
+	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() throws Exception {
 		return ((AdmissionControllerI)this.connector).getApplicationVMManagementOutboundPorts();
 	}
 }

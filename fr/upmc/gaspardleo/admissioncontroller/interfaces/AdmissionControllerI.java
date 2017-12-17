@@ -6,8 +6,6 @@ import java.util.Map;
 import fr.upmc.components.interfaces.OfferedI;
 import fr.upmc.components.interfaces.RequiredI;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
-import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public interface AdmissionControllerI 
@@ -26,5 +24,5 @@ public interface AdmissionControllerI
 	public void removeRequestSource(
 			String requestGeneratorURI) throws Exception;
 	
-	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts();
+	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() throws Exception;
 }

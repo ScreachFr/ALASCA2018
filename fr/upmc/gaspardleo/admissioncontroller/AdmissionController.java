@@ -23,7 +23,7 @@ import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherOutboundPort;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
+import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.connectors.RequestDispatherConnector;
 
 public class AdmissionController 
@@ -33,11 +33,12 @@ public class AdmissionController
 	private final static int DEFAULT_CORE_NUMBER = 2;
 	
 	public static enum	ACPortTypes {
-		INTROSPECTION
+		INTROSPECTION,
+		ADMISSION_CONTROLLER_IN;
 	}
 
 	private DynamicComponentCreator dcc;
-	private AdmissionControllerOutboundPort acop;
+	private AdmissionControllerInboundPort acip;
 	private ArrayList<ApplicationVMManagementOutboundPort> avmPorts;
 	
 	// Map<RequestGenerator, RequestDispatcher>
@@ -48,7 +49,10 @@ public class AdmissionController
 	private Map<ComputerPoolPorts, String> computerPoolURIs;
 	private ComputerPooOutboundPort cpop;
 	
-	public AdmissionController(String AC_URI, Map<ComputerPoolPorts, String> computerPoolUri, DynamicComponentCreator dcc) throws Exception{		
+	public AdmissionController(String AC_URI,
+			HashMap<ComputerPoolPorts, String> computerPoolUri,
+			String admissionController_IN,
+			DynamicComponentCreator dcc) throws Exception{		
 		super(1, 1);
 		
 		this.avmPorts 	= new ArrayList<ApplicationVMManagementOutboundPort>();
@@ -56,9 +60,9 @@ public class AdmissionController
 		
 		
 		this.addOfferedInterface(AdmissionControllerI.class);
-		this.acop = new AdmissionControllerOutboundPort(AC_URI, this);
-		this.addPort(this.acop);
-		this.acop.publishPort();		
+		this.acip = new AdmissionControllerInboundPort(admissionController_IN, this);
+		this.addPort(this.acip);
+		this.acip.publishPort();		
 		
 		this.addRequiredInterface(ComputerPoolI.class);
 		this.cpop = new ComputerPooOutboundPort(AbstractPort.generatePortURI(), this);
@@ -71,10 +75,6 @@ public class AdmissionController
 		
 		this.toggleLogging();
 		this.toggleTracing();
-	}
-	
-	public AdmissionControllerOutboundPort getProtToConnectWithRG(){
-		return acop;
 	}
 	
 	@Override
@@ -179,12 +179,24 @@ public class AdmissionController
 		return this.avmPorts;
 	}
 	
-	public static Map<ACPortTypes, String> newInstance(DynamicComponentCreator dcc, String AC_URI) throws Exception{
+	public static Map<ACPortTypes, String> newInstance(String AC_URI,
+			Map<ComputerPoolPorts, String> computerPoolUri,
+			DynamicComponentCreator dcc) throws Exception{
 
-		dcc.createComponent(AdmissionController.class.getCanonicalName(), new Object[]{AC_URI, dcc});
+		String admissionController_IN = AbstractPort.generatePortURI();
+		
+		Object[] args = new Object[] {
+				AC_URI,
+				computerPoolUri,
+				admissionController_IN,
+				dcc
+		};
+		
+		dcc.createComponent(AdmissionController.class.getCanonicalName(), args);
 		
 		HashMap<ACPortTypes, String> ret = new HashMap<ACPortTypes, String>();		
 		ret.put(ACPortTypes.INTROSPECTION, AC_URI);
+		ret.put(ACPortTypes.ADMISSION_CONTROLLER_IN, admissionController_IN);
 		
 		return ret;		
 	}

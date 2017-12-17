@@ -65,6 +65,9 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 		this.addPort(this.sip);
 		this.sip.publishPort();
 		
+		this.toggleLogging();
+		
+		
 	}
 
 	@Override

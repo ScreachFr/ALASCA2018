@@ -3,11 +3,13 @@ package fr.upmc.gaspardleo.computerpool.interfaces;
 import java.util.Map;
 import java.util.Set;
 
+import fr.upmc.components.interfaces.OfferedI;
+import fr.upmc.components.interfaces.RequiredI;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.computer.Computer;
 
-public interface ComputerPoolI {
+public interface ComputerPoolI extends OfferedI, RequiredI {
 	
 	
 	/**

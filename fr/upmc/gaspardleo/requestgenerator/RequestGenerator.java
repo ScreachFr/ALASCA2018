@@ -1,5 +1,6 @@
 package fr.upmc.gaspardleo.requestgenerator;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,8 +8,6 @@ import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.components.ports.PortI;
 import fr.upmc.datacenter.software.interfaces.RequestI;
-import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorI;
-import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
 
 public class RequestGenerator 
 extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
@@ -24,10 +23,17 @@ extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
 
 	private String rgURI;
 
-	public RequestGenerator(String rgURI, double meanInterArrivalTime, long meanNumberOfInstructions,
-			String managementInboundPortURI, String requestSubmissionOutboundPortURI,
+	public RequestGenerator(String rgURI,
+			Double meanInterArrivalTime,
+			Long meanNumberOfInstructions,
+			String managementInboundPortURI,
+			String requestSubmissionOutboundPortURI,
 			String requestNotificationInboundPortURI) throws Exception {
-		super(rgURI, meanInterArrivalTime, meanNumberOfInstructions, managementInboundPortURI, requestSubmissionOutboundPortURI,
+		super(rgURI,
+				meanInterArrivalTime,
+				meanNumberOfInstructions,
+				managementInboundPortURI,
+				requestSubmissionOutboundPortURI,
 				requestNotificationInboundPortURI);
 		this.rgURI = rgURI;
 
@@ -45,20 +51,27 @@ extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
 		System.out.println(rgURI  + " : gettting an answer for " + r.getRequestURI());
 		super.acceptRequestTerminationNotification(r);
 	}
-
+	
 
 	public void addPort(PortI p) throws Exception{
 		super.addPort(p);
 	}
 
 	public static Map<RGPortTypes, String> newInstance(String rgURI, double meanInterArrivalTime,
-			long meanNumberOfInstructions, String requestSubmissionOutboundPortURI, DynamicComponentCreator dcc) throws Exception {
+			long meanNumberOfInstructions, DynamicComponentCreator dcc) throws Exception {
+		
 		String managementInboundPortURI = AbstractPort.generatePortURI();
 		String requestNotificationInboundPortURI = AbstractPort.generatePortURI();
-
+		String requestSubmissionOutboundPortURI = AbstractPort.generatePortURI();
+		
+		
+		
 		Object[] args = new Object[] {
-				rgURI, meanInterArrivalTime, meanNumberOfInstructions,
-				managementInboundPortURI, requestSubmissionOutboundPortURI,
+				rgURI,
+				meanInterArrivalTime,
+				meanNumberOfInstructions,
+				managementInboundPortURI,
+				requestSubmissionOutboundPortURI,
 				requestNotificationInboundPortURI
 		};
 

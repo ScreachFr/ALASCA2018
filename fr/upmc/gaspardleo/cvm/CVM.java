@@ -137,12 +137,12 @@ public class CVM extends AbstractCVM {
 		
 		super.start();
 		
-		this.cores = this.csPort.allocateCores(NB_CPU * NB_CORES);
-		
-		for (int i = 0; i < this.avmPorts.size(); i++){
-			ApplicationVMManagementOutboundPort avmPort = this.avmPorts.get(i);
-				avmPort.allocateCores(getAllocatedCore());
-		}
+//		this.cores = this.csPort.allocateCores(NB_CPU * NB_CORES);
+//		
+//		for (int i = 0; i < this.avmPorts.size(); i++){
+//			ApplicationVMManagementOutboundPort avmPort = this.avmPorts.get(i);
+//				avmPort.allocateCores(getAllocatedCore());
+//		}
 	}
 
 	private AllocatedCore[] getAllocatedCore() {
