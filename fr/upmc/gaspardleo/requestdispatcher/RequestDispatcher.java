@@ -3,6 +3,7 @@ package fr.upmc.gaspardleo.requestdispatcher;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
@@ -17,6 +18,7 @@ import fr.upmc.datacenter.software.ports.RequestNotificationInboundPort;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
+import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
@@ -40,9 +42,10 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	private String 										Component_URI;
 	
 	// VMs
-	private ArrayList<String> 							registeredVmsUri;
-	private ArrayList<RequestSubmissionOutboundPort> 	registeredVmsRsop;
-	private ArrayList<RequestNotificationInboundPort> 	registeredVmsRnip;
+	private Map<String, RequestSubmissionOutboundPort> 		registeredVmsRsop;
+	private Map<String, RequestNotificationInboundPort> 	registeredVmsRnip;
+	private ArrayList<Map<ApplicationVMPortTypes, String>> 	registeredVmsUri;
+	
 	
 	//Ports
 	private RequestSubmissionInboundPort 				rsip;
@@ -69,8 +72,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 		this.Component_URI 		= Component_URI;
 		this.registeredVmsUri 	= new ArrayList<>();
-		this.registeredVmsRsop 	= new ArrayList<>();
-		this.registeredVmsRnip	= new ArrayList<>();
+		this.registeredVmsRsop 	= new HashMap<>();
+		this.registeredVmsRnip	= new HashMap<>();
 		this.vmCursor 			= 0;
 
 		//Request Dispatcher Inbound port connection.
@@ -118,16 +121,21 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	}
 
 	@Override
-	public String registerVM(String vmUri, String VM_requestSubmissionInboundPort, Class<?> vmInterface) throws Exception {
-	
-		if (this.registeredVmsUri.contains(vmUri)) 
-			return null; // TODO retourner l'uri qui existe déjà.
-
+	public String registerVM(Map<ApplicationVMPortTypes, String> avmURIs, Class<?> vmInterface) throws Exception {
+		String avmUri = avmURIs.get(ApplicationVMPortTypes.INTROSPECTION);
+		
+		// Verifi si l'AVM est déjà registered.
+		if (this.registeredVmsUri.stream().anyMatch((e) -> e.get(ApplicationVMPortTypes.INTROSPECTION).equals(avmUri))) { 
+			this.logMessage("Register AVM : You just tried to register an AVM that already was registered it this RequestDispatcher.");
+			return null;
+		}
+		
+		
 		RequestSubmissionOutboundPort rsop = new RequestSubmissionOutboundPort(this);
 		this.addPort(rsop);
 		rsop.publishPort();
 		
-		rsop.doConnection(VM_requestSubmissionInboundPort, 
+		rsop.doConnection(avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
 				ClassFactory.newConnector(vmInterface).getCanonicalName());
 		
 		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
@@ -136,11 +144,11 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		
 		
 		
-		this.registeredVmsRnip.add(rnip);
-		this.registeredVmsRsop.add(rsop);
-		this.registeredVmsUri.add(this.registeredVmsUri.size(), vmUri);
+		this.registeredVmsRnip.put(avmUri, rnip);
+		this.registeredVmsRsop.put(avmUri, rsop);
+		this.registeredVmsUri.add(avmURIs);
 		
-		this.logMessage(this.Component_URI + " : " + vmUri + " has been added.");
+		this.logMessage(this.Component_URI + " : " + avmURIs + " has been added.");
 		
 		return rnip.getPortURI();
 	}
@@ -148,10 +156,20 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void unregisterVM(String vmUri) throws Exception {
-		int index = registeredVmsUri.indexOf(vmUri);
-		RequestSubmissionOutboundPort rsop = registeredVmsRsop.remove(index);
-		registeredVmsUri.remove(index);
-		rsop.doDisconnection();
+		Optional<Map<ApplicationVMPortTypes,String>> URIs = 
+				registeredVmsUri.stream()
+				.filter(e -> e.get(ApplicationVMPortTypes.INTROSPECTION).equals(vmUri))
+				.findFirst();
+		
+		if (!URIs.isPresent()) {
+			this.logMessage("Unregister AVM : This AVM is not registered!");
+			return;
+		}
+		
+		registeredVmsUri.remove(URIs.get());
+		registeredVmsRnip.get(vmUri).doDisconnection();
+		registeredVmsRsop.get(vmUri).doDisconnection();
+		
 	}
 
 	@Override
@@ -159,12 +177,14 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		
 		this.logMessage(this.Component_URI + " : incoming request submission");
 		
-		if (this.registeredVmsRsop.size() == 0) {
+		if (this.registeredVmsUri.size() == 0) {
 			this.logMessage(this.Component_URI + " : no registered vm.");
 			
 		} else {
+			String avmURI = registeredVmsUri
+					.get(vmCursor%registeredVmsUri.size()).get(ApplicationVMPortTypes.INTROSPECTION);
 			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(
-					vmCursor%this.registeredVmsRsop.size()); 
+					avmURI); 
 
 			if (!rsop.connected()) {
 				throw new Exception(this.Component_URI + " can't conect to vm.");
@@ -181,12 +201,17 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
 		this.logMessage(this.Component_URI + " : incoming request submission and notification.");
 
-		if (this.registeredVmsRsop.size() == 0) {
+		if (this.registeredVmsUri.size() == 0) {
 			this.logMessage(this.Component_URI + " : no registered vm.");
 		} else {
-			vmCursor = (vmCursor+1)%this.registeredVmsRsop.size();
-			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(vmCursor); 
-			this.logMessage(this.Component_URI + " is using " + this.registeredVmsUri.get(vmCursor));
+			vmCursor = (vmCursor+1) % this.registeredVmsUri.size();
+			
+			String avmURI = registeredVmsUri
+					.get(vmCursor).get(ApplicationVMPortTypes.INTROSPECTION);
+			
+			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(avmURI);
+			
+			this.logMessage(this.Component_URI + " is using " + avmURI);
 			
 			if (!rsop.connected()) {
 				throw new Exception(this.Component_URI + " can't conect to vm.");
@@ -212,16 +237,20 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	
 	@Override
 	public void shutdown() throws ComponentShutdownException {
-		for (RequestSubmissionOutboundPort rsop : registeredVmsRsop) {
+		registeredVmsUri.forEach(e -> {
+			String avmUri = e.get(ApplicationVMPortTypes.INTROSPECTION);
+			
 			try {
-				rsop.doDisconnection();
-			} catch (Exception e) {
-				e.printStackTrace();
+				registeredVmsRnip.get(avmUri).doDisconnection();
+				registeredVmsRsop.get(avmUri).doDisconnection();
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
-		}
+		});
 		
 		registeredVmsUri.clear();
 		registeredVmsRsop.clear();
+		registeredVmsUri.clear();
 		
 		super.shutdown();
 	}	

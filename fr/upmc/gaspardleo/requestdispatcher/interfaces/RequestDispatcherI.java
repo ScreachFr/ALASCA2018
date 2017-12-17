@@ -1,5 +1,9 @@
 package fr.upmc.gaspardleo.requestdispatcher.interfaces;
 
+import java.util.Map;
+
+import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+
 public interface RequestDispatcherI{
 
 	/**
@@ -12,8 +16,7 @@ public interface RequestDispatcherI{
 	 * 		Uri du port de notification de terminaison des requètes.
 	 * @throws Exception
 	 */
-	public String registerVM(String vmUri, 
-			String requestSubmissionOutboundPort, Class<?> vmInterface) throws Exception;
+	public String registerVM(Map<ApplicationVMPortTypes, String> avmURIs, Class<?> vmInterface) throws Exception;
 	
 	public void unregisterVM(String vmUri) throws Exception;
 }

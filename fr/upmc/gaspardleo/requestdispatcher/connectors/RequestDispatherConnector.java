@@ -1,6 +1,9 @@
 package fr.upmc.gaspardleo.requestdispatcher.connectors;
 
+import java.util.Map;
+
 import fr.upmc.components.connectors.AbstractConnector;
+import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 
 public class RequestDispatherConnector 
@@ -8,8 +11,8 @@ public class RequestDispatherConnector
 	implements RequestDispatcherI{
 
 	@Override
-	public String registerVM(String vmUri, String requestSubmissionOutboundPort, Class<?> vmInterface) throws Exception {
-		return ((RequestDispatcherI)this.offering).registerVM(vmUri, requestSubmissionOutboundPort, vmInterface);		
+	public String registerVM(Map<ApplicationVMPortTypes, String> avmURIs, Class<?> vmInterface) throws Exception {
+		return ((RequestDispatcherI)this.offering).registerVM(avmURIs, vmInterface);		
 	}
 
 	@Override
