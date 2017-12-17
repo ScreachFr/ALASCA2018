@@ -13,6 +13,7 @@ import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
+import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionInboundPort;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 
@@ -29,6 +30,7 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 		INTROSPECTION,
 		STATIC_STATE,
 		DYNAMIC_STATE,
+		CONNECTION_REQUEST,
 		SHUTDOWNABLE;
 	}
 
@@ -37,17 +39,26 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 
 	// Ports
 	private ShutdownableInboundPort sip;
+	private ApplicationVMConnectionInboundPort avmcip;
 	
 	public ApplicationVM(String vmURI,
 			String applicationVMManagementInboundPortURI,
 			String requestSubmissionInboundPortURI,
 			String requestNotificationOutboundPortURI,
+			String applicationVMConnectionPort_URI,
 			String shutdownableInboundPort_URI) throws Exception {
+		
 		super(vmURI, 
 				applicationVMManagementInboundPortURI,
 				requestSubmissionInboundPortURI,
 				requestNotificationOutboundPortURI);
 		this.vmURI = vmURI;
+		
+		
+		this.addOfferedInterface(ApplicationVMConnectionsI.class);
+		this.avmcip = new ApplicationVMConnectionInboundPort(applicationVMConnectionPort_URI, this);
+		this.addPort(avmcip);
+		this.avmcip.publishPort();
 		
 		this.addOfferedInterface(ShutdownableI.class);
 		this.sip = new ShutdownableInboundPort(shutdownableInboundPort_URI, this);

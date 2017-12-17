@@ -47,42 +47,42 @@ public class CVM extends AbstractCVM {
 		AbstractComponent.configureLogging("", "", 0, '|');
 		Processor.DEBUG = true;
 		
-		Computer c = createComputer();
-		Map<ComputerPortsTypes, String> computerPorts = createComputerServicesOutboundPort(c);
+//		Computer c = createComputer();
+//		Map<ComputerPortsTypes, String> computerPorts = createComputerServicesOutboundPort(c);
 		
-		ComputerMonitor cm = createComputerMonitor(c);
-		connexionComputerMonitorWithComputer(cm,computerPorts);
+//		ComputerMonitor cm = createComputerMonitor(c);
+//		connexionComputerMonitorWithComputer(cm,computerPorts);
 		
 		super.deploy();
 	}
 	
-	private Computer createComputer() throws Exception{
-		System.out.println("Computer creation and core allocation.");
-		
-		// Computer creation
-		Set<Integer> admissibleFrequencies = new HashSet<Integer>() ;
-		admissibleFrequencies.add(1500);	// Cores can run at 1,5 GHz
-		admissibleFrequencies.add(3000);	// and at 3 GHz
-		
-		Map<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
-		processingPower.put(1500, 1500000);	// 1,5 GHz executes 1,5 Mips
-		processingPower.put(3000, 3000000);	// 3 GHz executes 3 Mips
-				
-		Computer c = new Computer(
-				"computer0",
-				admissibleFrequencies,
-				processingPower,  
-				CPU_FREQUENCY,			// Test scenario 1, frequency = 1,5 GHz
-				CPU_MAX_FREQUENCY_GAP,	// max frequency gap within a processor
-				NB_CPU,
-				NB_CORES);
-		
-		this.addDeployedComponent(c);
-				
-		cores = c.allocateCores(NB_CPU * NB_CORES);
-				
-		return c;
-	}
+//	private Computer createComputer() throws Exception{
+//		System.out.println("Computer creation and core allocation.");
+//		
+//		// Computer creation
+//		Set<Integer> admissibleFrequencies = new HashSet<Integer>() ;
+//		admissibleFrequencies.add(1500);	// Cores can run at 1,5 GHz
+//		admissibleFrequencies.add(3000);	// and at 3 GHz
+//		
+//		Map<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
+//		processingPower.put(1500, 1500000);	// 1,5 GHz executes 1,5 Mips
+//		processingPower.put(3000, 3000000);	// 3 GHz executes 3 Mips
+//				
+//		Computer c = new Computer(
+//				"computer0",
+//				admissibleFrequencies,
+//				processingPower,  
+//				CPU_FREQUENCY,			// Test scenario 1, frequency = 1,5 GHz
+//				CPU_MAX_FREQUENCY_GAP,	// max frequency gap within a processor
+//				NB_CPU,
+//				NB_CORES);
+//		
+//		this.addDeployedComponent(c);
+//				
+//		cores = c.allocateCores(NB_CPU * NB_CORES);
+//				
+//		return c;
+//	}
 	
 	private Map<ComputerPortsTypes, String> createComputerServicesOutboundPort(Computer c) 
 			throws Exception{

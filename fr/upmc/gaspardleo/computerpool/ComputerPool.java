@@ -26,14 +26,19 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort;
 public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	public final static int DEFAULT_CORE_ALLOC_NUMBER = 2;
 
+	public enum ComputerPoolPorts {
+		ITROSPECTION,
+		COMPUTER_POOL;
+	}
+	
 	private String uri;
 	
 	private DynamicComponentCreator dcc;
 
 	private ComputerPoolInbounPort cpi;
 	
+	private List<Map<ComputerPortsTypes, String>> computers;
 	
-	private List<Computer> computers;
 	private List<AllocatedCore[]> availableCores;
 	private Map<Map<ApplicationVMPortTypes, String>, AllocatedCore[]> avmInUse;
 
@@ -73,7 +78,8 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 		for (int i = 0; i < (numberOfProcessors * numberOfCores)/2; i++) {
 			availableCores.add(csop.allocateCores(DEFAULT_CORE_ALLOC_NUMBER));
 		}
-
+		
+		this.computers.add(computerUris);
 	}
 
 	@Override
@@ -109,18 +115,21 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	public static Map<ComputerPoolPorts, String> newInstance(String componentURI, DynamicComponentCreator dcc) throws Exception {
 		String computerPoolPort_URI = AbstractPort.generatePortURI();
 		
+		Object[] args = new Object[]{
+				componentURI,
+				computerPoolPort_URI,
+				dcc
+		};
 		
-		dcc.createComponent(ComputerPool.class.getCanonicalName(), new Object[]{componentURI, computerPoolPort_URI, dcc});
+		dcc.createComponent(ComputerPool.class.getCanonicalName(), args);
 		
 		
 		HashMap<ComputerPoolPorts, String> result = new HashMap<>();
-		result.put(ComputerPoolPorts.COMPUTER_POOL, computerPoolPort_URI);
 		
+		result.put(ComputerPoolPorts.COMPUTER_POOL, computerPoolPort_URI);
+		result.put(ComputerPoolPorts.ITROSPECTION, componentURI);
 		
 		return result;
 	}
 
-	public enum ComputerPoolPorts {
-		COMPUTER_POOL;
-	}
 }

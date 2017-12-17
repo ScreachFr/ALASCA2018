@@ -2,20 +2,20 @@ package fr.upmc.gaspardleo.admissioncontroller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
-import fr.upmc.components.cvm.pre.dcc.connectors.DynamicComponentCreationConnector;
-import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
-import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.ports.AbstractPort;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
+import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
-import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
+import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
+import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
+import fr.upmc.gaspardleo.computerpool.ports.ComputerPooOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
@@ -30,6 +30,8 @@ public class AdmissionController
 		extends AbstractComponent
 		implements AdmissionControllerI{
 
+	private final static int DEFAULT_CORE_NUMBER = 2;
+	
 	public static enum	ACPortTypes {
 		INTROSPECTION
 	}
@@ -40,17 +42,32 @@ public class AdmissionController
 	
 	// Map<RequestGenerator, RequestDispatcher>
 	private Map<Map<RGPortTypes, String>, Map<RDPortTypes, String>> requestSources;
+	// Map<RD_URI, AVM> XXX Peut-être pas utile (gardé pour unregister). 
+	private Map<String, Map<ApplicationVMPortTypes, String>> registeredAVMs;
 	
+	private Map<ComputerPoolPorts, String> computerPoolURIs;
+	private ComputerPooOutboundPort cpop;
 	
-	public AdmissionController(String AC_URI, DynamicComponentCreator dcc) throws Exception{		
+	public AdmissionController(String AC_URI, Map<ComputerPoolPorts, String> computerPoolUri, DynamicComponentCreator dcc) throws Exception{		
 		super(1, 1);
 		
 		this.avmPorts 	= new ArrayList<ApplicationVMManagementOutboundPort>();
+		this.computerPoolURIs = computerPoolUri;
+		
 		
 		this.addOfferedInterface(AdmissionControllerI.class);
 		this.acop = new AdmissionControllerOutboundPort(AC_URI, this);
 		this.addPort(this.acop);
 		this.acop.publishPort();		
+		
+		this.addRequiredInterface(ComputerPoolI.class);
+		this.cpop = new ComputerPooOutboundPort(AbstractPort.generatePortURI(), this);
+		this.addPort(cpop);
+		this.cpop.publishPort();
+		
+		this.cpop.doConnection(computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
+				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
+		
 		
 		this.toggleLogging();
 		this.toggleTracing();
@@ -69,6 +86,8 @@ public class AdmissionController
 		String RG_RequestNotificationInboundPortURI = requestGeneratorURIs.get(RGPortTypes.REQUEST_NOTIFICATION_IN);
 		
 		Map<RDPortTypes, String> RD_uris = RequestDispatcher.newInstance(dcc, RD_Component_URI, RG_RequestNotificationInboundPortURI);
+		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
+		
 		
 		RequestDispatcherOutboundPort rdop = new RequestDispatcherOutboundPort(this);
 		this.addPort(rdop);
@@ -79,73 +98,59 @@ public class AdmissionController
 				RequestDispatherConnector.class.getCanonicalName());
 		
 		// Vm applications creation
-		ApplicationVM vm0 = createApplicationVM("vm-" + RD_Component_URI + "-0");
-		ApplicationVM vm1 = createApplicationVM("vm-" + RD_Component_URI + "-1");
-		ApplicationVM vm2 = createApplicationVM("vm-" + RD_Component_URI + "-2");
 		
-		ArrayList<ApplicationVM> newAVMs = new ArrayList<>();
-		newAVMs.add(vm0);
-		newAVMs.add(vm1);
-		newAVMs.add(vm2);
+		Map<ApplicationVMPortTypes, String> avm0_URIs = 
+				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-0", DEFAULT_CORE_NUMBER);
+		Map<ApplicationVMPortTypes, String> avm1_URIs = 
+				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-1", DEFAULT_CORE_NUMBER);
+		Map<ApplicationVMPortTypes, String> avm2_URIs = 
+				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-2", DEFAULT_CORE_NUMBER);
+		
+		
 		
 		String currentNotifPortUri;
 		
 		// Register application VM in Request Dispatcher
 		currentNotifPortUri = rdop.registerVM(
-				vm0.getNewAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
-				vm0.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION),
+				avm0_URIs,
 				RequestSubmissionI.class);
+		doAVMRequestNotificationConnection(avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+				currentNotifPortUri);
+		this.registeredAVMs.put(rd_URI, avm0_URIs);
 		
-		vm0.doRequestNotificationConnection(currentNotifPortUri);
 		currentNotifPortUri = rdop.registerVM(
-				vm1.getNewAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
-				vm1.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION),
+				avm1_URIs,
 				RequestSubmissionI.class);
-		vm1.doRequestNotificationConnection(currentNotifPortUri);
+		doAVMRequestNotificationConnection(avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+				currentNotifPortUri);
+		this.registeredAVMs.put(rd_URI, avm1_URIs);
+		
 		currentNotifPortUri = rdop.registerVM(
-				vm2.getNewAVMPortsURI().get(ApplicationVMPortTypes.INTROSPECTION),
-				vm2.getNewAVMPortsURI().get(ApplicationVMPortTypes.REQUEST_SUBMISSION),
+				avm2_URIs,
 				RequestSubmissionI.class);
-		vm2.doRequestNotificationConnection(currentNotifPortUri);
+		doAVMRequestNotificationConnection(avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+				currentNotifPortUri);
+		this.registeredAVMs.put(rd_URI, avm2_URIs);
+		
 	}
 	
-	/**
-	 * Créer une AVM.
-	 * @param VM_URI
-	 * 		Uri de la nouvelle AVM.
-	 * @param cvm
-	 * 		Utile pour l'allocation de core. TODO Créer un composant pour gerer les ordinateurs.
-	 * @return
-	 * 		L'AVM créée.
-	 * @throws Exception
-	 */
-	private ApplicationVM createApplicationVM(String VM_URI) throws Exception{
-				
-		// Vm applications creation
-		ApplicationVM vm = new ApplicationVM(VM_URI);
+	private void doAVMRequestNotificationConnection(String AVMConnectionPort_URI,
+			String notificationPort_URI) throws Exception {
+		ApplicationVMConnectionOutboundPort avmcop 
+			= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
 		
-		// VM debug
-		vm.toggleTracing();
-		vm.toggleLogging();
-				
-		// Create a mock up port to manage the AVM component (allocate cores).
-		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(
-				new AbstractComponent(0, 0) {});
-		avmPort.publishPort();
+		this.addPort(avmcop);
+		avmcop.publishPort();
+		avmcop.doConnection(AVMConnectionPort_URI, 
+				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
 		
-		avmPort.doConnection(
-				vm.getNewAVMPortsURI().get(ApplicationVMPortTypes.MANAGEMENT),
-				ApplicationVMManagementConnector.class.getCanonicalName());
 		
-		this.avmPorts.add(avmPort);
-				
-		return vm;
+		avmcop.doRequestNotificationConnection(notificationPort_URI);
 	}
+	
 	
 	@Override
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
-		Map<RDPortTypes, String> rd = null;
-		
 		Optional<Map<RGPortTypes,String>> optRD = 
 				requestSources.keySet().stream()
 				.filter((e) -> e.get(RGPortTypes.INTROSPECTION).equals(requestGeneratorURI))
@@ -155,8 +160,6 @@ public class AdmissionController
 			this.logMessage("Remove request source : Can't find the request generator you're looking for!");
 			return;
 		}
-		
-		rd = requestSources.get(optRD.get());
 		
 		ShutdownableOutboundPort sop = new ShutdownableOutboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(sop);
