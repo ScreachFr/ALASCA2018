@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
+import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.exceptions.ComponentShutdownException;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
@@ -256,7 +257,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	}	
 	
 	public static Map<RDPortTypes, String> newInstance(
-			DynamicComponentCreator dcc, 
+			DynamicComponentCreationOutboundPort dcc, 
 			String Component_URI, 
 			String RG_RequestNotification_In) throws Exception {
 		

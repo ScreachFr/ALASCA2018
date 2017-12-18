@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
+import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
+import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
@@ -39,7 +41,7 @@ public class AdmissionController
 		ADMISSION_CONTROLLER_IN;
 	}
 
-	private DynamicComponentCreator dcc;
+	private DynamicComponentCreationOutboundPort dcc;
 	private AdmissionControllerInboundPort acip;
 	private ArrayList<ApplicationVMManagementOutboundPort> avmPorts;
 	
@@ -54,7 +56,7 @@ public class AdmissionController
 	public AdmissionController(String AC_URI,
 			HashMap<ComputerPoolPorts, String> computerPoolUri,
 			String admissionController_IN,
-			DynamicComponentCreator dcc) throws Exception{		
+			DynamicComponentCreationOutboundPort dcc) throws Exception{		
 		super(1, 1);
 		
 		this.avmPorts 	= new ArrayList<ApplicationVMManagementOutboundPort>();
@@ -161,18 +163,18 @@ public class AdmissionController
 	 * @throws Exception
 	 */
 	private void createApplicationVM(String VM_URI) throws Exception{
-				
-		// Vm applications creation
-		Map<ApplicationVMPortTypes, String> AVM_uris = ApplicationVM.newInstance(dcc, VM_URI);
-				
-		// Create a mock up port to manage the AVM component (allocate cores).
-		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(new AbstractComponent(0, 0) {});
-		avmPort.publishPort();
-		this.avmPorts.add(avmPort);
-		
-		avmPort.doConnection(
-				AVM_uris.get(ApplicationVMPortTypes.MANAGEMENT),
-				ApplicationVMManagementConnector.class.getCanonicalName());
+		// TODO retirer cette methode dès que le computerPool est fonctionnel.		
+//		// Vm applications creation
+//		Map<ApplicationVMPortTypes, String> AVM_uris = ApplicationVM.newInstance(dcc, VM_URI);
+//				
+//		// Create a mock up port to manage the AVM component (allocate cores).
+//		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(new AbstractComponent(0, 0) {});
+//		avmPort.publishPort();
+//		this.avmPorts.add(avmPort);
+//		
+//		avmPort.doConnection(
+//				AVM_uris.get(ApplicationVMPortTypes.MANAGEMENT),
+//				ApplicationVMManagementConnector.class.getCanonicalName());
 	}
 		
 	@Override
@@ -208,7 +210,7 @@ public class AdmissionController
 	public static Map<ACPortTypes, String> newInstance(
 			String AC_URI,
 			Map<ComputerPoolPorts, String> computerPoolUri,
-			DynamicComponentCreator dcc) throws Exception{
+			DynamicComponentCreationOutboundPort dcc) throws Exception{
 
 		String admissionController_IN = AbstractPort.generatePortURI();
 		

@@ -9,6 +9,8 @@ import java.util.Set;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
+import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
+import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
@@ -42,7 +44,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	private List<AllocatedCore[]> availableCores;
 	private Map<Map<ApplicationVMPortTypes, String>, AllocatedCore[]> avmInUse;
 
-	public ComputerPool(String componentURI, String ComputerPoolPort_IN, DynamicComponentCreator dcc) throws Exception {
+	public ComputerPool(String componentURI, String ComputerPoolPort_IN, DynamicComponentCreationOutboundPort dcc) throws Exception {
 		super(1, 1);
 
 		this.uri = componentURI;
@@ -112,7 +114,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	
 	// TODO pouvoir enlever des avms et rendre les cores de nouveau disponible.
 	
-	public static Map<ComputerPoolPorts, String> newInstance(String componentURI, DynamicComponentCreator dcc) throws Exception {
+	public static Map<ComputerPoolPorts, String> newInstance(String componentURI, DynamicComponentCreationOutboundPort dcc) throws Exception {
 		String computerPoolPort_URI = AbstractPort.generatePortURI();
 		
 		Object[] args = new Object[]{

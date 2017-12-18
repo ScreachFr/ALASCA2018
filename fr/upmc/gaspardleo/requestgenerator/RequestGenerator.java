@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
+import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.components.ports.PortI;
 import fr.upmc.datacenter.software.interfaces.RequestI;
@@ -58,7 +59,7 @@ extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
 	}
 
 	public static Map<RGPortTypes, String> newInstance(String rgURI, double meanInterArrivalTime,
-			long meanNumberOfInstructions, DynamicComponentCreator dcc) throws Exception {
+			long meanNumberOfInstructions, DynamicComponentCreationI dcc) throws Exception {
 		
 		String managementInboundPortURI = AbstractPort.generatePortURI();
 		String requestNotificationInboundPortURI = AbstractPort.generatePortURI();
