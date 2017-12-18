@@ -88,7 +88,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 		if (availableCores.size() == 0)
 			throw new NoAvailableResourceException();
 
-		Map<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(avmURI, dcc);
+		Map<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(dcc, avmURI);
 		
 		// Create a mock up port to manage the AVM component (allocate cores).
 		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(

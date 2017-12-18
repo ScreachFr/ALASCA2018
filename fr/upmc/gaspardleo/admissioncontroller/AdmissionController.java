@@ -8,6 +8,7 @@ import java.util.Optional;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
 import fr.upmc.components.ports.AbstractPort;
+import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
@@ -16,6 +17,7 @@ import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPooOutboundPort;
+import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
@@ -147,8 +149,32 @@ public class AdmissionController
 		
 		avmcop.doRequestNotificationConnection(notificationPort_URI);
 	}
-	
-	
+
+	/**
+	 * Créer une AVM.
+	 * @param VM_URI
+	 * 		Uri de la nouvelle AVM.
+	 * @param cvm
+	 * 		Utile pour l'allocation de core. TODO Créer un composant pour gerer les ordinateurs.
+	 * @return
+	 * 		L'AVM créée.
+	 * @throws Exception
+	 */
+	private void createApplicationVM(String VM_URI) throws Exception{
+				
+		// Vm applications creation
+		Map<ApplicationVMPortTypes, String> AVM_uris = ApplicationVM.newInstance(dcc, VM_URI);
+				
+		// Create a mock up port to manage the AVM component (allocate cores).
+		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(new AbstractComponent(0, 0) {});
+		avmPort.publishPort();
+		this.avmPorts.add(avmPort);
+		
+		avmPort.doConnection(
+				AVM_uris.get(ApplicationVMPortTypes.MANAGEMENT),
+				ApplicationVMManagementConnector.class.getCanonicalName());
+	}
+		
 	@Override
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
 		Optional<Map<RGPortTypes,String>> optRD = 
@@ -179,7 +205,8 @@ public class AdmissionController
 		return this.avmPorts;
 	}
 	
-	public static Map<ACPortTypes, String> newInstance(String AC_URI,
+	public static Map<ACPortTypes, String> newInstance(
+			String AC_URI,
 			Map<ComputerPoolPorts, String> computerPoolUri,
 			DynamicComponentCreator dcc) throws Exception{
 
