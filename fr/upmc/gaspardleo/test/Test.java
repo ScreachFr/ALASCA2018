@@ -1,43 +1,41 @@
 package fr.upmc.gaspardleo.test;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.AbstractCVM;
-import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
 import fr.upmc.components.cvm.pre.dcc.connectors.DynamicComponentCreationConnector;
 import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
-import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationInboundPort;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
-import fr.upmc.components.exceptions.ComponentStartException;
 import fr.upmc.components.ports.AbstractPort;
-import fr.upmc.components.ports.PortI;
-import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
-import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.connectors.AdmissionControllerConnector;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.computerpool.ComputerPool;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
+import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
+import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.gaspardleo.cvm.CVM;
-import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
-import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class Test {
 
+	private final static int NB_CPU 				= 2;
+	private final static int NB_CORES 				= 4;
+	private final static int CPU_FREQUENCY 			= 3000;
+	private final static int CPU_MAX_FREQUENCY_GAP = 1500;
+
 	private final static int 	NB_DATASOURCE 	= 1;	
 	private final static String AC_URI 			= "AC_URI";
-	private final static String URI_DCC 		= "uri_dcc";
 	private final static String CP_URI			= "CP_URI";
 
 	private CVM 				cvm;
@@ -60,14 +58,38 @@ public class Test {
 			//TODO
 			// CVM creation
 			this.cvm 	= new CVM();
-			
-			DynamicComponentCreationOutboundPort dccop = new DynamicComponentCreationOutboundPort(new AbstractComponent(0, 0) {});
+
+			DynamicComponentCreationOutboundPort dccop = 
+					new DynamicComponentCreationOutboundPort(new AbstractComponent(0, 0) {});
 			dccop.publishPort();
 			dccop.doConnection(AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
 					DynamicComponentCreationConnector.class.getCanonicalName());
 
 			cp_uris = ComputerPool.newInstance(CP_URI, dccop);
 
+			ComputerPoolOutboundPort cpop = 
+					new ComputerPoolOutboundPort(AbstractPort.generatePortURI(), new AbstractComponent(0, 0) {});
+			cpop.publishPort();
+			cpop.doConnection(cp_uris.get(ComputerPoolPorts.COMPUTER_POOL),
+					ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
+
+			// Computer creation
+			HashSet<Integer> admissibleFrequencies = new HashSet<Integer>() ;
+			admissibleFrequencies.add(1500);	// Cores can run at 1,5 GHz
+			admissibleFrequencies.add(3000);	// and at 3 GHz
+
+			HashMap<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
+			processingPower.put(1500, 1500000);	// 1,5 GHz executes 1,5 Mips
+			processingPower.put(3000, 3000000); // 3 GHz executes 3 Mips
+
+			cpop.createNewComputer("computer-0",
+					admissibleFrequencies,
+					processingPower,
+					CPU_FREQUENCY,
+					CPU_MAX_FREQUENCY_GAP,
+					NB_CPU,
+					NB_CORES);
+			System.out.println("computer creation launched.");
 			// Admission Controller creation
 			ac_uris = AdmissionController.newInstance(AC_URI, cp_uris, dccop);
 
@@ -93,28 +115,6 @@ public class Test {
 		acop.publishPort();
 		acop.doConnection(ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), AdmissionControllerConnector.class.getCanonicalName());
 		acop.addRequestDispatcher("rd-"+i, rg);
-		//		this.ac.addRequestDispatcher("rd-"+i, rg);
-
-		//this.cvm.deployComponent(rd);
-
-		//		ArrayList<ApplicationVM> vms = this.ac.addApplicationVMs(rd);
-
-		//		for (int j = 0; j < vms.size(); j++){
-		//			this.cvm.deployComponent(vms.get(j));
-		//		}
-
-		//		ArrayList<ApplicationVMManagementOutboundPort> avmPorts = this.ac.getApplicationVMManagementOutboundPorts();
-		//		
-		//		for (int j = avmPorts.size() - vms.size(); j < avmPorts.size(); j++){
-		//			ApplicationVMManagementOutboundPort avmPort = avmPorts.get(j);
-		//			this.cvm.allocateCores(avmPort);
-		//		}
-
-		// Port connections
-		//		rg.doPortConnection(
-		//			rg.getRGPortsURI().get(RGPortTypes.REQUEST_SUBMISSION_OUT),
-		//			rd.getRDPortsURI().get(RDPortTypes.REQUEST_SUBMISSION_IN),
-		//			RequestSubmissionConnector.class.getCanonicalName());
 	}
 
 	private Map<RGPortTypes, String> createRequestGenerator(String RG_URI, DynamicComponentCreationI dcc) throws Exception{
@@ -148,6 +148,8 @@ public class Test {
 
 		// start the request generation in the request generator.
 
+		
+		Thread.sleep(1000L);
 		for(int i = 0; i < this.rgmops.size(); i++){
 			RequestGeneratorManagementOutboundPort rgmop = this.rgmops.get(i);
 			rgmop.startGeneration();
@@ -188,6 +190,7 @@ public class Test {
 					try {
 						tvmc.testScenario();
 					} catch (Exception e) {
+						e.printStackTrace();
 						throw new RuntimeException(e);
 					}
 				}

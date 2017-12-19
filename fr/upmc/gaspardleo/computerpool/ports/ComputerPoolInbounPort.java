@@ -1,5 +1,7 @@
 package fr.upmc.gaspardleo.computerpool.ports;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,9 +24,13 @@ public class ComputerPoolInbounPort extends AbstractOutboundPort implements Comp
 	}
 
 	@Override
-	public void createNewComputer(String computerURI, Set<Integer> possibleFrequencies,
-			Map<Integer, Integer> processingPower, int defaultFrequency, int maxFrequencyGap, int numberOfProcessors,
-			int numberOfCores) throws Exception {
+	public void createNewComputer(String computerURI,
+			HashSet<Integer> possibleFrequencies,
+			HashMap<Integer, Integer> processingPower,
+			Integer defaultFrequency,
+			Integer maxFrequencyGap,
+			Integer numberOfProcessors,
+			Integer numberOfCores) throws Exception {
 		final ComputerPool computerPool = (ComputerPool)this.owner;
 		computerPool.handleRequestAsync(
 				new ComponentI.ComponentService<ComputerPool>(){
@@ -39,7 +45,7 @@ public class ComputerPoolInbounPort extends AbstractOutboundPort implements Comp
 	}
 
 	@Override
-	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, int numberOfCoreToAllocate) throws Exception {
+	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate) throws Exception {
 		final ComputerPool computerPool = (ComputerPool)this.owner;
 		return computerPool.handleRequestSync(
 				new ComponentI.ComponentService<Map<ApplicationVMPortTypes, String>>(){

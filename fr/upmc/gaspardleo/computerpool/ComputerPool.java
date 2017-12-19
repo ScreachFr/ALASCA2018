@@ -2,6 +2,7 @@ package fr.upmc.gaspardleo.computerpool;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	
 	private String uri;
 	
-	private DynamicComponentCreator dcc;
+	private DynamicComponentCreationOutboundPort dcc;
 
 	private ComputerPoolInbounPort cpi;
 	
@@ -55,17 +56,23 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 		this.cpi.publishPort();
 		this.addPort(this.cpi);
 		
-		
+		this.dcc = dcc;
 
 		this.computers = new ArrayList<>();
 		this.availableCores = new ArrayList<>();
 		this.avmInUse = new HashMap<>();
+		
+		this.toggleLogging();
 	}
 
 	@Override
-	public void createNewComputer(String computerURI, Set<Integer> possibleFrequencies,
-			Map<Integer, Integer> processingPower, int defaultFrequency, int maxFrequencyGap, int numberOfProcessors,
-			int numberOfCores) throws Exception {
+	public void createNewComputer(String computerURI,
+			HashSet<Integer> possibleFrequencies,
+			HashMap<Integer, Integer> processingPower,
+			Integer defaultFrequency,
+			Integer maxFrequencyGap,
+			Integer numberOfProcessors,
+			Integer numberOfCores) throws Exception {
 
 		System.out.println("Computer creation and core allocation.");
 		
@@ -85,7 +92,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	}
 
 	@Override
-	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, int numberOfCoreToAllocate)  throws Exception{
+	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate)  throws Exception{
 		// Pas de core sous la main.
 		if (availableCores.size() == 0)
 			throw new NoAvailableResourceException();

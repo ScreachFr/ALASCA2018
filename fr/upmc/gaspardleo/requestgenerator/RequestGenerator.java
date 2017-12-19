@@ -1,10 +1,8 @@
 package fr.upmc.gaspardleo.requestgenerator;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
 import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.components.ports.PortI;
@@ -43,14 +41,23 @@ extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
 		this.toggleLogging();
 
 	}
-
-
+	
 
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		super.logMessage(rgURI  + " : gettting an answer for " + r.getRequestURI());
 		System.out.println(rgURI  + " : gettting an answer for " + r.getRequestURI());
 		super.acceptRequestTerminationNotification(r);
+	}
+	
+	@Override
+	public void startGeneration() throws Exception {
+		try {
+		super.startGeneration();
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}
 	
 
@@ -75,9 +82,12 @@ extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator{
 				requestSubmissionOutboundPortURI,
 				requestNotificationInboundPortURI
 		};
-
-		dcc.createComponent(RequestGenerator.class.getCanonicalName(), args);
-
+		try {
+			dcc.createComponent(RequestGenerator.class.getCanonicalName(), args);
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 		HashMap<RGPortTypes, String> ret =
 				new HashMap<RGPortTypes, String>();		
 		ret.put(RGPortTypes.INTROSPECTION,

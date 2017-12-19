@@ -1,10 +1,12 @@
 package fr.upmc.gaspardleo.computer;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
+import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.ports.AbstractPort;
 
 public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
@@ -12,8 +14,8 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 	private String computerURI;
 
 	public Computer(String computerURI,
-			Set<Integer> possibleFrequencies, Map<Integer, Integer> processingPower,
-			int defaultFrequency, int maxFrequencyGap, int numberOfProcessors, int numberOfCores,
+			HashSet<Integer> possibleFrequencies, HashMap<Integer, Integer> processingPower,
+			Integer defaultFrequency, Integer maxFrequencyGap, Integer numberOfProcessors, Integer numberOfCores,
 			String computerServicesInboundPortURI, String computerStaticStateDataInboundPortURI,
 			String computerDynamicStateDataInboundPortURI
 			) throws Exception {
@@ -31,8 +33,15 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 
 
 	public static Map<ComputerPortsTypes, String> newInstance(String computerURI,
-			Set<Integer> possibleFrequencies, Map<Integer, Integer> processingPower,
-			int defaultFrequency, int maxFrequencyGap, int numberOfProcessors, int numberOfCores, DynamicComponentCreator dcc) throws Exception {
+			HashSet<Integer> possibleFrequencies,
+			HashMap<Integer, Integer> processingPower,
+			Integer defaultFrequency,
+			Integer maxFrequencyGap,
+			Integer numberOfProcessors,
+			Integer numberOfCores,
+			DynamicComponentCreationOutboundPort dcc) throws Exception {
+
+
 
 		String computerServicesInboundPortURI = AbstractPort.generatePortURI();
 		String computerStaticStateDataInboundPortURI = AbstractPort.generatePortURI();
@@ -52,8 +61,15 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 				computerDynamicStateDataInboundPortURI
 		};
 
-		dcc.createComponent(Computer.class.getCanonicalName(), args);
+		System.out.println("Computer factory call");
+		try {
+			dcc.createComponent(Computer.class.getCanonicalName(), args);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 
+		System.out.println("Computer factory done");
 
 		Map<ComputerPortsTypes, String> result = new HashMap<>();
 
