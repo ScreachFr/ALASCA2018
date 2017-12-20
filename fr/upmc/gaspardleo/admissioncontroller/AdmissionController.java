@@ -80,7 +80,7 @@ implements AdmissionControllerI{
 
 
 		this.toggleLogging();
-		this.toggleTracing();
+		//this.toggleTracing();
 	}
 
 	@Override
@@ -93,7 +93,8 @@ implements AdmissionControllerI{
 		Map<RDPortTypes, String> RD_uris = RequestDispatcher.newInstance(dcc,
 				RD_Component_URI,
 				requestGeneratorURIs.get(RGPortTypes.REQUEST_NOTIFICATION_IN),
-				requestGeneratorURIs.get(RGPortTypes.REQUEST_SUBMISSION_OUT));
+				requestGeneratorURIs.get(RGPortTypes.REQUEST_SUBMISSION_OUT),
+				requestGeneratorURIs.get(RGPortTypes.CONNECTION_IN));
 		
 		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
 

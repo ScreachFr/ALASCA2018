@@ -1329,18 +1329,18 @@ implements	ComponentI
 		String ccname
 		) throws Exception 
 	{
-		System.out.println("[DEBUG LEO] portURI : " + portURI);
-		System.out.println("[DEBUG LEO] otherPortURI : " + otherPortURI);
-		System.out.println("[DEBUG LEO] ccname : " + ccname);
-		System.out.println("[DEBUG LEO] portURI != null : " + portURI != null);
+//		System.out.println("[DEBUG LEO] portURI : " + portURI);
+//		System.out.println("[DEBUG LEO] otherPortURI : " + otherPortURI);
+//		System.out.println("[DEBUG LEO] ccname : " + ccname);
+//		System.out.println("[DEBUG LEO] portURI != null : " + portURI != null);
 		assert	portURI != null;
-		System.out.println("[DEBUG LEO] otherPortURI != null : " + otherPortURI != null);
+//		System.out.println("[DEBUG LEO] otherPortURI != null : " + otherPortURI != null);
 		assert 	otherPortURI != null;
-		System.out.println("[DEBUG LEO] ccname != null : " + ccname != null);
+//		System.out.println("[DEBUG LEO] ccname != null : " + ccname != null);
 		assert  ccname != null ;
-		System.out.println("[DEBUG LEO] this.isPortExisting(portURI) : " + this.isPortExisting(portURI));
+//		System.out.println("[DEBUG LEO] this.isPortExisting(portURI) : " + this.isPortExisting(portURI));
 		assert	this.isPortExisting(portURI);
-		System.out.println("[DEBUG LEO] !this.isPortConnected(portURI) : " + !this.isPortConnected(portURI));
+//		System.out.println("[DEBUG LEO] !this.isPortConnected(portURI) : " + !this.isPortConnected(portURI));
 		assert	!this.isPortConnected(portURI) ;
 		
 		PortI p = this.findPortFromURI(portURI) ;
@@ -1349,7 +1349,7 @@ implements	ComponentI
 		} else {
 			p.doConnection(otherPortURI, ccname) ;
 		}
-		System.out.println("[DEBUG LEO] this.isPortConnected(portURI) : " + this.isPortConnected(portURI));
+//		System.out.println("[DEBUG LEO] this.isPortConnected(portURI) : " + this.isPortConnected(portURI));
 		assert	this.isPortConnected(portURI) ;
 	}
 

@@ -25,6 +25,10 @@ import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
+import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherOutboundPort;
+import fr.upmc.gaspardleo.requestgenerator.connectors.RequestGeneraterConnector;
+import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
+import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
 
 public class RequestDispatcher 
 extends AbstractComponent 
@@ -55,6 +59,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	private RequestNotificationInboundPort 				rnip;
 	private RequestDispatcherInboundPort				rdip;
 	private ShutdownableInboundPort						sip;
+	private RequestGeneratorOutboundPort				rgop;
 	
 	
 	//Misc
@@ -69,7 +74,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 			String RequestNotification_In,
 			String RequestNotification_Out,
 			String RequestDispatcher_In,
-			String ShutDownable_In) throws Exception {
+			String ShutDownable_In,
+			String RG_Connection_In) throws Exception {
 		
 		super(1, 1);
 
@@ -84,12 +90,13 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.addPort(this.rsip);
 		this.rsip.publishPort();
 		
-		
 		// Request submission outbound port connection.
         this.rsop = new RequestSubmissionOutboundPort(RequestSubmission_Out, this) ;
 		this.addPort(this.rsop);
 		this.rsop.publishPort();
 		this.addOfferedInterface(RequestSubmissionHandlerI.class) ;
+		
+		
 				
 		// Request notification submission inbound port connection.
 		this.rnip = new RequestNotificationInboundPort(RequestNotification_In, this);
@@ -119,6 +126,18 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.sip.publishPort();
 		this.addOfferedInterface(ShutdownableI.class);
 		
+		this.rgop = new RequestGeneratorOutboundPort(this);
+		this.addPort(this.rgop);
+		this.rgop.publishPort();
+		this.addRequiredInterface(RequestGeneratorConnectionI.class);
+			
+		try {
+		rgop.doConnection(RG_Connection_In, RequestGeneraterConnector.class.getCanonicalName());
+		rgop.doConnectionWithRD(RequestSubmission_In);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
 		
 		// Request Dispatcher debug
 		this.toggleLogging();
@@ -263,7 +282,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 			DynamicComponentCreationOutboundPort dcc, 
 			String Component_URI, 
 			String RG_RequestNotification_In,
-			String RG_RequestSubmission_Out) throws Exception {
+			String RG_RequestSubmission_Out,
+			String RG_Connection_In) throws Exception {
 		
 		String RequestSubmission_In = AbstractPort.generatePortURI();
 		String RequestSubmission_Out = AbstractPort.generatePortURI();
@@ -271,7 +291,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		String RequestNotification_Out = AbstractPort.generatePortURI();
 		String RequestDispatcher_In = AbstractPort.generatePortURI();
 		String Shutdownable_In = AbstractPort.generatePortURI();
-		
 		
 		Object[] args = new Object[]{ 
 				Component_URI, 
@@ -282,7 +301,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 				RequestNotification_In,
 				RequestNotification_Out,
 				RequestDispatcher_In,
-				Shutdownable_In
+				Shutdownable_In,
+				RG_Connection_In
 		};
 		
 		try {

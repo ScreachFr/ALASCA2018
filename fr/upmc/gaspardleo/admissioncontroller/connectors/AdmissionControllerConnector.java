@@ -17,7 +17,7 @@ public class AdmissionControllerConnector
 			String RD_URI,
 			Map<RGPortTypes, String> requestGeneratorURIs) throws Exception {
 		
-		System.out.println("[DEBUG LEO] (AdmissionControllerI)this.offering " + (AdmissionControllerI)this.offering);
+//		System.out.println("[DEBUG LEO] (AdmissionControllerI)this.offering " + (AdmissionControllerI)this.offering);
 		
 		((AdmissionControllerI)this.offering).addRequestDispatcher(
 				RD_URI,
