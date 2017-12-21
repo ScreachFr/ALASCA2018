@@ -124,7 +124,7 @@ public class				Processor
 extends		AbstractComponent
 implements	PushModeControllingI
 {
-	public static boolean	DEBUG = false ;
+	public static boolean	DEBUG = true ;
 
 	public static enum		ProcessorPortTypes {
 		SERVICES, INTROSPECTION, MANAGEMENT, STATIC_STATE, DYNAMIC_STATE

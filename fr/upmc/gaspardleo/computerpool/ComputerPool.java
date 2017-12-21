@@ -5,12 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.cvm.AbstractCVM;
-import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
-import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
@@ -63,6 +59,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 		this.avmInUse = new HashMap<>();
 		
 		this.toggleLogging();
+		this.toggleTracing();
 	}
 
 	@Override
@@ -74,7 +71,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 			Integer numberOfProcessors,
 			Integer numberOfCores) throws Exception {
 
-		System.out.println("Computer creation and core allocation.");
+		this.logMessage("Computer Pool : Computer creation and core allocation.");
 		
 		Map<ComputerPortsTypes, String> computerUris = Computer.newInstance(computerURI, possibleFrequencies, 
 				processingPower, defaultFrequency, maxFrequencyGap, numberOfProcessors, numberOfCores, dcc);
@@ -117,6 +114,10 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 		
 		
 		return result;
+	}
+	
+	public String getUri() {
+		return uri;
 	}
 	
 	// TODO pouvoir enlever des avms et rendre les cores de nouveau disponible.

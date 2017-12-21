@@ -52,7 +52,6 @@ public class RequestGenerator
 		// Rg debug
 		//this.toggleTracing();
 		this.toggleLogging();
-
 	}
 	
 

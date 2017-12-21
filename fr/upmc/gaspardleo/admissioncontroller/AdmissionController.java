@@ -17,7 +17,6 @@ import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
-import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
@@ -31,7 +30,7 @@ public class AdmissionController
 extends AbstractComponent
 implements AdmissionControllerI{
 
-	private final static int DEFAULT_CORE_NUMBER = 2;
+	private final static int DEFAULT_CORE_NUMBER = 1;
 
 	public static enum	ACPortTypes {
 		INTROSPECTION,
@@ -80,7 +79,7 @@ implements AdmissionControllerI{
 
 
 		this.toggleLogging();
-		//this.toggleTracing();
+		this.toggleTracing();
 	}
 
 	@Override
@@ -89,7 +88,7 @@ implements AdmissionControllerI{
 			Map<RGPortTypes, String> requestGeneratorURIs
 			) throws Exception {
 
-
+		this.logMessage("Admission controller : adding a request source...");
 		Map<RDPortTypes, String> RD_uris = RequestDispatcher.newInstance(dcc,
 				RD_Component_URI,
 				requestGeneratorURIs.get(RGPortTypes.REQUEST_NOTIFICATION_IN),
@@ -109,20 +108,14 @@ implements AdmissionControllerI{
 
 		// Vm applications creation
 
-		System.out.println("AC is creating some AVMs");
 		Map<ApplicationVMPortTypes, String> avm0_URIs = 
 				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-0", DEFAULT_CORE_NUMBER);
-		System.out.println("AVM0 done.");
 		Map<ApplicationVMPortTypes, String> avm1_URIs = 
 				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-1", DEFAULT_CORE_NUMBER);
-		System.out.println("AVM1 done.");
 		Map<ApplicationVMPortTypes, String> avm2_URIs = 
 				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-2", DEFAULT_CORE_NUMBER);
-		System.out.println("AVM2 done.");
 
-		System.out.println("AVMs has been successfully created!");
-
-
+		// RNIP
 		String currentNotifPortUri;
 
 		// Register application VM in Request Dispatcher
@@ -157,39 +150,15 @@ implements AdmissionControllerI{
 
 		this.addPort(avmcop);
 		avmcop.publishPort();
-		avmcop.doConnection(AVMConnectionPort_URI, 
+ 		avmcop.doConnection(AVMConnectionPort_URI, 
 				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
-
+		
 
 		avmcop.doRequestNotificationConnection(notificationPort_URI);
 		
 		this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
 	}
 
-	/**
-	 * Créer une AVM.
-	 * @param VM_URI
-	 * 		Uri de la nouvelle AVM.
-	 * @param cvm
-	 * 		Utile pour l'allocation de core. TODO Créer un composant pour gerer les ordinateurs.
-	 * @return
-	 * 		L'AVM créée.
-	 * @throws Exception
-	 */
-	private void createApplicationVM(String VM_URI) throws Exception{
-		// TODO retirer cette methode dès que le computerPool est fonctionnel.		
-		//		// Vm applications creation
-		//		Map<ApplicationVMPortTypes, String> AVM_uris = ApplicationVM.newInstance(dcc, VM_URI);
-		//				
-		//		// Create a mock up port to manage the AVM component (allocate cores).
-		//		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(new AbstractComponent(0, 0) {});
-		//		avmPort.publishPort();
-		//		this.avmPorts.add(avmPort);
-		//		
-		//		avmPort.doConnection(
-		//				AVM_uris.get(ApplicationVMPortTypes.MANAGEMENT),
-		//				ApplicationVMManagementConnector.class.getCanonicalName());
-	}
 
 	@Override
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
@@ -235,8 +204,13 @@ implements AdmissionControllerI{
 				dcc
 		};
 
-		dcc.createComponent(AdmissionController.class.getCanonicalName(), args);
-
+		try {
+			dcc.createComponent(AdmissionController.class.getCanonicalName(), args);
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		
 		HashMap<ACPortTypes, String> ret = new HashMap<ACPortTypes, String>();		
 		ret.put(ACPortTypes.INTROSPECTION, AC_URI);
 		ret.put(ACPortTypes.ADMISSION_CONTROLLER_IN, admissionController_IN);

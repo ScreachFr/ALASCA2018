@@ -3,11 +3,9 @@ package fr.upmc.gaspardleo.computerpool.ports;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 

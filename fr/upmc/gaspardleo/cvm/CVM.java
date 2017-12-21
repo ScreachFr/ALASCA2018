@@ -1,11 +1,6 @@
 package fr.upmc.gaspardleo.cvm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.connectors.DataConnector;
@@ -23,22 +18,15 @@ import fr.upmc.gaspardleo.computer.ComputerMonitor.ComputerMonitorPortTypes;
 
 public class CVM extends AbstractCVM {
 	
-	private final static int NB_CPU 				= 2;
-	private final static int NB_CORES 				= 2;
-	private final static int CPU_FREQUENCY 			= 3000;
-	private final static int CPU_MAX_FREQUENCY_GAP 	= 1500;
 		
 	private ComputerServicesOutboundPort 				csPort;	// Ports
 	private AllocatedCore[] 							cores;
 	private int 										currentCore;
-	private List<ApplicationVMManagementOutboundPort> 	avmPorts;
 	
 	public CVM() throws Exception {		
 		super();
 				
 		this.currentCore = 0;
-		this.avmPorts = new ArrayList<>();
-		
 	}
 
 	@Override

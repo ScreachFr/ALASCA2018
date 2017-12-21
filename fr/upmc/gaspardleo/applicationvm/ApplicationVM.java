@@ -3,20 +3,14 @@ package fr.upmc.gaspardleo.applicationvm;
 import java.util.HashMap;
 import java.util.Map;
 
-import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorServicesNotificationInboundPort;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorServicesOutboundPort;
-import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
 import fr.upmc.datacenter.software.applicationvm.interfaces.TaskI;
-import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
-import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionInboundPort;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
@@ -57,6 +51,8 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 				requestSubmission_In,
 				requestNotification_Out);
 
+		this.vmURI = component_URI;
+		
 		this.addOfferedInterface(ApplicationVMConnectionsI.class);
 		this.avmcip = new ApplicationVMConnectionInboundPort(applicationVMConnectionPort_URI, this);
 		this.addPort(avmcip);
@@ -69,19 +65,20 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 
 		// VM debug
 		this.toggleLogging();
+		this.toggleTracing();
 	}
 
 	@Override
 	public void doRequestNotificationConnection(String RD_RequestNotificationInboundPortURI) throws Exception {
-		
-		this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
-		this.addPort(requestNotificationOutboundPort);
-		this.requestNotificationOutboundPort.publishPort();
-		this.addRequiredInterface(RequestNotificationI.class);
+//		this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
+//		this.addPort(requestNotificationOutboundPort);
+//		this.requestNotificationOutboundPort.publishPort();
 
 		this.requestNotificationOutboundPort
 				.doConnection(RD_RequestNotificationInboundPortURI,
 						RequestNotificationConnector.class.getCanonicalName());
+		
+		this.logMessage("AVM : rnop connected to " + RD_RequestNotificationInboundPortURI);
 		this.logMessage("AVM : rnop connection status : " + this.requestNotificationOutboundPort.connected());
 	}
 
@@ -97,9 +94,8 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 		assert	!this.taskQueue.isEmpty() ;
 
 		AllocatedCore ac = this.findIdleCore();
-
 		this.logMessage("Starting task execution on core " + ac + ".");
-
+		
 		if (ac != null) {
 			this.allocatedCoresIdleStatus.remove(ac) ;
 			this.allocatedCoresIdleStatus.put(ac, false) ;
@@ -137,14 +133,13 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 				applicationVMConnectionPort_URI,
 				shutdownableInboundPort
 		};
-		System.out.println("AVM inst call...");
+
 		try {
 			dcc.createComponent(ApplicationVM.class.getCanonicalName(), args);
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
-		System.out.println("AVM inst done.");
 		
 		HashMap<ApplicationVMPortTypes, String> ret =
 				new HashMap<ApplicationVMPortTypes, String>();		

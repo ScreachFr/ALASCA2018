@@ -3,9 +3,7 @@ package fr.upmc.gaspardleo.computer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.ports.AbstractPort;
 
@@ -61,15 +59,12 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 				computerDynamicStateDataInboundPortURI
 		};
 
-		System.out.println("Computer factory call");
 		try {
 			dcc.createComponent(Computer.class.getCanonicalName(), args);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
-
-		System.out.println("Computer factory done");
 
 		Map<ComputerPortsTypes, String> result = new HashMap<>();
 

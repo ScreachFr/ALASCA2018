@@ -34,6 +34,9 @@ public class Test {
 	private final static int CPU_FREQUENCY 			= 3000;
 	private final static int CPU_MAX_FREQUENCY_GAP = 1500;
 
+	private final static long RG_INSTR_NB = 100000l; // was 6000000000L
+	private final static double MEAN_INTER_ARRIVAL_TIME = 100.0; // was 500.0
+	
 	private final static int 	NB_DATASOURCE 	= 1;	
 	private final static String AC_URI 			= "AC_URI";
 	private final static String CP_URI			= "CP_URI";
@@ -118,7 +121,7 @@ public class Test {
 	}
 
 	private Map<RGPortTypes, String> createRequestGenerator(String RG_URI, DynamicComponentCreationI dcc) throws Exception{
-		Map<RGPortTypes, String> result = RequestGenerator.newInstance(RG_URI, 500.0, 6000000000L, dcc);
+		Map<RGPortTypes, String> result = RequestGenerator.newInstance(RG_URI, MEAN_INTER_ARRIVAL_TIME, RG_INSTR_NB, dcc);
 
 		createRGManagement(result.get(RGPortTypes.MANAGEMENT_IN));
 
@@ -150,20 +153,24 @@ public class Test {
 
 		
 		Thread.sleep(1000L);
+		System.out.println("Starting generation...");
 		for(int i = 0; i < this.rgmops.size(); i++){
 			RequestGeneratorManagementOutboundPort rgmop = this.rgmops.get(i);
 			rgmop.startGeneration();
 		}
 
 		// wait 20 seconds
-		Thread.sleep(20000L);
+		Thread.sleep(4000L);
 		// then stop the generation.
-
+		
+		System.out.println("Stopping RGs..");
+		
 		for(int i = 0; i < this.rgmops.size(); i++){
 			RequestGeneratorManagementOutboundPort rgmop = this.rgmops.get(i);
 			rgmop.stopGeneration();
 		}
 
+		System.out.println("Done.");
 	}
 
 	public CVM getCvm() {
@@ -189,6 +196,7 @@ public class Test {
 				public void run() {
 					try {
 						tvmc.testScenario();
+						System.out.println("Test scenario done.");
 					} catch (Exception e) {
 						e.printStackTrace();
 						throw new RuntimeException(e);

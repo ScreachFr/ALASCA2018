@@ -10,7 +10,6 @@ import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort
 import fr.upmc.components.exceptions.ComponentShutdownException;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
-import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
@@ -25,7 +24,6 @@ import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
-import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherOutboundPort;
 import fr.upmc.gaspardleo.requestgenerator.connectors.RequestGeneraterConnector;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
@@ -48,7 +46,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	
 	// VMs
 	private Map<String, RequestSubmissionOutboundPort> 		registeredVmsRsop;
-	private Map<String, RequestNotificationInboundPort> 	registeredVmsRnip;
 	private ArrayList<Map<ApplicationVMPortTypes, String>> 	registeredVmsUri;
 	
 	
@@ -82,7 +79,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.Component_URI 		= Component_URI;
 		this.registeredVmsUri 	= new ArrayList<>();
 		this.registeredVmsRsop 	= new HashMap<>();
-		this.registeredVmsRnip	= new HashMap<>();
 		this.vmCursor 			= 0;
 
 		// Request submission inbound port connection.
@@ -161,13 +157,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		rsop.doConnection(avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
 				ClassFactory.newConnector(vmInterface).getCanonicalName());
 		
-		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
-		this.addPort(rnip);
-		rnip.publishPort();
-		
-		
-		
-		this.registeredVmsRnip.put(avmUri, rnip);
 		this.registeredVmsRsop.put(avmUri, rsop);
 		this.registeredVmsUri.add(avmURIs);
 		
@@ -190,7 +179,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		}
 		
 		registeredVmsUri.remove(URIs.get());
-		registeredVmsRnip.get(vmUri).doDisconnection();
 		registeredVmsRsop.get(vmUri).doDisconnection();
 		
 	}
@@ -247,13 +235,15 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
-
+		System.out.println(this.Component_URI + " : incoming request termination notification for request " + r.getRequestURI() + ".");
+		
 		rnop.notifyRequestTermination(r);
 	}
 	
 	@Override
 	public void notifyRequestTermination(RequestI r) throws Exception {
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
+
 		// XXX Pas utilisé.
 		rnop.notifyRequestTermination(r);
 	}
@@ -264,7 +254,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 			String avmUri = e.get(ApplicationVMPortTypes.INTROSPECTION);
 			
 			try {
-				registeredVmsRnip.get(avmUri).doDisconnection();
 				registeredVmsRsop.get(avmUri).doDisconnection();
 			} catch (Exception e1) {
 				e1.printStackTrace();
