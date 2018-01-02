@@ -2,253 +2,227 @@ package fr.upmc.gaspardleo.test;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.connectors.DataConnector;
+import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.cvm.AbstractDistributedCVM;
+import fr.upmc.components.cvm.pre.dcc.connectors.DynamicComponentCreationConnector;
+import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
+import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
+import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
-import fr.upmc.datacenter.connectors.ControlledDataConnector;
-import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
-import fr.upmc.datacenter.hardware.computers.ports.ComputerServicesOutboundPort;
-import fr.upmc.datacenter.hardware.processors.Processor;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
+import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.connectors.AdmissionControllerConnector;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
-import fr.upmc.gaspardleo.computer.Computer;
-import fr.upmc.gaspardleo.computer.ComputerMonitor;
-import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
-import fr.upmc.gaspardleo.computer.ComputerMonitor.ComputerMonitorPortTypes;
+import fr.upmc.gaspardleo.computerpool.ComputerPool;
+import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
+import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
+import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
-import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
 
 public class DistributedTest 
 	extends	AbstractDistributedCVM{
 	
-	private static final String Datacenter 			= "datacenter";
-	private static final String DatacenterClient 	= "datacenterclient";
-	private static String		ac_uri				= "ac_uri";
-	private static String		rg_uri				= "rg_uri";
+	//DataCenter
 	
-	private Computer 								c;
-	private ComputerServicesOutboundPort 			csPort;
+	private static final String Datacenter = "datacenter";
+	private static final String CP_URI = "CP_URI";
+	private static final String AC_URI = "AC_URI";
+
+	private static final int CPU_FREQUENCY = 3000;
+	private static final int CPU_MAX_FREQUENCY_GAP = 1500;
+	private static final int NB_CPU = 2;
+	private static final int NB_CORES = 4;
+
+//	private DynamicComponentCreationOutboundPort dccop_1;
 	
-	private AdmissionController						ac;
+	private Map<ComputerPoolPorts, String> cp_uris;
+	private Map<ACPortTypes, String> ac_uris;
 	
-	private RequestGenerator 						rg;
-	private RequestGeneratorManagementOutboundPort 	rgmop;
+	//DataCenterClient
 	
-	private final static int NB_CPU 				= 2;
-	private final static int NB_CORES 				= 2;
-	private final static int CPU_FREQUENCY 			= 3000;
-	private final static int CPU_MAX_FREQUENCY_GAP 	= 1500;
+	private static final String DatacenterClient = "datacenterclient";
+	private static final int 	NB_DATASOURCE 	= 1;	
+	
+//	private DynamicComponentCreationOutboundPort dccop_2;
+
+	private List<RequestGeneratorManagementOutboundPort> rgmops;
+
+	
+	private DistributedSynchronizerManager dsm_1;
+	private DistributedSynchronizerManager dsm_2;
+
+	protected final String	synchronizerManagerURI_1 = "sm_uri_1";
+	protected final String	synchronizerManagerURI_2 = "sm_uri_2";
 	
 	public DistributedTest(String[] args) throws Exception {
 		super(args);
 	}
-	
+		
 	@Override
 	public void instantiateAndPublish() throws Exception {
 		
 		if(thisJVMURI.equals(Datacenter)){
-						
-			AbstractComponent.configureLogging("", "", 0, '|');
-			Processor.DEBUG = true;
 			
-			System.out.println("### Creation Computer ...");
-			this.c = createComputer();
-			c.toggleLogging();
-			this.addDeployedComponent(c);
-			Map<ComputerPortsTypes, String> computerPorts = createComputerServicesOutboundPort(c);
-			System.out.println("### Computer created");
-			System.out.println("");
+//			dccop_1 = new DynamicComponentCreationOutboundPort(new AbstractComponent(0, 0) {});
+//			dccop_1.publishPort();
+//			
 			
-			System.out.println("### Creation Computer Monitor ...");
-			ComputerMonitor cm = createComputerMonitor(c);
-			connexionComputerMonitorWithComputer(cm,computerPorts);
-			System.out.println("### Computer Monitor created");
-			System.out.println("");
-			
-			System.out.println("### Creation AC ...");
-			this.ac = new AdmissionController(ac_uri);
-			this.addDeployedComponent(ac);
-			System.out.println("### AC created");
-			System.out.println("");
-			
-			System.out.println("### Datacenter instantiated and published");
-			System.out.println("");
+			dsm_1 = new DistributedSynchronizerManager(
+					synchronizerManagerURI_1, true);
+			this.deployedComponents.add(dsm_1);
 			
 		} else {
 			if (thisJVMURI.equals(DatacenterClient)){
 				
-				System.out.println("### Creation RG ...");
-				this.rg  = new RequestGenerator("rg", rg_uri);
-				this.addDeployedComponent(rg);
+//				dccop_2 = new DynamicComponentCreationOutboundPort(new AbstractComponent(0, 0) {});
+//				dccop_2.publishPort();
 				
-				this.rgmop = new RequestGeneratorManagementOutboundPort(
-					AbstractPort.generatePortURI(),
-					new AbstractComponent(0, 0) {});
-				this.rgmop.publishPort();
-				
-				this.rgmop.doConnection(
-					rg.getRGPortsURI().get(RGPortTypes.MANAGEMENT_IN),
-					RequestGeneratorManagementConnector.class.getCanonicalName());
-				System.out.println("### RG created");
-				System.out.println("");
-				
-				System.out.println("### DatacenterClient instantiated and published");
-				System.out.println("");
-				
-			} else {
-				throw new RuntimeException("unknown JVM " + thisJVMURI);
+				dsm_2 = new DistributedSynchronizerManager(
+						synchronizerManagerURI_2, true);
+				this.deployedComponents.add(dsm_2);
 			}
 		}
+		
+		System.out.println("[DEBUG LEO] instantiateAndPublish ok");
+		
 		super.instantiateAndPublish();
-	}
-	
-	private Computer createComputer() throws Exception{
-		
-		// Computer creation
-		Set<Integer> admissibleFrequencies = new HashSet<Integer>() ;
-		admissibleFrequencies.add(1500);	// Cores can run at 1,5 GHz
-		admissibleFrequencies.add(3000);	// and at 3 GHz
-		
-		Map<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
-		processingPower.put(1500, 1500000);	// 1,5 GHz executes 1,5 Mips
-		processingPower.put(3000, 3000000);	// 3 GHz executes 3 Mips
-				
-		Computer c = new Computer(
-				"computer0",
-				admissibleFrequencies,
-				processingPower,  
-				CPU_FREQUENCY,			// Test scenario 1, frequency = 1,5 GHz
-				CPU_MAX_FREQUENCY_GAP,	// max frequency gap within a processor
-				NB_CPU,
-				NB_CORES);
-		
-		return c;
-	}
-	
-	private Map<ComputerPortsTypes, String> createComputerServicesOutboundPort(Computer c) 
-			throws Exception{
-		
-		Map<ComputerPortsTypes, String> computerPorts = c.getComputerPortsURI();
-		
-		this.csPort = new ComputerServicesOutboundPort(
-				new AbstractComponent(0, 0) {}) ;
-
-		this.csPort.publishPort();
-		this.csPort.doConnection(
-				computerPorts.get(ComputerPortsTypes.SERVICE_IN),
-				ComputerServicesConnector.class.getCanonicalName());
-		
-		return computerPorts;
-	}
-	
-	private ComputerMonitor createComputerMonitor(Computer c) throws Exception{
-		
-		ComputerMonitor cm = new ComputerMonitor(
-				c.getComputerPortsURI().get(ComputerPortsTypes.INTROSEPTION),true);
-		
-		return cm;
-	}
-	
-	private void connexionComputerMonitorWithComputer(
-			ComputerMonitor cm, Map<ComputerPortsTypes, String> computerPorts) throws Exception{
-		
-		Map<ComputerMonitorPortTypes, String> computerMonitorPorts = cm.getPortTypes();
-		
-		cm.doPortConnection(
-				computerMonitorPorts.get(ComputerMonitorPortTypes.STATIC_STATE_OUT),
-				computerPorts.get(ComputerPortsTypes.STATIC_STATE_IN),
-				DataConnector.class.getCanonicalName()) ;
-
-		cm.doPortConnection(
-				computerMonitorPorts.get(ComputerMonitorPortTypes.DYNAMIC_STATE_OUT),
-				computerPorts.get(ComputerPortsTypes.DYNAMIC_STATE_IN),
-				ControlledDataConnector.class.getCanonicalName()) ;
 	}
 	
 	@Override
 	public void interconnect() throws Exception {
 		
 		if(thisJVMURI.equals(Datacenter)){
-			
-			System.out.println("### Interconnect ...");
-			System.out.println("");
-			
-			System.out.println("### Connection AC with RG ...");
-			ac.doPortConnection(ac_uri, rg_uri, RequestGeneratorInboundPort.class.getCanonicalName());
-			System.out.println("### AC and RG connected");
-			System.out.println("");
-			
-			System.out.println("### Interconnection done");
-			
+						
+//			assert dccop_1 != null;
+//			
+//			dccop_1.doConnection(thisJVMURI + AbstractDistributedCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
+//					DynamicComponentCreationConnector.class.getCanonicalName());
+						
 		} else {
 			if (thisJVMURI.equals(DatacenterClient)){	
-			} else {
-				throw new RuntimeException("unknown JVM " + thisJVMURI);
+				
+//				assert dccop_2 != null;
+//				
+//				dccop_2.doConnection(thisJVMURI + AbstractDistributedCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
+//						DynamicComponentCreationConnector.class.getCanonicalName());
 			}
 		}
+		
 		super.interconnect();
 	}
 	
 	@Override
 	public void start() throws Exception {
-				
+
+		super.start();
+		
 		if(thisJVMURI.equals(Datacenter)){
+			
+			assert dsm_1 != null;
 						
+			cp_uris = ComputerPool.newInstance(CP_URI, dsm_1, true);
+
+			System.out.println("[DEBUG LEO] cp_uris length : " + cp_uris.size());
+			for(ComputerPoolPorts k : cp_uris.keySet()){
+				System.out.println("[DEBUG LEO] key : " + k + "; value : " + cp_uris.get(k));
+			}
+
+			ComputerPoolOutboundPort cpop = new ComputerPoolOutboundPort(new AbstractComponent(0, 0) {});
+			cpop.publishPort();
+			
+			//BUG avec Javassist en Multi-JVM
+//			cpop.doConnection(cp_uris.get(ComputerPoolPorts.COMPUTER_POOL),
+//					ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
+			
+			cpop.doConnection(cp_uris.get(ComputerPoolPorts.COMPUTER_POOL),
+					ComputerPoolConnector.class.getCanonicalName());
+//
+//			HashSet<Integer> admissibleFrequencies = new HashSet<Integer>() ;
+//			admissibleFrequencies.add(1500);
+//			admissibleFrequencies.add(3000);
+//
+//			HashMap<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
+//			processingPower.put(1500, 1500000);
+//			processingPower.put(3000, 3000000);
+//
+//			cpop.createNewComputer("computer-0",
+//					admissibleFrequencies,
+//					processingPower,
+//					CPU_FREQUENCY,
+//					CPU_MAX_FREQUENCY_GAP,
+//					NB_CPU,
+//					NB_CORES);
+//
+//			ac_uris = AdmissionController.newInstance(AC_URI, cp_uris, null, dsm_1, true);
+//
+			System.out.println("DataCenter started !");
+			
 		} else {
 			if (thisJVMURI.equals(DatacenterClient)){
-				
-				//TODO
-				
-			} else {
-				throw new RuntimeException("unknown JVM " + thisJVMURI);
+
+//				assert dsm_2 != null;
+//				
+//				for (int i = 0; i < NB_DATASOURCE; i++) {
+//					
+//					// Request Generator creation
+//					Map<RGPortTypes, String> rg_uris  = RequestGenerator.newInstance("rg-"+i, 500.0, 6000000000L, null, dsm_2, true);
+//					
+//					// Rg management creation
+//					RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
+//							new AbstractComponent(0, 0) {});
+//					rgmop.publishPort();
+//					rgmop.doConnection(
+//							rg_uris.get(RGPortTypes.MANAGEMENT_IN),
+//							RequestGeneratorManagementConnector.class.getCanonicalName());
+//					this.rgmops.add(rgmop);
+//					
+//					// Dynamic ressources creation
+//					AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(
+//							new AbstractComponent(0, 0) {});
+//					acop.publishPort();
+//					acop.doConnection(
+//							ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
+//							AdmissionControllerConnector.class.getCanonicalName());
+//					acop.addRequestDispatcher("rd-"+i, rg_uris);				
+//				}
+				System.out.println("DataCenterClient started !");
 			}
 		}
-		super.start();
-	}
-	
-	public void testScenario() throws Exception {
-		
-		this.rgmop.startGeneration();
-		Thread.sleep(20000L);
-		this.rgmop.stopGeneration();
 	}
 	
 	public static void main(String[] args){
 		
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		
 		try {
-			final DistributedTest dTest = new DistributedTest(args);
+			DistributedTest dTest = new DistributedTest(args);
 			dTest.deploy();
-			
 			System.out.println("starting...");
 			dTest.start();
-			
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
 					try {
-						dTest.testScenario();
+						//dTest.testScenario();
 					} catch (Exception e) {
+						e.printStackTrace();
 						throw new RuntimeException(e);
 					}
 				}
-			}).start();;
-			
+			}).start();
 			Thread.sleep(90000L);
-			
-			System.out.println("shutting down...");
-			dTest.shutdown() ;
-			
+			System.out.println("shutdown...");
+			dTest.shutdown();
 			System.out.println("ending...");
-			System.exit(0) ;
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -8,6 +8,8 @@ import java.util.Optional;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.exceptions.ComponentShutdownException;
+import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
+import fr.upmc.components.extensions.synchronizers.components.SynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
@@ -278,12 +280,13 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		super.shutdown();
 	}	
 	
-	public static Map<RDPortTypes, String> newInstance(
-			DynamicComponentCreationOutboundPort dcc, 
+	public static Map<RDPortTypes, String> newInstance( 
 			String Component_URI, 
 			String RG_RequestNotification_In,
 			String RG_RequestSubmission_Out,
-			String RG_Connection_In) throws Exception {
+			String RG_Connection_In,
+			SynchronizerManager sm,
+			Boolean distributed) throws Exception {
 		
 		String RequestSubmission_In = AbstractPort.generatePortURI();
 		String RequestSubmission_Out = AbstractPort.generatePortURI();
@@ -306,7 +309,10 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		};
 		
 		try {
-			dcc.createComponent(RequestDispatcher.class.getCanonicalName(), args);
+			if(!distributed)
+				sm.createComponent(RequestDispatcher.class, args);
+			else 
+				((DistributedSynchronizerManager)sm).createComponent(RequestDispatcher.class, args);
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw e;

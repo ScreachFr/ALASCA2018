@@ -5,6 +5,7 @@ import java.util.Map;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
+import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
@@ -15,6 +16,12 @@ public class AdmissionControllerOutboundPort
 
 	public AdmissionControllerOutboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, AdmissionControllerI.class, owner);
+		
+		assert	uri != null ;
+	}
+	
+	public AdmissionControllerOutboundPort(ComponentI owner) throws Exception {
+		super(AbstractPort.generatePortURI(), AdmissionControllerI.class, owner);
 		
 		assert	uri != null ;
 	}

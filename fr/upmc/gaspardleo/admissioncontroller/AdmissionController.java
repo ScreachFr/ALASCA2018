@@ -7,13 +7,17 @@ import java.util.Optional;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
+import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
+import fr.upmc.components.extensions.synchronizers.components.SynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+import fr.upmc.gaspardleo.applicationvm.connectors.ApplicationVMConnector;
 import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
+import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
@@ -38,7 +42,7 @@ implements AdmissionControllerI{
 		ADMISSION_CONTROLLER_IN;
 	}
 
-	private DynamicComponentCreationOutboundPort dcc;
+	private SynchronizerManager sm;
 	private AdmissionControllerInboundPort acip;
 	private ArrayList<ApplicationVMManagementOutboundPort> avmPorts;
 
@@ -50,13 +54,17 @@ implements AdmissionControllerI{
 	private Map<ComputerPoolPorts, String> computerPoolURIs;
 	private ComputerPoolOutboundPort cpop;
 
+	private Boolean distributed;
+	
 	public AdmissionController(String AC_URI,
 			HashMap<ComputerPoolPorts, String> computerPoolUri,
 			String admissionController_IN,
-			DynamicComponentCreationOutboundPort dcc) throws Exception{		
+			SynchronizerManager sm,
+			Boolean distributed) throws Exception{		
 		super(1, 1);
 
-		this.dcc = dcc;
+		this.sm = sm;
+		this.distributed = distributed;
 		this.registeredAVMs = new HashMap<>();
 		this.requestSources = new HashMap<>();
 
@@ -75,9 +83,12 @@ implements AdmissionControllerI{
 		this.addPort(cpop);
 		this.cpop.publishPort();
 
-		this.cpop.doConnection(computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
-				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
+//		//BUG Javassist avec Multi-JVM
+//		this.cpop.doConnection(computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
+//				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
 
+		this.cpop.doConnection(computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
+				ComputerPoolConnector.class.getCanonicalName());
 
 		this.toggleLogging();
 		//this.toggleTracing();
@@ -90,11 +101,13 @@ implements AdmissionControllerI{
 			) throws Exception {
 
 
-		Map<RDPortTypes, String> RD_uris = RequestDispatcher.newInstance(dcc,
+		Map<RDPortTypes, String> RD_uris = RequestDispatcher.newInstance(
 				RD_Component_URI,
 				requestGeneratorURIs.get(RGPortTypes.REQUEST_NOTIFICATION_IN),
 				requestGeneratorURIs.get(RGPortTypes.REQUEST_SUBMISSION_OUT),
-				requestGeneratorURIs.get(RGPortTypes.CONNECTION_IN));
+				requestGeneratorURIs.get(RGPortTypes.CONNECTION_IN),
+				this.sm,
+				this.distributed);
 		
 		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
 
@@ -157,9 +170,13 @@ implements AdmissionControllerI{
 
 		this.addPort(avmcop);
 		avmcop.publishPort();
-		avmcop.doConnection(AVMConnectionPort_URI, 
-				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
+		
+//		//BUG avec Javassist en Multi-JVM
+//		avmcop.doConnection(AVMConnectionPort_URI, 
+//				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
 
+		avmcop.doConnection(AVMConnectionPort_URI, 
+				ApplicationVMConnector.class.getCanonicalName());
 
 		avmcop.doRequestNotificationConnection(notificationPort_URI);
 		
@@ -224,7 +241,8 @@ implements AdmissionControllerI{
 	public static Map<ACPortTypes, String> newInstance(
 			String AC_URI,
 			Map<ComputerPoolPorts, String> computerPoolUri,
-			DynamicComponentCreationOutboundPort dcc) throws Exception{
+			SynchronizerManager sm,
+			Boolean distributed) throws Exception{
 
 		String admissionController_IN = AbstractPort.generatePortURI();
 
@@ -232,11 +250,15 @@ implements AdmissionControllerI{
 				AC_URI,
 				computerPoolUri,
 				admissionController_IN,
-				dcc
+				sm,
+				distributed
 		};
 
-		dcc.createComponent(AdmissionController.class.getCanonicalName(), args);
-
+		if (!distributed)
+			sm.createComponent(AdmissionController.class, args);
+		else 
+			((DistributedSynchronizerManager)sm).createComponent(AdmissionController.class, args);
+		
 		HashMap<ACPortTypes, String> ret = new HashMap<ACPortTypes, String>();		
 		ret.put(ACPortTypes.INTROSPECTION, AC_URI);
 		ret.put(ACPortTypes.ADMISSION_CONTROLLER_IN, admissionController_IN);

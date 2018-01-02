@@ -15,10 +15,7 @@ public class AdmissionControllerConnector
 	@Override
 	public void addRequestDispatcher(
 			String RD_URI,
-			Map<RGPortTypes, String> requestGeneratorURIs) throws Exception {
-		
-//		System.out.println("[DEBUG LEO] (AdmissionControllerI)this.offering " + (AdmissionControllerI)this.offering);
-		
+			Map<RGPortTypes, String> requestGeneratorURIs) throws Exception {		
 		((AdmissionControllerI)this.offering).addRequestDispatcher(
 				RD_URI,
 				requestGeneratorURIs);

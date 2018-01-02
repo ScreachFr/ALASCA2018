@@ -183,12 +183,7 @@ implements	OutboundPortI
 	public void			publishPort() throws Exception
 	{
 		// an outbound port never needs to be published distributedly
-
-		// DEBUG LEO
-		
-		super.localPublishPort() ;
-		
-		//super.publishPort();
+		super.publishPort();
 	}
 
 	// ------------------------------------------------------------------------
@@ -318,14 +313,14 @@ implements	OutboundPortI
 	public void			obeyConnection(String otherPortURI, String ccname)
 	throws	Exception
 	{
-//				System.err.println("otherPortURI != null : " + (otherPortURI != null));
+//				System.err.println("[DEBUG LEO] otherPortURI != null : " + (otherPortURI != null));
 //				System.out.flush();
-//				System.err.println("\nccname != null : " + (ccname != null));;
+//				System.err.println("\n[DEBUG LEO]  ccname != null : " + (ccname != null));;
 //				System.out.flush();
-//				System.err.println("\n!this.connected() : " + !this.connected());
+//				System.err.println("\n[DEBUG LEO]  !this.connected() : " + !this.connected());
 //		
 //				
-//				System.err.println("\notherPortURI : " + otherPortURI +
+//				System.err.println("\n[DEBUG LEO]  otherPortURI : " + otherPortURI +
 //						"\nccname : " + ccname);
 				
 		assert	otherPortURI != null && ccname != null && !this.connected() ;
@@ -333,17 +328,17 @@ implements	OutboundPortI
 		// FIXME: should use a proper state machine model to implement the
 		// connection and disconnection protocol
 
-//		System.out.println("1");
+//		System.out.println("[DEBUG LEO]  1");
 		Class<?> cc = Class.forName(ccname) ;
-//		System.out.println("2");
+//		System.out.println("[DEBUG LEO]  2");
 		Constructor<?> c = cc.getConstructor(new Class<?>[]{}) ;
-//		System.out.println("3");
+//		System.out.println("[DEBUG LEO]  3");
 		ConnectorI connector = (ConnectorI) c.newInstance() ;
-//		System.out.println("4");
+//		System.out.println("[DEBUG LEO]  4");
 		ConnectionBuilder.SINGLETON.connectWith(otherPortURI,
 												this.getPortURI(),
 												connector) ;
-//		System.out.println("5");
+//		System.out.println("[DEBUG LEO]  5");
 		assert	this.connected() ;
 	}
 

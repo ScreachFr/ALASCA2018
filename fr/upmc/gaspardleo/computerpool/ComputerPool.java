@@ -12,6 +12,8 @@ import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
 import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
+import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
+import fr.upmc.components.extensions.synchronizers.components.SynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
@@ -29,14 +31,16 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort;
 public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	public final static int DEFAULT_CORE_ALLOC_NUMBER = 2;
 
+	private static final String DistributedSynchronizerManager = null;
+
 	public enum ComputerPoolPorts {
-		ITROSPECTION,
+		INTROSPECTION,
 		COMPUTER_POOL;
 	}
 	
 	private String uri;
 	
-	private DynamicComponentCreationOutboundPort dcc;
+	private SynchronizerManager sm;
 
 	private ComputerPoolInbounPort cpi;
 	
@@ -45,24 +49,44 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	private List<AllocatedCore[]> availableCores;
 	private Map<Map<ApplicationVMPortTypes, String>, AllocatedCore[]> avmInUse;
 
-	public ComputerPool(String componentURI, String ComputerPoolPort_IN, DynamicComponentCreationOutboundPort dcc) throws Exception {
+	private Boolean distributed;
+	
+	//DEBUG LEO
+	private String toto;
+	
+	public ComputerPool(
+			String componentURI, 
+			String computerPoolPort_URI, 
+			SynchronizerManager sm,
+			Boolean distributed) throws Exception {
+				
 		super(1, 1);
 
+		//DEBUG LEO
+		this.toto = "TOTO";
+		
 		this.uri = componentURI;
 
+		this.distributed = distributed;
 		
 		this.addOfferedInterface(ComputerPoolI.class);
-		this.cpi = new ComputerPoolInbounPort(ComputerPoolPort_IN, this);
+		this.cpi = new ComputerPoolInbounPort(computerPoolPort_URI, this);
 		this.cpi.publishPort();
 		this.addPort(this.cpi);
 		
-		this.dcc = dcc;
+		System.out.println("[DEBUG LEO] ????????????? ComputerPoolInbounPort published : " + cpi.isPublished());
+		assert cpi.isPublished();
+		
+		this.sm = sm;
 
 		this.computers = new ArrayList<>();
 		this.availableCores = new ArrayList<>();
 		this.avmInUse = new HashMap<>();
 		
 		this.toggleLogging();
+		
+		System.out.println("[DEBUG LEO] ComputerPool maded");
+
 	}
 
 	@Override
@@ -77,7 +101,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 		System.out.println("Computer creation and core allocation.");
 		
 		Map<ComputerPortsTypes, String> computerUris = Computer.newInstance(computerURI, possibleFrequencies, 
-				processingPower, defaultFrequency, maxFrequencyGap, numberOfProcessors, numberOfCores, dcc);
+				processingPower, defaultFrequency, maxFrequencyGap, numberOfProcessors, numberOfCores, sm, distributed);
 
 		ComputerServicesOutboundPort csop = new ComputerServicesOutboundPort(this);
 		this.addPort(csop);
@@ -97,7 +121,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 		if (availableCores.size() == 0)
 			throw new NoAvailableResourceException();
 
-		Map<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(dcc, avmURI);
+		Map<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(sm, avmURI, distributed);
 		
 		// Create a mock up port to manage the AVM component (allocate cores).
 		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(
@@ -121,24 +145,43 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	
 	// TODO pouvoir enlever des avms et rendre les cores de nouveau disponible.
 	
-	public static Map<ComputerPoolPorts, String> newInstance(String componentURI, DynamicComponentCreationOutboundPort dcc) throws Exception {
-		String computerPoolPort_URI = AbstractPort.generatePortURI();
+	public static Map<ComputerPoolPorts, String> newInstance(
+			String componentURI, 
+			SynchronizerManager sm,
+			Boolean distributed) throws Exception {
 		
+		String computerPoolPort_URI = AbstractPort.generatePortURI();
+				
 		Object[] args = new Object[]{
 				componentURI,
 				computerPoolPort_URI,
-				dcc
+				sm,
+				distributed
 		};
 		
-		dcc.createComponent(ComputerPool.class.getCanonicalName(), args);
-		
-		
+		try{
+			if (!distributed){
+				sm.createComponent(ComputerPool.class, args);
+			}
+			else{
+				System.out.println("[DEBUG LEO] createComponent");
+				((DistributedSynchronizerManager)sm).createComponent(ComputerPool.class, args);
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			throw e;
+		}
 		HashMap<ComputerPoolPorts, String> result = new HashMap<>();
 		
 		result.put(ComputerPoolPorts.COMPUTER_POOL, computerPoolPort_URI);
-		result.put(ComputerPoolPorts.ITROSPECTION, componentURI);
+		result.put(ComputerPoolPorts.INTROSPECTION, componentURI);
 		
 		return result;
 	}
 
+	//DEBUG LEO
+	
+	public String getToto(){
+		return this.toto;
+	}
 }

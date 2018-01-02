@@ -118,32 +118,17 @@ implements	InboundPortI
 		) throws Exception
 	{
 		super() ;
-		
-//		System.out.println("[DEBUG LEO]");
-//		System.out.println("[DEBUG LEO] uri != null : " + uri != null);
-//		System.out.println("[DEBUG LEO] owner != null : " + owner != null);
 		assert	uri != null && owner != null ;
-		
-//		System.out.println("[DEBUG LEO] assert OfferedI || RequiredI : " + (OfferedI.class.isAssignableFrom(implementedInterface)
-//				|| this instanceof DataOutboundPortI &&
-//				RequiredI.class.isAssignableFrom(implementedInterface) ));
-		
 		assert	OfferedI.class.isAssignableFrom(implementedInterface)
 				|| this instanceof DataOutboundPortI &&
 						RequiredI.class.isAssignableFrom(implementedInterface) ;
-
 		this.uri = uri ;
 		this.implementedInterface = implementedInterface ;
 		this.owner = owner ;
-
 		// All inbound ports implement an offered interface, except
 		// subclasses that inherits from AbstractDataOutboundPort
 		// for which the inbound behavior comes from the push interface
 		// and not the RequiredI implemented interface
-		
-//		System.out.println("[DEBUG LEO] assert	OfferedI || instanceof : " + (OfferedI.class.isAssignableFrom(implementedInterface)
-//				|| this instanceof AbstractDataOutboundPort));
-		
 		assert	OfferedI.class.isAssignableFrom(implementedInterface)
 				|| this instanceof AbstractDataOutboundPort ;
 	}

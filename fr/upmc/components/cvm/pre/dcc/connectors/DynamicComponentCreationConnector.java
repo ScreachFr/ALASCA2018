@@ -68,6 +68,9 @@ implements	DynamicComponentCreationI
 		Object[] constructorParams
 		) throws Exception
 	{
+		System.out.println("[DEBUG LEO] createComponent 4");
+		System.out.println("[DEBUG LEO] classname : " + classname);
+
 		((DynamicComponentCreationI)this.offering).
 								createComponent(classname, constructorParams) ;
 	}

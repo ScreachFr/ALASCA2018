@@ -111,7 +111,11 @@ extends AbstractComponent
 	 * @param constructorParams Paramètres du constructeur de la classe.
 	 * @throws Exception
 	 */
-	protected void				createComponent(
+	
+	//DEBUG LEO
+//	protected void				createComponent(
+	public void				createComponent(			
+	//FIN DEBUG
 			Class<?> clas,
 			Object[] constructorParams
 	) throws Exception 
@@ -119,8 +123,11 @@ extends AbstractComponent
 		assert clas != null;
 		assert constructorParams != null;
 		
+//		System.out.println("[DEBUG LEO] constructorParams.length : " + constructorParams.length);
 		Class<?>[] parameterTypes = new Class[constructorParams.length] ;
+//		System.out.println("[DEBUG LEO] parameterTypes : " + parameterTypes.getClass().getCanonicalName());
 		for(int i = 0 ; i < constructorParams.length ; i++) {
+//			System.out.println("[DEBUG LEO] constructorParams[i].getClass() : " + constructorParams[i].getClass());
 			parameterTypes[i] = constructorParams[i].getClass() ;
 		}
 		

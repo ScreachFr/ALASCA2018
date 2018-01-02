@@ -7,6 +7,8 @@ import java.util.Set;
 
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
+import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
+import fr.upmc.components.extensions.synchronizers.components.SynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
 
 public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
@@ -39,7 +41,8 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 			Integer maxFrequencyGap,
 			Integer numberOfProcessors,
 			Integer numberOfCores,
-			DynamicComponentCreationOutboundPort dcc) throws Exception {
+			SynchronizerManager sm,
+			Boolean distributed) throws Exception {
 
 
 
@@ -58,12 +61,15 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 				numberOfCores,
 				computerServicesInboundPortURI, 
 				computerStaticStateDataInboundPortURI,
-				computerDynamicStateDataInboundPortURI
+				computerDynamicStateDataInboundPortURI,
 		};
 
 		System.out.println("Computer factory call");
 		try {
-			dcc.createComponent(Computer.class.getCanonicalName(), args);
+			if (! distributed)
+				sm.createComponent(Computer.class, args);
+			else
+				((DistributedSynchronizerManager)sm).createComponent(Computer.class, args);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;

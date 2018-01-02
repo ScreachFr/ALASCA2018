@@ -1,6 +1,7 @@
 package fr.upmc.components.extensions.synchronizers.components;
 
 import fr.upmc.components.cvm.pre.dcc.connectors.DynamicComponentCreationConnector;
+import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.connectors.ConnectionBuilder;
 import fr.upmc.components.connectors.ConnectorI;
@@ -52,7 +53,10 @@ extends SynchronizerManager
 	 * @throws Exception
 	 */
 	@Override
-	protected void 					createComponent(
+//	//DEBUG LEO
+//	public void 					createComponent(	
+	public void 					createComponent(
+	//FIN DEBUG
 			Class<?> clas,
 			Object[] constructorParams
 	) throws Exception 
@@ -63,8 +67,11 @@ extends SynchronizerManager
 		// Création du composant sur le serveur de composant
 		DynamicComponentCreationOutboundPort portToDCCServer =
 			connectToDCCServer(getJVMURIToDeploy());
+		System.out.println("[DEBUG LEO] createComponent 2");
 		portToDCCServer.createComponent(clas.getName(), constructorParams);
 		disconnectFromDCCServer(portToDCCServer);
+		
+		
 	}
 
 	
@@ -80,18 +87,42 @@ extends SynchronizerManager
 	) throws Exception
 	{
 		// Création du port et connexion au serveur de création de composants
+		
+		//DEBUG LEO
+		this.addRequiredInterface(DynamicComponentCreationI.class);
+		//FIN DEBUG
 		DynamicComponentCreationOutboundPort portToDCCServer = 
 			new DynamicComponentCreationOutboundPort(this) ;
+		
 		portToDCCServer.localPublishPort() ;
 	
 		this.addPort(portToDCCServer);
-		ConnectorI c = new DynamicComponentCreationConnector() ;
-		ConnectionBuilder.SINGLETON.connectWith(
-			server_uri + "-" +
-				AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX,
-			portToDCCServer.getPortURI(),
-			c);
+		
+		portToDCCServer.doConnection(
+				server_uri +
+				AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
+				DynamicComponentCreationConnector.class.getCanonicalName());
+		
+		//DEBUG LEO
+		
+//		ConnectorI c = new DynamicComponentCreationConnector() ;
+//		
+////		//DEBUG LEO
+////		ConnectionBuilder.SINGLETON.connectWith(
+////			server_uri + "-" +
+////				AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX,
+////			portToDCCServer.getPortURI(),
+////			c);
+////		//FIN DEBUG
+//		
+//		ConnectionBuilder.SINGLETON.connectWith(
+//				server_uri +
+//					AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX,
+//				portToDCCServer.getPortURI(),
+//				c);
 
+		//DEBUG LEO
+		
 		return portToDCCServer;
 	}
 	

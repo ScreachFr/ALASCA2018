@@ -6,6 +6,8 @@ import java.util.Map;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
+import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
+import fr.upmc.components.extensions.synchronizers.components.SynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorServicesNotificationInboundPort;
@@ -119,8 +121,9 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 	}
 
 	public static Map<ApplicationVMPortTypes, String> newInstance(
-			DynamicComponentCreationOutboundPort dcc,
-			String component_URI) throws Exception {
+			SynchronizerManager sm,
+			String component_URI,
+			Boolean distributed) throws Exception {
 
 		String applicationVMManagement_In = AbstractPort.generatePortURI();
 		String requestSubmission_In = AbstractPort.generatePortURI();
@@ -139,7 +142,10 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 		};
 		System.out.println("AVM inst call...");
 		try {
-			dcc.createComponent(ApplicationVM.class.getCanonicalName(), args);
+			if(!distributed)
+				sm.createComponent(ApplicationVM.class, args);
+			else 
+				((DistributedSynchronizerManager)sm).createComponent(ApplicationVM.class, args);
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw e;

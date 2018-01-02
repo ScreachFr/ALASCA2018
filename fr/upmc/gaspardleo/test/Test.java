@@ -11,6 +11,8 @@ import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.cvm.pre.dcc.connectors.DynamicComponentCreationConnector;
 import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
+import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
+import fr.upmc.components.extensions.synchronizers.components.SynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
@@ -59,13 +61,17 @@ public class Test {
 			// CVM creation
 			this.cvm 	= new CVM();
 
-			DynamicComponentCreationOutboundPort dccop = 
-					new DynamicComponentCreationOutboundPort(new AbstractComponent(0, 0) {});
-			dccop.publishPort();
-			dccop.doConnection(AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
-					DynamicComponentCreationConnector.class.getCanonicalName());
+//			DynamicComponentCreationOutboundPort dccop = 
+//					new DynamicComponentCreationOutboundPort(new AbstractComponent(0, 0) {});
+//			dccop.publishPort();
+//			dccop.doConnection(AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
+//					DynamicComponentCreationConnector.class.getCanonicalName());
+			
+			SynchronizerManager sm = new SynchronizerManager(
+					"sm", false);
+			this.cvm.addDeployedComponent(sm);;
 
-			cp_uris = ComputerPool.newInstance(CP_URI, dccop);
+			cp_uris = ComputerPool.newInstance(CP_URI, sm, false);
 
 			ComputerPoolOutboundPort cpop = 
 					new ComputerPoolOutboundPort(AbstractPort.generatePortURI(), new AbstractComponent(0, 0) {});
@@ -91,11 +97,11 @@ public class Test {
 					NB_CORES);
 			System.out.println("computer creation launched.");
 			// Admission Controller creation
-			ac_uris = AdmissionController.newInstance(AC_URI, cp_uris, dccop);
+			ac_uris = AdmissionController.newInstance(AC_URI, cp_uris, sm, false);
 
 			// Simply adds some request generators to the current admission controller.
 			for (int i = 0; i < NB_DATASOURCE; i++) {
-				this.addDataSource(i, dccop);
+				this.addDataSource(i, sm);
 			}
 
 		} catch (Exception e) {
@@ -105,10 +111,10 @@ public class Test {
 
 
 
-	private void addDataSource(int i, DynamicComponentCreationI dcc) throws Exception {
+	private void addDataSource(int i, SynchronizerManager sm) throws Exception {
 
 		// Request Generator creation
-		Map<RGPortTypes, String> rg  = createRequestGenerator("rg-"+i, dcc);
+		Map<RGPortTypes, String> rg  = createRequestGenerator("rg-"+i, sm);
 
 		// Dynamic ressources creation
 		AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(AbstractPort.generatePortURI(), new AbstractComponent(0, 0) {});
@@ -117,8 +123,8 @@ public class Test {
 		acop.addRequestDispatcher("rd-"+i, rg);
 	}
 
-	private Map<RGPortTypes, String> createRequestGenerator(String RG_URI, DynamicComponentCreationI dcc) throws Exception{
-		Map<RGPortTypes, String> result = RequestGenerator.newInstance(RG_URI, 500.0, 6000000000L, dcc);
+	private Map<RGPortTypes, String> createRequestGenerator(String RG_URI, SynchronizerManager sm) throws Exception{
+		Map<RGPortTypes, String> result = RequestGenerator.newInstance(RG_URI, 500.0, 6000000000L, sm, false);
 
 		createRGManagement(result.get(RGPortTypes.MANAGEMENT_IN));
 
