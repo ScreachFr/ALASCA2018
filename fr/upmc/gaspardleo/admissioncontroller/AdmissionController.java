@@ -6,22 +6,17 @@ import java.util.Map;
 import java.util.Optional;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
-import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
-import fr.upmc.components.extensions.synchronizers.components.SynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.applicationvm.connectors.ApplicationVMConnector;
-import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
-import fr.upmc.gaspardleo.classfactory.ClassFactory;
+import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
-import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
@@ -32,46 +27,34 @@ import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPor
 import fr.upmc.gaspardleo.requestdispatcher.connectors.RequestDispatherConnector;
 
 public class AdmissionController 
-extends AbstractComponent
-implements AdmissionControllerI{
-
-	private final static int DEFAULT_CORE_NUMBER = 2;
+		extends AbstractComponent
+		implements AdmissionControllerI{
 
 	public static enum	ACPortTypes {
-		INTROSPECTION,
 		ADMISSION_CONTROLLER_IN;
 	}
-
-	private SynchronizerManager sm;
+	
+	private final static int DEFAULT_CORE_NUMBER = 2;
 	private AdmissionControllerInboundPort acip;
 	private ArrayList<ApplicationVMManagementOutboundPort> avmPorts;
-
 	// Map<RequestGenerator, RequestDispatcher>
 	private Map<Map<RGPortTypes, String>, Map<RDPortTypes, String>> requestSources;
 	// Map<RD_URI, AVM> XXX Peut-être pas utile (gardé pour unregister). 
 	private Map<String, Map<ApplicationVMPortTypes, String>> registeredAVMs;
-
 	private Map<ComputerPoolPorts, String> computerPoolURIs;
 	private ComputerPoolOutboundPort cpop;
-
-	private Boolean distributed;
 	
-	public AdmissionController(String AC_URI,
+	public AdmissionController(
 			HashMap<ComputerPoolPorts, String> computerPoolUri,
-			String admissionController_IN,
-			SynchronizerManager sm,
-			Boolean distributed) throws Exception{		
+			String admissionController_IN) throws Exception{		
+		
 		super(1, 1);
 
-		this.sm = sm;
-		this.distributed = distributed;
 		this.registeredAVMs = new HashMap<>();
 		this.requestSources = new HashMap<>();
 
-
 		this.avmPorts 	= new ArrayList<ApplicationVMManagementOutboundPort>();
 		this.computerPoolURIs = computerPoolUri;
-
 
 		this.addOfferedInterface(AdmissionControllerI.class);
 		this.acip = new AdmissionControllerInboundPort(admissionController_IN, this);
@@ -97,20 +80,17 @@ implements AdmissionControllerI{
 	@Override
 	public void addRequestDispatcher(
 			String RD_Component_URI,
-			Map<RGPortTypes, String> requestGeneratorURIs
-			) throws Exception {
-
+			Map<RGPortTypes, String> requestGeneratorURIs,
+			ComponentCreator cc) throws Exception {
 
 		Map<RDPortTypes, String> RD_uris = RequestDispatcher.newInstance(
 				RD_Component_URI,
 				requestGeneratorURIs.get(RGPortTypes.REQUEST_NOTIFICATION_IN),
 				requestGeneratorURIs.get(RGPortTypes.REQUEST_SUBMISSION_OUT),
 				requestGeneratorURIs.get(RGPortTypes.CONNECTION_IN),
-				this.sm,
-				this.distributed);
+				cc);
 		
 		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
-
 
 		RequestDispatcherOutboundPort rdop = new RequestDispatcherOutboundPort(this);
 		this.addPort(rdop);
@@ -123,47 +103,58 @@ implements AdmissionControllerI{
 		// Vm applications creation
 
 		System.out.println("AC is creating some AVMs");
+		
 		Map<ApplicationVMPortTypes, String> avm0_URIs = 
-				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-0", DEFAULT_CORE_NUMBER);
+				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-0", DEFAULT_CORE_NUMBER, cc);
 		System.out.println("AVM0 done.");
+		
 		Map<ApplicationVMPortTypes, String> avm1_URIs = 
-				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-1", DEFAULT_CORE_NUMBER);
+				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-1", DEFAULT_CORE_NUMBER, cc);
 		System.out.println("AVM1 done.");
+		
 		Map<ApplicationVMPortTypes, String> avm2_URIs = 
-				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-2", DEFAULT_CORE_NUMBER);
+				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-2", DEFAULT_CORE_NUMBER, cc);
 		System.out.println("AVM2 done.");
 
 		System.out.println("AVMs has been successfully created!");
 
-
-		String currentNotifPortUri;
-
 		// Register application VM in Request Dispatcher
-		currentNotifPortUri = rdop.registerVM(
+		
+		 String currentNotifPortUri = rdop.registerVM(
 				avm0_URIs,
 				RequestSubmissionI.class);
-		doAVMRequestNotificationConnection(avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+		
+		doAVMRequestNotificationConnection(
+				avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
 				currentNotifPortUri);
-		this.registeredAVMs.put(rd_URI, avm0_URIs);
-
+		
 		currentNotifPortUri = rdop.registerVM(
 				avm1_URIs,
 				RequestSubmissionI.class);
-		doAVMRequestNotificationConnection(avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+		
+		doAVMRequestNotificationConnection(
+				avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
 				currentNotifPortUri);
-		this.registeredAVMs.put(rd_URI, avm1_URIs);
 
 		currentNotifPortUri = rdop.registerVM(
 				avm2_URIs,
 				RequestSubmissionI.class);
-		doAVMRequestNotificationConnection(avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+		
+		doAVMRequestNotificationConnection(
+				avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
 				currentNotifPortUri);
+		
+		this.registeredAVMs.put(rd_URI, avm0_URIs);
+		this.registeredAVMs.put(rd_URI, avm1_URIs);
 		this.registeredAVMs.put(rd_URI, avm2_URIs);
+		
 		this.logMessage("Admission controller : Request source successfully added!");
 	}
 
-	private void doAVMRequestNotificationConnection(String AVMConnectionPort_URI,
+	private void doAVMRequestNotificationConnection(
+			String AVMConnectionPort_URI,
 			String notificationPort_URI) throws Exception {
+		
 		this.logMessage("Admission controller : connection on notification port.");
 		ApplicationVMConnectionOutboundPort avmcop 
 				= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
@@ -182,34 +173,10 @@ implements AdmissionControllerI{
 		
 		this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
 	}
-
-	/**
-	 * Créer une AVM.
-	 * @param VM_URI
-	 * 		Uri de la nouvelle AVM.
-	 * @param cvm
-	 * 		Utile pour l'allocation de core. TODO Créer un composant pour gerer les ordinateurs.
-	 * @return
-	 * 		L'AVM créée.
-	 * @throws Exception
-	 */
-	private void createApplicationVM(String VM_URI) throws Exception{
-		// TODO retirer cette methode dès que le computerPool est fonctionnel.		
-		//		// Vm applications creation
-		//		Map<ApplicationVMPortTypes, String> AVM_uris = ApplicationVM.newInstance(dcc, VM_URI);
-		//				
-		//		// Create a mock up port to manage the AVM component (allocate cores).
-		//		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(new AbstractComponent(0, 0) {});
-		//		avmPort.publishPort();
-		//		this.avmPorts.add(avmPort);
-		//		
-		//		avmPort.doConnection(
-		//				AVM_uris.get(ApplicationVMPortTypes.MANAGEMENT),
-		//				ApplicationVMManagementConnector.class.getCanonicalName());
-	}
-
+	
 	@Override
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
+		
 		Optional<Map<RGPortTypes,String>> optRD = 
 				requestSources.keySet().stream()
 				.filter((e) -> e.get(RGPortTypes.INTROSPECTION).equals(requestGeneratorURI))
@@ -228,7 +195,7 @@ implements AdmissionControllerI{
 
 		requestSources.remove(optRD.get());
 
-		// XXX Attendre la fin du shutdown avant de faire ça ?
+		// TODO Attendre la fin du shutdown avant de faire ça ?
 		//sop.doDisconnection();
 	}
 
@@ -239,28 +206,24 @@ implements AdmissionControllerI{
 	}
 
 	public static Map<ACPortTypes, String> newInstance(
-			String AC_URI,
 			Map<ComputerPoolPorts, String> computerPoolUri,
-			SynchronizerManager sm,
-			Boolean distributed) throws Exception{
+			ComponentCreator cc) throws Exception{
 
 		String admissionController_IN = AbstractPort.generatePortURI();
 
-		Object[] args = new Object[] {
-				AC_URI,
+		Object[] constructorParams = new Object[] {
 				computerPoolUri,
-				admissionController_IN,
-				sm,
-				distributed
+				admissionController_IN
 		};
 
-		if (!distributed)
-			sm.createComponent(AdmissionController.class, args);
-		else 
-			((DistributedSynchronizerManager)sm).createComponent(AdmissionController.class, args);
+		try {
+			cc.createComponent(AdmissionController.class, constructorParams);
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 		
 		HashMap<ACPortTypes, String> ret = new HashMap<ACPortTypes, String>();		
-		ret.put(ACPortTypes.INTROSPECTION, AC_URI);
 		ret.put(ACPortTypes.ADMISSION_CONTROLLER_IN, admissionController_IN);
 
 		return ret;		

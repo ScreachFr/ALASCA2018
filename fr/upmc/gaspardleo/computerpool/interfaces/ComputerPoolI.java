@@ -3,16 +3,13 @@ package fr.upmc.gaspardleo.computerpool.interfaces;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import fr.upmc.components.interfaces.OfferedI;
 import fr.upmc.components.interfaces.RequiredI;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.computer.Computer;
+import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 
 public interface ComputerPoolI extends OfferedI, RequiredI {
-	
 	
 	/**
 	 * Ajoute un ordinateur au pool actuel du composant.
@@ -26,7 +23,8 @@ public interface ComputerPoolI extends OfferedI, RequiredI {
 			Integer defaultFrequency,
 			Integer maxFrequencyGap,
 			Integer numberOfProcessors,
-			Integer numberOfCores) throws Exception;
+			Integer numberOfCores,
+			ComponentCreator cc) throws Exception;
 	
 	/**
 	 * Créé une nouvelle ApplicationVM.
@@ -37,5 +35,7 @@ public interface ComputerPoolI extends OfferedI, RequiredI {
 	 * @return
 	 * 		La nouvelle ApplicationVM.
 	 */
-	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate) throws Exception;
+	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, 
+			Integer numberOfCoreToAllocate,
+			ComponentCreator cc) throws Exception;
 }

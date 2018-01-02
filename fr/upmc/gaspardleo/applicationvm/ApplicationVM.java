@@ -3,29 +3,23 @@ package fr.upmc.gaspardleo.applicationvm;
 import java.util.HashMap;
 import java.util.Map;
 
-import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.cvm.pre.dcc.DynamicComponentCreator;
-import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
-import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
-import fr.upmc.components.extensions.synchronizers.components.SynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorServicesNotificationInboundPort;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorServicesOutboundPort;
-import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
 import fr.upmc.datacenter.software.applicationvm.interfaces.TaskI;
-import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionInboundPort;
+import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 
-public class ApplicationVM extends fr.upmc.datacenter.software.applicationvm.ApplicationVM
-implements ApplicationVMConnectionsI, ShutdownableI {
+public class ApplicationVM 
+		extends fr.upmc.datacenter.software.applicationvm.ApplicationVM
+		implements ApplicationVMConnectionsI, ShutdownableI {
 
 	public static enum	ApplicationVMPortTypes {
 		REQUEST_SUBMISSION,
@@ -37,9 +31,6 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 		CONNECTION_REQUEST,
 		SHUTDOWNABLE;
 	}
-
-	// Misc
-	private String vmURI;
 
 	// Ports
 	private ShutdownableInboundPort sip;
@@ -54,10 +45,10 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 			String shutdownableInboundPort_URI) throws Exception {
 
 		super(
-				component_URI, 
-				applicationVMManagement_In, 
-				requestSubmission_In,
-				requestNotification_Out);
+			component_URI, 
+			applicationVMManagement_In, 
+			requestSubmission_In,
+			requestNotification_Out);
 
 		this.addOfferedInterface(ApplicationVMConnectionsI.class);
 		this.avmcip = new ApplicationVMConnectionInboundPort(applicationVMConnectionPort_URI, this);
@@ -68,13 +59,14 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 		this.sip = new ShutdownableInboundPort(shutdownableInboundPort_URI, this);
 		this.addPort(this.sip);
 		this.sip.publishPort();
-
+		
 		// VM debug
 		this.toggleLogging();
 	}
 
 	@Override
-	public void doRequestNotificationConnection(String RD_RequestNotificationInboundPortURI) throws Exception {
+	public void doRequestNotificationConnection(
+			String RD_RequestNotificationInboundPortURI) throws Exception {
 		
 		this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
 		this.addPort(requestNotificationOutboundPort);
@@ -84,10 +76,12 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 		this.requestNotificationOutboundPort
 				.doConnection(RD_RequestNotificationInboundPortURI,
 						RequestNotificationConnector.class.getCanonicalName());
+		
 		this.logMessage("AVM : rnop connection status : " + this.requestNotificationOutboundPort.connected());
 	}
 
 	public RequestNotificationOutboundPort getRequestNotificationOutboundPort() throws Exception {
+		
 		if (this.requestNotificationOutboundPort == null)
 			this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
 
@@ -96,6 +90,7 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 
 	@Override
 	public void startTask() throws Exception {
+		
 		assert	!this.taskQueue.isEmpty() ;
 
 		AllocatedCore ac = this.findIdleCore();
@@ -114,6 +109,7 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 			ProcessorServicesNotificationInboundPort np =
 					this.processorNotificationInboundPorts.get(ac.processorURI) ;
 			p.executeTaskOnCoreAndNotify(t, ac.coreNo, np.getPortURI()) ;
+		
 		} else {
 			// TODO
 			this.logMessage("Task cancelled, couldn't find an idling core.");
@@ -121,18 +117,16 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 	}
 
 	public static Map<ApplicationVMPortTypes, String> newInstance(
-			SynchronizerManager sm,
 			String component_URI,
-			Boolean distributed) throws Exception {
+			ComponentCreator cc) throws Exception {
 
 		String applicationVMManagement_In = AbstractPort.generatePortURI();
 		String requestSubmission_In = AbstractPort.generatePortURI();
 		String requestNotification_Out = AbstractPort.generatePortURI();
 		String applicationVMConnectionPort_URI = AbstractPort.generatePortURI();
 		String shutdownableInboundPort = AbstractPort.generatePortURI();
-
 		
-		Object[] args = new Object[] {
+		Object[] constructorParams = new Object[] {
 				component_URI,
 				applicationVMManagement_In,
 				requestSubmission_In, 
@@ -140,20 +134,19 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 				applicationVMConnectionPort_URI,
 				shutdownableInboundPort
 		};
+		
 		System.out.println("AVM inst call...");
+		
 		try {
-			if(!distributed)
-				sm.createComponent(ApplicationVM.class, args);
-			else 
-				((DistributedSynchronizerManager)sm).createComponent(ApplicationVM.class, args);
+			cc.createComponent(ApplicationVM.class, constructorParams);
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
+		
 		System.out.println("AVM inst done.");
 		
-		HashMap<ApplicationVMPortTypes, String> ret =
-				new HashMap<ApplicationVMPortTypes, String>();		
+		HashMap<ApplicationVMPortTypes, String> ret = new HashMap<ApplicationVMPortTypes, String>();		
 		ret.put(ApplicationVMPortTypes.REQUEST_SUBMISSION, requestSubmission_In);
 		ret.put(ApplicationVMPortTypes.MANAGEMENT, applicationVMManagement_In);
 		ret.put(ApplicationVMPortTypes.INTROSPECTION, component_URI);
@@ -162,7 +155,5 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 		ret.put(ApplicationVMPortTypes.CONNECTION_REQUEST, applicationVMConnectionPort_URI);
 
 		return ret;
-
 	}
-
 }

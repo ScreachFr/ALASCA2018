@@ -8,7 +8,7 @@ import fr.upmc.components.ports.AbstractInboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
+import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class AdmissionControllerInboundPort extends AbstractInboundPort
@@ -20,20 +20,25 @@ implements AdmissionControllerI {
 		super(uri, AdmissionControllerI.class, owner);
 	}
 
-
 	@Override
-	public void addRequestDispatcher(String RD_URI, Map<RGPortTypes, String> requestGeneratorURIs) throws Exception {
+	public void addRequestDispatcher(
+			String RD_URI,
+			Map<RGPortTypes, String> requestGeneratorURIs,
+			ComponentCreator cc) throws Exception {
+		
 		AdmissionController ac = (AdmissionController) this.owner;
 
 		ac.handleRequestAsync(
 				new ComponentI.ComponentService<AdmissionController>(){
 					@Override
 					public AdmissionController call() throws Exception {
-						ac.addRequestDispatcher(RD_URI, requestGeneratorURIs);
+						ac.addRequestDispatcher(
+								RD_URI, 
+								requestGeneratorURIs,
+								cc);
 						return ac;
 					}
 				});
-
 	}
 
 	@Override

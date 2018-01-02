@@ -3,20 +3,17 @@ package fr.upmc.gaspardleo.requestgenerator;
 import java.util.HashMap;
 import java.util.Map;
 
-import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
-import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
-import fr.upmc.components.extensions.synchronizers.components.SynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.components.ports.PortI;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
+import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
 
-public class RequestGenerator 
+public 	class RequestGenerator 
 		extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator
 		implements RequestGeneratorConnectionI{
-
 
 	public static enum	RGPortTypes {
 		INTROSPECTION,
@@ -48,20 +45,19 @@ public class RequestGenerator
 		
 		this.rgURI = rgURI;
 
+		this.addOfferedInterface(RequestGeneratorConnectionI.class);
 		this.rgip = new RequestGeneratorInboundPort(connection_In, this);
 		this.addPort(this.rgip);
 		this.rgip.publishPort();
-		this.addOfferedInterface(RequestGeneratorConnectionI.class);
 		
 		// Rg debug
 		//this.toggleTracing();
 		this.toggleLogging();
-
 	}
-	
 
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
+		
 		super.logMessage(rgURI  + " : gettting an answer for " + r.getRequestURI());
 		System.out.println(rgURI  + " : gettting an answer for " + r.getRequestURI());
 		super.acceptRequestTerminationNotification(r);
@@ -69,8 +65,9 @@ public class RequestGenerator
 	
 	@Override
 	public void startGeneration() throws Exception {
+		
 		try {
-		super.startGeneration();
+			super.startGeneration();
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw e;
@@ -79,14 +76,17 @@ public class RequestGenerator
 	
 
 	public void addPort(PortI p) throws Exception{
+		
 		super.addPort(p);
 	}
 
 	@Override
 	public void doConnectionWithRD(String RD_Request_Submission_In) throws Exception {
 		try {
-						
-			super.rsop.doConnection(RD_Request_Submission_In, RequestSubmissionConnector.class.getCanonicalName());	
+				
+			super.rsop.doConnection(
+					RD_Request_Submission_In, 
+					RequestSubmissionConnector.class.getCanonicalName());	
 
 		}catch(Exception e){
 			e.printStackTrace();
@@ -97,16 +97,15 @@ public class RequestGenerator
 	public static Map<RGPortTypes, String> newInstance(
 			String rgURI, 
 			double meanInterArrivalTime,
-			long meanNumberOfInstructions, 
-			SynchronizerManager sm,
-			Boolean distributed) throws Exception {
+			long meanNumberOfInstructions,
+			ComponentCreator cc) throws Exception {
 		
 		String managementInboundPortURI = AbstractPort.generatePortURI();
 		String requestNotificationInboundPortURI = AbstractPort.generatePortURI();
 		String requestSubmissionOutboundPortURI = AbstractPort.generatePortURI();
 		String connection_In = AbstractPort.generatePortURI();
 		
-		Object[] args = new Object[] {
+		Object[] constructorParams = new Object[] {
 				rgURI,
 				connection_In,
 				meanInterArrivalTime,
@@ -116,10 +115,12 @@ public class RequestGenerator
 				requestNotificationInboundPortURI
 		};
 		
-		if (!distributed)
-			sm.createComponent(RequestGenerator.class, args);
-		else
-			((DistributedSynchronizerManager)sm).createComponent(RequestGenerator.class, args);
+		try {
+			cc.createComponent(RequestGenerator.class, constructorParams);
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}	
 		
 		HashMap<RGPortTypes, String> ret = new HashMap<RGPortTypes, String>();		
 		ret.put(RGPortTypes.INTROSPECTION, rgURI);

@@ -6,13 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.exceptions.ComponentShutdownException;
-import fr.upmc.components.extensions.synchronizers.components.DistributedSynchronizerManager;
-import fr.upmc.components.extensions.synchronizers.components.SynchronizerManager;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
-import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
@@ -23,18 +19,22 @@ import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
+import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
-import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherOutboundPort;
 import fr.upmc.gaspardleo.requestgenerator.connectors.RequestGeneraterConnector;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
 
-public class RequestDispatcher 
-extends AbstractComponent 
-implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHandlerI, RequestNotificationI, ShutdownableI {
+public 	class 		RequestDispatcher 
+		extends 	AbstractComponent 
+		implements 	RequestDispatcherI, 
+					RequestSubmissionHandlerI , 
+					RequestNotificationHandlerI, 
+					RequestNotificationI, 
+					ShutdownableI {
 
 	public static enum	RDPortTypes {
 		REQUEST_SUBMISSION_IN, 
@@ -43,29 +43,27 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		REQUEST_NOTIFICATION_IN,
 		REQUEST_DISPATCHER_IN,
 		INTROSPECTION,
-		SHUTDOWNABLE_IN;
+		SHUTDOWNABLE_IN
 	}
 	
-	private String 										Component_URI;
+	private String 											Component_URI;
 	
 	// VMs
 	private Map<String, RequestSubmissionOutboundPort> 		registeredVmsRsop;
 	private Map<String, RequestNotificationInboundPort> 	registeredVmsRnip;
 	private ArrayList<Map<ApplicationVMPortTypes, String>> 	registeredVmsUri;
 	
-	
 	//Ports
-	private RequestSubmissionInboundPort 				rsip;
-	private RequestNotificationOutboundPort 			rnop;
-	private RequestSubmissionOutboundPort 				rsop;
-	private RequestNotificationInboundPort 				rnip;
-	private RequestDispatcherInboundPort				rdip;
-	private ShutdownableInboundPort						sip;
-	private RequestGeneratorOutboundPort				rgop;
-	
+	private RequestSubmissionInboundPort 					rsip;
+	private RequestNotificationOutboundPort 				rnop;
+	private RequestSubmissionOutboundPort 					rsop;
+	private RequestNotificationInboundPort 					rnip;
+	private RequestDispatcherInboundPort					rdip;
+	private ShutdownableInboundPort							sip;
+	private RequestGeneratorOutboundPort					rgop;
 	
 	//Misc
-	private Integer 									vmCursor;
+	private Integer 										vmCursor;
 
 	public RequestDispatcher(
 			String Component_URI, 
@@ -97,8 +95,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		this.addPort(this.rsop);
 		this.rsop.publishPort();
 		this.addOfferedInterface(RequestSubmissionHandlerI.class) ;
-		
-		
 				
 		// Request notification submission inbound port connection.
 		this.rnip = new RequestNotificationInboundPort(RequestNotification_In, this);
@@ -155,7 +151,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 			return null;
 		}
 		
-		
 		RequestSubmissionOutboundPort rsop = new RequestSubmissionOutboundPort(this);
 		this.addPort(rsop);
 		rsop.publishPort();
@@ -166,9 +161,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
 		this.addPort(rnip);
 		rnip.publishPort();
-		
-		
-		
+				
 		this.registeredVmsRnip.put(avmUri, rnip);
 		this.registeredVmsRsop.put(avmUri, rsop);
 		this.registeredVmsUri.add(avmURIs);
@@ -194,11 +187,11 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		registeredVmsUri.remove(URIs.get());
 		registeredVmsRnip.get(vmUri).doDisconnection();
 		registeredVmsRsop.get(vmUri).doDisconnection();
-		
 	}
 
 	@Override
 	public void acceptRequestSubmission(RequestI r) throws Exception {
+		
 		System.out.println("XXXXXXXXXXXXXXXXx Request accept !");
 		this.logMessage(this.Component_URI + " : incoming request submission");
 		
@@ -206,6 +199,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 			this.logMessage(this.Component_URI + " : no registered vm.");
 			
 		} else {
+			
 			String avmURI = registeredVmsUri
 					.get(vmCursor%registeredVmsUri.size()).get(ApplicationVMPortTypes.INTROSPECTION);
 			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(
@@ -219,16 +213,19 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 			vmCursor++;
 		}
-
 	}
 
 	@Override
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
+		
 		this.logMessage(this.Component_URI + " : incoming request submission and notification.");
 
 		if (this.registeredVmsUri.size() == 0) {
+			
 			this.logMessage(this.Component_URI + " : no registered vm.");
+			
 		} else {
+			
 			vmCursor = (vmCursor+1) % this.registeredVmsUri.size();
 			
 			String avmURI = registeredVmsUri
@@ -248,15 +245,15 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
+		
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
-
 		rnop.notifyRequestTermination(r);
 	}
 	
 	@Override
 	public void notifyRequestTermination(RequestI r) throws Exception {
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
-		// XXX Pas utilisé.
+		// TODO Pas utilisé.
 		rnop.notifyRequestTermination(r);
 	}
 	
@@ -285,8 +282,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 			String RG_RequestNotification_In,
 			String RG_RequestSubmission_Out,
 			String RG_Connection_In,
-			SynchronizerManager sm,
-			Boolean distributed) throws Exception {
+			ComponentCreator cc) throws Exception {
 		
 		String RequestSubmission_In = AbstractPort.generatePortURI();
 		String RequestSubmission_Out = AbstractPort.generatePortURI();
@@ -295,7 +291,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		String RequestDispatcher_In = AbstractPort.generatePortURI();
 		String Shutdownable_In = AbstractPort.generatePortURI();
 		
-		Object[] args = new Object[]{ 
+		Object[] constructorParams = new Object[]{ 
 				Component_URI, 
 				RG_RequestNotification_In,
 				RG_RequestSubmission_Out,
@@ -309,14 +305,12 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		};
 		
 		try {
-			if(!distributed)
-				sm.createComponent(RequestDispatcher.class, args);
-			else 
-				((DistributedSynchronizerManager)sm).createComponent(RequestDispatcher.class, args);
+			cc.createComponent(RequestDispatcher.class, constructorParams);
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
+		
 		HashMap<RDPortTypes, String> ret = new HashMap<RDPortTypes, String>() ;		
 		ret.put(RDPortTypes.INTROSPECTION, Component_URI);
 		ret.put(RDPortTypes.REQUEST_SUBMISSION_IN, RequestSubmission_In);

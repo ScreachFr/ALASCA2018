@@ -57,14 +57,17 @@ import fr.upmc.components.ports.AbstractOutboundPort;
  */
 public class			DynamicComponentCreationOutboundPort
 extends		AbstractOutboundPort
-implements	DynamicComponentCreationI{
+implements	DynamicComponentCreationI
 
-//,
-//
 ////DEBUG LEO
-//java.io.Serializable{
-//	
-//	private static final long serialVersionUID = 2L;
+
+//{
+
+,
+java.io.Serializable{
+	
+	private static final long serialVersionUID = 2L;
+
 //	// FIN DEBUG 
 	
 	public 				DynamicComponentCreationOutboundPort(
