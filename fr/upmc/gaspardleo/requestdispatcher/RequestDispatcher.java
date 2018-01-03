@@ -19,8 +19,6 @@ import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
-import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
@@ -29,6 +27,8 @@ import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
 import fr.upmc.gaspardleo.requestgenerator.connectors.RequestGeneraterConnector;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
+import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
+import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
 public class RequestDispatcher 
 extends AbstractComponent 
@@ -60,10 +60,13 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 	private ShutdownableInboundPort						sip;
 	private RequestGeneratorOutboundPort				rgop;
 	
-	
 	//Misc
 	private Integer 									vmCursor;
 
+	//Monitoring
+	private Map<RequestI, Long> requestStartTimeStamps;
+	private RequestMonitorOutboundPort rmop;
+	
 	public RequestDispatcher(
 			String Component_URI, 
 			String RG_RequestNotification_In,
@@ -74,7 +77,9 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 			String RequestNotification_Out,
 			String RequestDispatcher_In,
 			String ShutDownable_In,
-			String RG_Connection_In) throws Exception {
+			String RG_Connection_In,
+			String RequestMonitor_In
+			) throws Exception {
 		
 		super(1, 1);
 
@@ -82,6 +87,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		this.registeredVmsUri 	= new ArrayList<>();
 		this.registeredVmsRsop 	= new HashMap<>();
 		this.vmCursor 			= 0;
+		this.requestStartTimeStamps = new HashMap<>();
 
 		// Request submission inbound port connection.
 		this.rsip = new RequestSubmissionInboundPort(RequestSubmission_In, this);
@@ -137,8 +143,17 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 			throw e;
 		}
 		
+		this.addRequiredInterface(RequestMonitorI.class);
+		this.rmop = new RequestMonitorOutboundPort(AbstractPort.generatePortURI(), this);
+		this.addPort(this.rmop);
+		this.rmop.publishPort();
+		
+		this.rmop.doConnection(RequestMonitor_In,
+				ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
+		
 		// Request Dispatcher debug
 		this.toggleLogging();
+		this.toggleTracing();
 	}
 
 	@Override
@@ -165,11 +180,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		
 		this.logMessage(this.Component_URI + " : " + avmURIs + " has been added.");
 		
-		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
-		this.addPort(rnip);
-		rnip.publishPort();
-		
-		// XXX était une ref à this.rnip à la base XXX
 		return rnip.getPortURI();
 	}
 
@@ -236,17 +246,27 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 			}
 			
 			rsop.submitRequestAndNotify(r);
+			Long submissionTimestamp = System.currentTimeMillis();
+			
+			this.requestStartTimeStamps.put(r, submissionTimestamp);
+			
 		}
 	}
 	
 	
-	// XXX est seulement utilisé par la dernière AVM registered.
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
+		Long requestTerminationTimeStamp = System.currentTimeMillis();
+		
+		this.rmop.addEntry(this.requestStartTimeStamps.get(r), requestTerminationTimeStamp);
+		
+		
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
-		System.out.println(this.Component_URI + " : incoming request termination notification for request " + r.getRequestURI() + ".");
 		
 		rnop.notifyRequestTermination(r);
+		
+		double mean = rmop.getMeanRequestExecutionTime();
+		this.logMessage(this.Component_URI + " : request mean execution time : " + mean + " ms."); 
 	}
 	
 	@Override
@@ -281,7 +301,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 			String Component_URI, 
 			String RG_RequestNotification_In,
 			String RG_RequestSubmission_Out,
-			String RG_Connection_In) throws Exception {
+			String RG_Connection_In,
+			String RequestMonitor_In) throws Exception {
 		
 		String RequestSubmission_In = AbstractPort.generatePortURI();
 		String RequestSubmission_Out = AbstractPort.generatePortURI();
@@ -300,7 +321,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 				RequestNotification_Out,
 				RequestDispatcher_In,
 				Shutdownable_In,
-				RG_Connection_In
+				RG_Connection_In,
+				RequestMonitor_In
 		};
 		
 		try {

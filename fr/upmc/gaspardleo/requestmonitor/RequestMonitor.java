@@ -25,7 +25,7 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 	public RequestMonitor(String componentUri, String requestMonitorIn_URI, Double alpha) throws Exception {
 		super(1, 1);
 		
-		if (alpha < 0 || alpha > 0)
+		if (alpha < 0.0 || alpha > 1.0)
 			throw new Error("RequestMonitor constructor : Wrong alpha value. This value must be between 0 and 1. It's current value is " + alpha + ".");
 		
 		this.meanRequestExecutionTime = 0.0;
@@ -81,9 +81,13 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 				alpha
 		};
 		
+		try {
 		dcc.createComponent(RequestMonitor.class.getCanonicalName(),
 				args);
-		
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 		
 		Map<RequestMonitorPorts, String> result = new HashMap<>();
 		

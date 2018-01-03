@@ -22,6 +22,8 @@ import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherOutboundPort;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
+import fr.upmc.gaspardleo.requestmonitor.RequestMonitor;
+import fr.upmc.gaspardleo.requestmonitor.RequestMonitor.RequestMonitorPorts;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.connectors.RequestDispatherConnector;
@@ -89,11 +91,16 @@ implements AdmissionControllerI{
 			) throws Exception {
 
 		this.logMessage("Admission controller : adding a request source...");
+		
+		
+		Map<RequestMonitorPorts, String> requestMonitorURIs = RequestMonitor.newInstance(dcc, "rm-" + RD_Component_URI, 0.5);
+		
 		Map<RDPortTypes, String> RD_uris = RequestDispatcher.newInstance(dcc,
 				RD_Component_URI,
 				requestGeneratorURIs.get(RGPortTypes.REQUEST_NOTIFICATION_IN),
 				requestGeneratorURIs.get(RGPortTypes.REQUEST_SUBMISSION_OUT),
-				requestGeneratorURIs.get(RGPortTypes.CONNECTION_IN));
+				requestGeneratorURIs.get(RGPortTypes.CONNECTION_IN),
+				requestMonitorURIs.get(RequestMonitorPorts.REQUEST_MONITOR_IN));
 		
 		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
 
@@ -142,6 +149,7 @@ implements AdmissionControllerI{
 		this.logMessage("Admission controller : Request source successfully added!");
 	}
 
+	
 	private void doAVMRequestNotificationConnection(String AVMConnectionPort_URI,
 			String notificationPort_URI) throws Exception {
 		this.logMessage("Admission controller : connection on notification port.");
