@@ -50,7 +50,7 @@ public class RequestGenerator
 		this.addOfferedInterface(RequestGeneratorConnectionI.class);
 		
 		// Rg debug
-		//this.toggleTracing();
+		this.toggleTracing();
 		this.toggleLogging();
 	}
 	
@@ -58,7 +58,6 @@ public class RequestGenerator
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		super.logMessage(rgURI  + " : gettting an answer for " + r.getRequestURI());
-		System.out.println(rgURI  + " : gettting an answer for " + r.getRequestURI());
 		super.acceptRequestTerminationNotification(r);
 	}
 	

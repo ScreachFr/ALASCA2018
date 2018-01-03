@@ -19,6 +19,8 @@ import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
+import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
@@ -30,7 +32,7 @@ import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
 
 public class RequestDispatcher 
 extends AbstractComponent 
-implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHandlerI, RequestNotificationI, ShutdownableI {
+implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHandlerI, RequestNotificationI, ShutdownableI {
 
 	public static enum	RDPortTypes {
 		REQUEST_SUBMISSION_IN, 
@@ -157,14 +159,19 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 		rsop.doConnection(avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
 				ClassFactory.newConnector(vmInterface).getCanonicalName());
 		
+		
 		this.registeredVmsRsop.put(avmUri, rsop);
 		this.registeredVmsUri.add(avmURIs);
 		
 		this.logMessage(this.Component_URI + " : " + avmURIs + " has been added.");
 		
+		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
+		this.addPort(rnip);
+		rnip.publishPort();
+		
+		// XXX était une ref à this.rnip à la base XXX
 		return rnip.getPortURI();
 	}
-
 
 	@Override
 	public void unregisterVM(String vmUri) throws Exception {
@@ -231,7 +238,9 @@ implements RequestDispatcherI, RequestSubmissionHandlerI , RequestNotificationHa
 			rsop.submitRequestAndNotify(r);
 		}
 	}
-
+	
+	
+	// XXX est seulement utilisé par la dernière AVM registered.
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");

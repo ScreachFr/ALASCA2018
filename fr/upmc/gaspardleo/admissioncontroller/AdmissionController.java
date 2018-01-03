@@ -129,14 +129,14 @@ implements AdmissionControllerI{
 		currentNotifPortUri = rdop.registerVM(
 				avm1_URIs,
 				RequestSubmissionI.class);
-		doAVMRequestNotificationConnection(avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+		doAVMRequestNotificationConnection(avm1_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
 				currentNotifPortUri);
 		this.registeredAVMs.put(rd_URI, avm1_URIs);
 
 		currentNotifPortUri = rdop.registerVM(
 				avm2_URIs,
 				RequestSubmissionI.class);
-		doAVMRequestNotificationConnection(avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+		doAVMRequestNotificationConnection(avm2_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
 				currentNotifPortUri);
 		this.registeredAVMs.put(rd_URI, avm2_URIs);
 		this.logMessage("Admission controller : Request source successfully added!");
