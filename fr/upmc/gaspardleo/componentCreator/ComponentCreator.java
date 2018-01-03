@@ -13,7 +13,7 @@ public class ComponentCreator
 	extends AbstractComponent {
 	
 	public ComponentCreator() throws Exception{
-		
+		super(1, 0);
 	}
 		
 	public void createComponent(
@@ -24,41 +24,56 @@ public class ComponentCreator
 		assert clas != null;
 		assert constructorParams != null;
 		
-		if(AbstractCVM.isDistributed){
+		if(!AbstractCVM.isDistributed){
 			
-			if(!this.isRequiredInterface(DynamicComponentCreationI.class)){
-				this.addRequiredInterface(DynamicComponentCreationI.class);
-			}
-			DynamicComponentCreationOutboundPort dccop = new DynamicComponentCreationOutboundPort(this);
-			dccop.publishPort();
-			this.addPort(dccop);
-			
-			assert dccop != null;
-			
-			dccop.doConnection(
-					AbstractDistributedCVM.thisJVMURI +
-					AbstractDistributedCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
-					DynamicComponentCreationConnector.class.getCanonicalName());
-			
-			dccop.createComponent(clas.getCanonicalName(), constructorParams);
-			
-			dccop.doDisconnection();
-			dccop.destroyPort();
+			this.componentCreation(clas, constructorParams);
 			
 		} else {
 			
-			Class<?>[] parameterTypes = new Class[constructorParams.length] ;
-			for(int i = 0 ; i < constructorParams.length ; i++) {
-				parameterTypes[i] = constructorParams[i].getClass() ;
-			}
-			
-			Constructor<?> cons = null;
-			cons = clas.getConstructor(parameterTypes);
-			
-			AbstractComponent component = 
-					(AbstractComponent) cons.newInstance(constructorParams);
-			
-			component.start();
+			this.dynamicComponetCreation(clas, constructorParams);
 		}
+	}
+	
+	private void componentCreation(Class<?> clas,
+			Object[] constructorParams
+			) throws Exception{
+		
+		Class<?>[] parameterTypes = new Class[constructorParams.length] ;
+		for(int i = 0 ; i < constructorParams.length ; i++) {
+			parameterTypes[i] = constructorParams[i].getClass() ;
+		}
+		
+		Constructor<?> cons = null;
+		cons = clas.getConstructor(parameterTypes);
+		
+		AbstractComponent component = 
+				(AbstractComponent) cons.newInstance(constructorParams);
+		
+		component.start();
+	}
+	
+	private void dynamicComponetCreation(Class<?> clas,
+			Object[] constructorParams
+			) throws Exception{
+		
+		if(!this.isRequiredInterface(DynamicComponentCreationI.class)){
+			this.addRequiredInterface(DynamicComponentCreationI.class);
+		}
+		
+		DynamicComponentCreationOutboundPort dccop = new DynamicComponentCreationOutboundPort(this);
+		dccop.localPublishPort();
+		this.addPort(dccop);
+		
+		assert dccop != null;
+		
+		dccop.doConnection(
+				AbstractDistributedCVM.thisJVMURI +
+				AbstractDistributedCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
+				DynamicComponentCreationConnector.class.getCanonicalName());
+		
+		dccop.createComponent(clas.getCanonicalName(), constructorParams);
+		
+		dccop.doDisconnection();
+		dccop.destroyPort();
 	}
 }

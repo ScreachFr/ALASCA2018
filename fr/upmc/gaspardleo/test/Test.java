@@ -21,8 +21,10 @@ import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.connectors.AdmissionControllerConnector;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
+import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.computerpool.ComputerPool;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
+import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.gaspardleo.cvm.CVM;
@@ -60,24 +62,22 @@ public class Test {
 			//TODO
 			// CVM creation
 			this.cvm 	= new CVM();
-
-//			DynamicComponentCreationOutboundPort dccop = 
-//					new DynamicComponentCreationOutboundPort(new AbstractComponent(0, 0) {});
-//			dccop.publishPort();
-//			dccop.doConnection(AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
-//					DynamicComponentCreationConnector.class.getCanonicalName());
 			
-			SynchronizerManager sm = new SynchronizerManager(
-					"sm", false);
-			this.cvm.addDeployedComponent(sm);;
+			ComponentCreator cc = new ComponentCreator();
+			assert cc != null : "cc is null";
+			this.cvm.addDeployedComponent(cc);
+			
+			cp_uris = ComputerPool.newInstance(cc);
 
-			cp_uris = ComputerPool.newInstance(CP_URI, sm, false);
-
-			ComputerPoolOutboundPort cpop = 
-					new ComputerPoolOutboundPort(AbstractPort.generatePortURI(), new AbstractComponent(0, 0) {});
+			ComputerPoolOutboundPort cpop = new ComputerPoolOutboundPort(new AbstractComponent(0, 0) {});
 			cpop.publishPort();
+			
+			//BUG avec Javassist en Multi-JVM
+//		cpop.doConnection(cp_uris.get(ComputerPoolPorts.COMPUTER_POOL),
+//				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
+			
 			cpop.doConnection(cp_uris.get(ComputerPoolPorts.COMPUTER_POOL),
-					ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
+					ComputerPoolConnector.class.getCanonicalName());
 
 			// Computer creation
 			HashSet<Integer> admissibleFrequencies = new HashSet<Integer>() ;
@@ -89,19 +89,48 @@ public class Test {
 			processingPower.put(3000, 3000000); // 3 GHz executes 3 Mips
 
 			cpop.createNewComputer("computer-0",
-					admissibleFrequencies,
-					processingPower,
-					CPU_FREQUENCY,
-					CPU_MAX_FREQUENCY_GAP,
-					NB_CPU,
-					NB_CORES);
+				admissibleFrequencies,
+				processingPower,
+				CPU_FREQUENCY,
+				CPU_MAX_FREQUENCY_GAP,
+				NB_CPU,
+				NB_CORES,
+				cc);
+			
 			System.out.println("computer creation launched.");
+			
 			// Admission Controller creation
-			ac_uris = AdmissionController.newInstance(AC_URI, cp_uris, sm, false);
+			ac_uris = AdmissionController.newInstance(cp_uris, cc);
 
 			// Simply adds some request generators to the current admission controller.
 			for (int i = 0; i < NB_DATASOURCE; i++) {
-				this.addDataSource(i, sm);
+				// Request Generator creation
+				Map<RGPortTypes, String> rg_uris  = RequestGenerator.newInstance("rg-"+i, 500.0, 6000000000L, cc);
+				
+				// Rg management creation
+				RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
+						new AbstractComponent(0, 0) {});
+				
+				rgmop.publishPort();
+				
+				rgmop.doConnection(
+						rg_uris.get(RGPortTypes.MANAGEMENT_IN),
+						RequestGeneratorManagementConnector.class.getCanonicalName());
+				
+				List<RequestGeneratorManagementOutboundPort> rgmops = new ArrayList<>();
+				rgmops.add(rgmop);
+				
+				// Dynamic ressources creation
+				AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(
+						new AbstractComponent(0, 0) {});
+				
+				acop.publishPort();
+				
+				acop.doConnection(
+						ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
+						AdmissionControllerConnector.class.getCanonicalName());
+				
+				acop.addRequestDispatcher("rd-"+i, rg_uris, cc);
 			}
 
 		} catch (Exception e) {
@@ -109,44 +138,42 @@ public class Test {
 		}
 	}
 
-
-
-	private void addDataSource(int i, SynchronizerManager sm) throws Exception {
-
-		// Request Generator creation
-		Map<RGPortTypes, String> rg  = createRequestGenerator("rg-"+i, sm);
-
-		// Dynamic ressources creation
-		AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(AbstractPort.generatePortURI(), new AbstractComponent(0, 0) {});
-		acop.publishPort();
-		acop.doConnection(ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), AdmissionControllerConnector.class.getCanonicalName());
-		acop.addRequestDispatcher("rd-"+i, rg);
-	}
-
-	private Map<RGPortTypes, String> createRequestGenerator(String RG_URI, SynchronizerManager sm) throws Exception{
-		Map<RGPortTypes, String> result = RequestGenerator.newInstance(RG_URI, 500.0, 6000000000L, sm, false);
-
-		createRGManagement(result.get(RGPortTypes.MANAGEMENT_IN));
-
-
-		return result;
-	}
-
-	private void createRGManagement(String rg_management_in) throws Exception{
-
-		// Rg management creation
-		RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
-				AbstractPort.generatePortURI(),
-				new AbstractComponent(0, 0) {});
-
-		rgmop.publishPort();
-
-		rgmop.doConnection(
-				rg_management_in,
-				RequestGeneratorManagementConnector.class.getCanonicalName());
-
-		this.rgmops.add(rgmop);
-	}
+//	private void addDataSource(int i, SynchronizerManager sm) throws Exception {
+//
+//		// Request Generator creation
+//		Map<RGPortTypes, String> rg  = createRequestGenerator("rg-"+i, sm);
+//
+//		// Dynamic ressources creation
+//		AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(AbstractPort.generatePortURI(), new AbstractComponent(0, 0) {});
+//		acop.publishPort();
+//		acop.doConnection(ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), AdmissionControllerConnector.class.getCanonicalName());
+//		acop.addRequestDispatcher("rd-"+i, rg);
+//	}
+//
+//	private Map<RGPortTypes, String> createRequestGenerator(String RG_URI, SynchronizerManager sm) throws Exception{
+//		Map<RGPortTypes, String> result = RequestGenerator.newInstance(RG_URI, 500.0, 6000000000L, sm, false);
+//
+//		createRGManagement(result.get(RGPortTypes.MANAGEMENT_IN));
+//
+//
+//		return result;
+//	}
+//
+//	private void createRGManagement(String rg_management_in) throws Exception{
+//
+//		// Rg management creation
+//		RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
+//				AbstractPort.generatePortURI(),
+//				new AbstractComponent(0, 0) {});
+//
+//		rgmop.publishPort();
+//
+//		rgmop.doConnection(
+//				rg_management_in,
+//				RequestGeneratorManagementConnector.class.getCanonicalName());
+//
+//		this.rgmops.add(rgmop);
+//	}
 
 	//TODO proposer un scénario qui permet de mettre en évidence le refus de requêtes
 

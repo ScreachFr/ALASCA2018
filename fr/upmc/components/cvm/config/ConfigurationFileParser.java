@@ -128,28 +128,27 @@ public class			ConfigurationFileParser
 	public boolean		validateConfigurationFile(File configFile)
 	throws	Exception
 	{
-//		boolean result = false ;
-//		// Specify you want a factory for RELAX NG
-//		System.setProperty(
-//			SchemaFactory.class.getName() + ":" + XMLConstants.RELAXNG_NS_URI,
-//			"com.thaiopensource.relaxng.jaxp.CompactSyntaxSchemaFactory");
-//		SchemaFactory factory =
-//			SchemaFactory.newInstance(XMLConstants.RELAXNG_NS_URI);
-//
-//		// Load the specific schema you want.
-//		// Here I load it from a java.io.File, but we could also use a
-//		// java.net.URL or a javax.xml.transform.Source
-//		File schemaLocation = new File(SCHEMA_FILENAME);
-//
-//		// Compile the schema.
-//		Schema schema = null ;
-//		schema = factory.newSchema(schemaLocation);
-//		// Get a validator from the schema.
-//		Validator validator = schema.newValidator();
-//		validator.validate(new StreamSource(configFile));
-//		result = true ;
-//		return result ;
-		return true;
+		boolean result = false ;
+		// Specify you want a factory for RELAX NG
+		System.setProperty(
+			SchemaFactory.class.getName() + ":" + XMLConstants.RELAXNG_NS_URI,
+			"com.thaiopensource.relaxng.jaxp.CompactSyntaxSchemaFactory");
+		SchemaFactory factory =
+			SchemaFactory.newInstance(XMLConstants.RELAXNG_NS_URI);
+
+		// Load the specific schema you want.
+		// Here I load it from a java.io.File, but we could also use a
+		// java.net.URL or a javax.xml.transform.Source
+		File schemaLocation = new File(SCHEMA_FILENAME);
+
+		// Compile the schema.
+		Schema schema = null ;
+		schema = factory.newSchema(schemaLocation);
+		// Get a validator from the schema.
+		Validator validator = schema.newValidator();
+		validator.validate(new StreamSource(configFile));
+		result = true ;
+		return result ;
 	}
 
 	/**

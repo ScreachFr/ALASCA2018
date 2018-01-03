@@ -85,6 +85,9 @@ public class DistributedTest
 			}
 		}
 		
+		assert cc != null;
+		this.addDeployedComponent(cc);
+		
 		System.out.println("[DEBUG LEO] instantiateAndPublish ok");
 	}
 	
@@ -139,8 +142,8 @@ public class DistributedTest
 //					cc);
 //
 //			ac_uris = AdmissionController.newInstance(cp_uris, cc);
-//			
-//			System.out.println("DataCenter started !");
+			
+			System.out.println("DataCenter started !");
 			
 		} else {
 			if (thisJVMURI.equals(DatacenterClient)){
@@ -148,7 +151,6 @@ public class DistributedTest
 				assert cc != null;
 				
 				Map<ComputerPoolPorts, String> cp_uris = ComputerPool.newInstance(cc);
-
 				
 //				for (int i = 0; i < NB_DATASOURCE; i++) {
 //					

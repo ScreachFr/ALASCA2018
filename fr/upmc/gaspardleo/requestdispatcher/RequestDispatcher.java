@@ -18,10 +18,12 @@ import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+import fr.upmc.gaspardleo.applicationvm.connectors.ApplicationVMConnector;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
+import fr.upmc.gaspardleo.requestdispatcher.connectors.RequestDispatherConnector;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
 import fr.upmc.gaspardleo.requestgenerator.connectors.RequestGeneraterConnector;
@@ -155,9 +157,13 @@ public 	class 		RequestDispatcher
 		this.addPort(rsop);
 		rsop.publishPort();
 		
-		rsop.doConnection(avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
-				ClassFactory.newConnector(vmInterface).getCanonicalName());
+//		rsop.doConnection(avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
+//				ClassFactory.newConnector(vmInterface).getCanonicalName());
 		
+		rsop.doConnection(
+				avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
+				ApplicationVMConnector.class.getCanonicalName());
+
 		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
 		this.addPort(rnip);
 		rnip.publishPort();
