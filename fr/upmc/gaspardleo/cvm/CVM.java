@@ -1,43 +1,28 @@
 package fr.upmc.gaspardleo.cvm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.connectors.DataConnector;
 import fr.upmc.components.cvm.AbstractCVM;
-import fr.upmc.datacenter.connectors.ControlledDataConnector;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
-import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
-import fr.upmc.datacenter.hardware.computers.ports.ComputerServicesOutboundPort;
 import fr.upmc.datacenter.hardware.processors.Processor;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
-import fr.upmc.gaspardleo.computer.Computer;
-import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
-import fr.upmc.gaspardleo.computer.ComputerMonitor;
-import fr.upmc.gaspardleo.computer.ComputerMonitor.ComputerMonitorPortTypes;
 
 public class CVM extends AbstractCVM {
 	
-	private final static int NB_CPU 				= 2;
-	private final static int NB_CORES 				= 2;
-	private final static int CPU_FREQUENCY 			= 3000;
-	private final static int CPU_MAX_FREQUENCY_GAP 	= 1500;
-		
-	private ComputerServicesOutboundPort 				csPort;	// Ports
+//	private final static int NB_CPU 				= 2;
+//	private final static int NB_CORES 				= 2;
+//	private final static int CPU_FREQUENCY 			= 3000;
+//	private final static int CPU_MAX_FREQUENCY_GAP 	= 1500;
+//	private ComputerServicesOutboundPort 				csPort;	// Ports
+//	private List<ApplicationVMManagementOutboundPort> 	avmPorts;
+	
 	private AllocatedCore[] 							cores;
 	private int 										currentCore;
-	private List<ApplicationVMManagementOutboundPort> 	avmPorts;
 	
 	public CVM() throws Exception {		
 		super();
 				
 		this.currentCore = 0;
-		this.avmPorts = new ArrayList<>();
+//		this.avmPorts = new ArrayList<>();
 		
 	}
 
@@ -83,55 +68,55 @@ public class CVM extends AbstractCVM {
 //				
 //		return c;
 //	}
-	
-	private Map<ComputerPortsTypes, String> createComputerServicesOutboundPort(Computer c) 
-			throws Exception{
-		
-		Map<ComputerPortsTypes, String> computerPorts = c.getComputerPortsURI();
-		
-		this.csPort = new ComputerServicesOutboundPort(
-				new AbstractComponent(0, 0) {}) ;
-
-		this.csPort.publishPort();
-		this.csPort.doConnection(
-				computerPorts.get(ComputerPortsTypes.SERVICE_IN),
-				ComputerServicesConnector.class.getCanonicalName());
-		
-		return computerPorts;
-	}
-	
-	private ComputerMonitor createComputerMonitor(Computer c) throws Exception{
-		
-		ComputerMonitor cm = new ComputerMonitor(
-				c.getComputerPortsURI().get(ComputerPortsTypes.INTROSEPTION),true);
-		
-		this.addDeployedComponent(cm);
-		
-		return cm;
-	}
-	
-	private void connexionComputerMonitorWithComputer(
-			ComputerMonitor cm, Map<ComputerPortsTypes, String> computerPorts) throws Exception{
-		
-		Map<ComputerMonitorPortTypes, String> computerMonitorPorts = cm.getPortTypes();
-		
-		cm.doPortConnection(
-				computerMonitorPorts.get(ComputerMonitorPortTypes.STATIC_STATE_OUT),
-				computerPorts.get(ComputerPortsTypes.STATIC_STATE_IN),
-				DataConnector.class.getCanonicalName()) ;
-
-		cm.doPortConnection(
-				computerMonitorPorts.get(ComputerMonitorPortTypes.DYNAMIC_STATE_OUT),
-				computerPorts.get(ComputerPortsTypes.DYNAMIC_STATE_IN),
-				ControlledDataConnector.class.getCanonicalName()) ;
-	}
-
-	/*@Override
-	public void addAVMPort(ApplicationVMManagementOutboundPort avmPort) {
-		
-		this.avmPorts.add(avmPort);
-	}*/
-	
+//	
+//	private Map<ComputerPortsTypes, String> createComputerServicesOutboundPort(Computer c) 
+//			throws Exception{
+//		
+//		Map<ComputerPortsTypes, String> computerPorts = c.getComputerPortsURI();
+//		
+//		this.csPort = new ComputerServicesOutboundPort(
+//				new AbstractComponent(0, 0) {}) ;
+//
+//		this.csPort.publishPort();
+//		this.csPort.doConnection(
+//				computerPorts.get(ComputerPortsTypes.SERVICE_IN),
+//				ComputerServicesConnector.class.getCanonicalName());
+//		
+//		return computerPorts;
+//	}
+//	
+//	private ComputerMonitor createComputerMonitor(Computer c) throws Exception{
+//		
+//		ComputerMonitor cm = new ComputerMonitor(
+//				c.getComputerPortsURI().get(ComputerPortsTypes.INTROSEPTION),true);
+//		
+//		this.addDeployedComponent(cm);
+//		
+//		return cm;
+//	}
+//	
+//	private void connexionComputerMonitorWithComputer(
+//			ComputerMonitor cm, Map<ComputerPortsTypes, String> computerPorts) throws Exception{
+//		
+//		Map<ComputerMonitorPortTypes, String> computerMonitorPorts = cm.getPortTypes();
+//		
+//		cm.doPortConnection(
+//				computerMonitorPorts.get(ComputerMonitorPortTypes.STATIC_STATE_OUT),
+//				computerPorts.get(ComputerPortsTypes.STATIC_STATE_IN),
+//				DataConnector.class.getCanonicalName()) ;
+//
+//		cm.doPortConnection(
+//				computerMonitorPorts.get(ComputerMonitorPortTypes.DYNAMIC_STATE_OUT),
+//				computerPorts.get(ComputerPortsTypes.DYNAMIC_STATE_IN),
+//				ControlledDataConnector.class.getCanonicalName()) ;
+//	}
+//
+//	@Override
+//	public void addAVMPort(ApplicationVMManagementOutboundPort avmPort) {
+//		
+//		this.avmPorts.add(avmPort);
+//	}
+//	
 	@Override
 	public void start() throws Exception {
 		

@@ -60,7 +60,9 @@ public class				RequestGeneratorManagementInboundPort
 extends		AbstractInboundPort
 implements	RequestGeneratorManagementI
 {
-	private static final long serialVersionUID = 1L ;
+	//DEBUG LEO
+	private static final long serialVersionUID = 2L;
+	//FIN DEBUG
 
 	// ------------------------------------------------------------------------
 	// Constructors

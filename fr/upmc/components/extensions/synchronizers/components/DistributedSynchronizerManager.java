@@ -53,10 +53,7 @@ extends SynchronizerManager
 	 * @throws Exception
 	 */
 	@Override
-//	//DEBUG LEO
-//	public void 					createComponent(	
 	public void 					createComponent(
-	//FIN DEBUG
 			Class<?> clas,
 			Object[] constructorParams
 	) throws Exception 
@@ -88,9 +85,6 @@ extends SynchronizerManager
 	{
 		// Création du port et connexion au serveur de création de composants
 		
-		//DEBUG LEO
-		this.addRequiredInterface(DynamicComponentCreationI.class);
-		//FIN DEBUG
 		DynamicComponentCreationOutboundPort portToDCCServer = 
 			new DynamicComponentCreationOutboundPort(this) ;
 		
@@ -102,26 +96,6 @@ extends SynchronizerManager
 				server_uri +
 				AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
 				DynamicComponentCreationConnector.class.getCanonicalName());
-		
-		//DEBUG LEO
-		
-//		ConnectorI c = new DynamicComponentCreationConnector() ;
-//		
-////		//DEBUG LEO
-////		ConnectionBuilder.SINGLETON.connectWith(
-////			server_uri + "-" +
-////				AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX,
-////			portToDCCServer.getPortURI(),
-////			c);
-////		//FIN DEBUG
-//		
-//		ConnectionBuilder.SINGLETON.connectWith(
-//				server_uri +
-//					AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX,
-//				portToDCCServer.getPortURI(),
-//				c);
-
-		//DEBUG LEO
 		
 		return portToDCCServer;
 	}

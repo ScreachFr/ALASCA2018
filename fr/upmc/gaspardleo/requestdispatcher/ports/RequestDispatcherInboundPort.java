@@ -1,6 +1,6 @@
 package fr.upmc.gaspardleo.requestdispatcher.ports;
 
-import java.util.Map;
+import java.util.HashMap;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractInboundPort;
@@ -25,7 +25,7 @@ public class RequestDispatcherInboundPort
 	}
 
 	@Override
-	public String registerVM(final Map<ApplicationVMPortTypes, String> vmUri, Class<?> vmInterface) throws Exception {
+	public String registerVM(final HashMap<ApplicationVMPortTypes, String> vmUri, Class<?> vmInterface) throws Exception {
 		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
 		return this.owner.handleRequestSync(
 				new ComponentI.ComponentService<String>(){

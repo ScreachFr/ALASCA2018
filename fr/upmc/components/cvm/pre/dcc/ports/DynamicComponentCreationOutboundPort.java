@@ -57,18 +57,7 @@ import fr.upmc.components.ports.AbstractOutboundPort;
  */
 public class			DynamicComponentCreationOutboundPort
 extends		AbstractOutboundPort
-implements	DynamicComponentCreationI
-
-////DEBUG LEO
-
-//{
-
-,
-java.io.Serializable{
-	
-	private static final long serialVersionUID = 2L;
-
-//	// FIN DEBUG 
+implements	DynamicComponentCreationI{ 
 	
 	public 				DynamicComponentCreationOutboundPort(
 		ComponentI owner
@@ -94,7 +83,7 @@ java.io.Serializable{
 		Object[] constructorParams
 		) throws Exception
 	{
-		System.out.println("[DEBUG LEO] createComponent 3");
+//		System.out.println("[DEBUG LEO] createComponent 3");
 		((DynamicComponentCreationI)this.connector).
 								createComponent(classname, constructorParams) ;
 	}

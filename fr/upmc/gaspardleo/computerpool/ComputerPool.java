@@ -2,7 +2,6 @@ package fr.upmc.gaspardleo.computerpool;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOu
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
-import fr.upmc.gaspardleo.computer.Computer;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computerpool.exceptions.NoAvailableResourceException;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
@@ -40,13 +38,13 @@ public class ComputerPool
 			String computerPoolPort_URI) throws Exception {
 				
 		super(1, 1);
-				
+						
 		this.addOfferedInterface(ComputerPoolI.class);
 		this.cpi = new ComputerPoolInbounPort(computerPoolPort_URI, this);
 		this.cpi.publishPort();
 		this.addPort(this.cpi);
 		
-		System.out.println("[DEBUG LEO] yoooooo");
+//		System.out.println("[DEBUG LEO] yoooooo");
 		
 		assert cpi.isPublished();
 		
@@ -57,36 +55,58 @@ public class ComputerPool
 		this.toggleLogging();
 	}
 
+//	@Override
+//	public void createNewComputer(
+//			String computerURI,
+//			HashSet<Integer> possibleFrequencies,
+//			HashMap<Integer, Integer> processingPower,
+//			Integer defaultFrequency,
+//			Integer maxFrequencyGap,
+//			Integer numberOfProcessors,
+//			Integer numberOfCores,
+//			ComponentCreator cc) throws Exception {
+//
+//		System.out.println("Computer creation and core allocation.");
+//		
+//		Map<ComputerPortsTypes, String> computerUris = Computer.newInstance(computerURI, possibleFrequencies, 
+//				processingPower, defaultFrequency, maxFrequencyGap, numberOfProcessors, numberOfCores, cc);
+//
+//		ComputerServicesOutboundPort csop = new ComputerServicesOutboundPort(this);
+//		this.addPort(csop);
+//		csop.publishPort();
+//		csop.doConnection(computerUris.get(ComputerPortsTypes.SERVICE_IN), ComputerServicesConnector.class.getCanonicalName());
+//		
+//		for (int i = 0; i < (numberOfProcessors * numberOfCores)/2; i++) {
+//			availableCores.add(csop.allocateCores(DEFAULT_CORE_ALLOC_NUMBER));
+//		}
+//		
+//		this.computers.add(computerUris);
+//	}
+	
 	@Override
-	public void createNewComputer(
-			String computerURI,
-			HashSet<Integer> possibleFrequencies,
-			HashMap<Integer, Integer> processingPower,
-			Integer defaultFrequency,
-			Integer maxFrequencyGap,
+	public void addComputer(
+			Map<ComputerPortsTypes, String> computerUris,
 			Integer numberOfProcessors,
-			Integer numberOfCores,
-			ComponentCreator cc) throws Exception {
-
-		System.out.println("Computer creation and core allocation.");
+			Integer numberOfCores
+			) throws Exception {
 		
-		Map<ComputerPortsTypes, String> computerUris = Computer.newInstance(computerURI, possibleFrequencies, 
-				processingPower, defaultFrequency, maxFrequencyGap, numberOfProcessors, numberOfCores, cc);
-
 		ComputerServicesOutboundPort csop = new ComputerServicesOutboundPort(this);
 		this.addPort(csop);
 		csop.publishPort();
-		csop.doConnection(computerUris.get(ComputerPortsTypes.SERVICE_IN), ComputerServicesConnector.class.getCanonicalName());
+		
+		csop.doConnection(
+				computerUris.get(ComputerPortsTypes.SERVICE_IN), 
+				ComputerServicesConnector.class.getCanonicalName());
 		
 		for (int i = 0; i < (numberOfProcessors * numberOfCores)/2; i++) {
 			availableCores.add(csop.allocateCores(DEFAULT_CORE_ALLOC_NUMBER));
 		}
 		
-		this.computers.add(computerUris);
+		this.computers.add(computerUris);	
 	}
 
 	@Override
-	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(
+	public HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(
 			String avmURI, 
 			Integer numberOfCoreToAllocate, 
 			ComponentCreator cc)  throws Exception{
@@ -95,7 +115,7 @@ public class ComputerPool
 		if (availableCores.size() == 0)
 			throw new NoAvailableResourceException();
 
-		Map<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(avmURI, cc);
+		HashMap<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(avmURI, cc);
 		
 		// Create a mock up port to manage the AVM component (allocate cores).
 		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(
@@ -116,7 +136,7 @@ public class ComputerPool
 	
 	// TODO pouvoir enlever des avms et rendre les cores de nouveau disponible.
 	
-	public static Map<ComputerPoolPorts, String> newInstance(
+	public static HashMap<ComputerPoolPorts, String> newInstance(
 			ComponentCreator cc) throws Exception {
 		
 		String computerPoolPort_URI = AbstractPort.generatePortURI();

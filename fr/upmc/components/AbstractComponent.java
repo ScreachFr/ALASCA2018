@@ -1216,7 +1216,7 @@ implements	ComponentI
 	{
 		
 //		System.out.println("[DEBUG LEO] p : " + p );
-		
+//		
 //		System.out.println("[DEBUG LEO] notInStateAmong : " + (this.notInStateAmong(new ComponentStateI[]{
 //							ComponentState.TERMINATED
 //							})));
@@ -1800,13 +1800,7 @@ implements	ComponentI
 		assert	task != null ;
 
 //		System.out.println("[DEBUG LEO] isConcurrent : " + this.isConcurrent());
-		if (this.isConcurrent()) {
-			
-			//DEBUG LEO
-			assert this.handleRequest(task) != null;
-			assert this.handleRequest(task).get() != null;
-			//FIN DEBUG LEO
-			
+		if (this.isConcurrent()) {			
 			return this.handleRequest(task).get() ;
 		} else {
 			return task.call() ;

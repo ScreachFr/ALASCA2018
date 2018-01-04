@@ -1,21 +1,20 @@
 package fr.upmc.gaspardleo.admissioncontroller.interfaces;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashMap;
 
 import fr.upmc.components.interfaces.OfferedI;
 import fr.upmc.components.interfaces.RequiredI;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
+import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public interface AdmissionControllerI 
 	extends	OfferedI, RequiredI{
 
 	public void addRequestDispatcher(
-		String RD_URI,
-		Map<RGPortTypes, String> requestGeneratorURIs,
-		ComponentCreator cc) throws Exception;
+		HashMap<RDPortTypes, String> RD_uris,
+		HashMap<RGPortTypes, String> RG_uris) throws Exception;
 		
 	/**
 	 * Supprime le RequestDispatcher associé à l'URI du port donné en paramètre.

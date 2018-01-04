@@ -1,7 +1,6 @@
 package fr.upmc.gaspardleo.requestgenerator;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.components.ports.PortI;
@@ -94,7 +93,7 @@ public 	class RequestGenerator
 		}
 	}
 	
-	public static Map<RGPortTypes, String> newInstance(
+	public static HashMap<RGPortTypes, String> newInstance(
 			String rgURI, 
 			double meanInterArrivalTime,
 			long meanNumberOfInstructions,

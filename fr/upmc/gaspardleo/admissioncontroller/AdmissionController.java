@@ -8,23 +8,22 @@ import java.util.Optional;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.applicationvm.connectors.ApplicationVMConnector;
+import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
-import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
-import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
+import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherOutboundPort;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort;
-import fr.upmc.gaspardleo.requestdispatcher.connectors.RequestDispatherConnector;
 
 public class AdmissionController 
 		extends AbstractComponent
@@ -43,10 +42,12 @@ public class AdmissionController
 	private Map<String, Map<ApplicationVMPortTypes, String>> registeredAVMs;
 	private Map<ComputerPoolPorts, String> computerPoolURIs;
 	private ComputerPoolOutboundPort cpop;
+	private ComponentCreator cc;
 	
 	public AdmissionController(
 			HashMap<ComputerPoolPorts, String> computerPoolUri,
-			String admissionController_IN) throws Exception{		
+			String admissionController_IN,
+			ComponentCreator cc) throws Exception{		
 		
 		super(1, 1);
 
@@ -66,29 +67,20 @@ public class AdmissionController
 		this.addPort(cpop);
 		this.cpop.publishPort();
 
-//		//BUG Javassist avec Multi-JVM
-//		this.cpop.doConnection(computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
-//				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
+		this.cpop.doConnection(
+				computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
+				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
 
-		this.cpop.doConnection(computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
-				ComputerPoolConnector.class.getCanonicalName());
-
+		this.cc = cc;
+		
 		this.toggleLogging();
 		//this.toggleTracing();
 	}
 
 	@Override
 	public void addRequestDispatcher(
-			String RD_Component_URI,
-			Map<RGPortTypes, String> requestGeneratorURIs,
-			ComponentCreator cc) throws Exception {
-
-		Map<RDPortTypes, String> RD_uris = RequestDispatcher.newInstance(
-				RD_Component_URI,
-				requestGeneratorURIs.get(RGPortTypes.REQUEST_NOTIFICATION_IN),
-				requestGeneratorURIs.get(RGPortTypes.REQUEST_SUBMISSION_OUT),
-				requestGeneratorURIs.get(RGPortTypes.CONNECTION_IN),
-				cc);
+			HashMap<RDPortTypes, String> RD_uris,
+			HashMap<RGPortTypes, String> RG_uris) throws Exception {
 		
 		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
 
@@ -98,22 +90,22 @@ public class AdmissionController
 
 		rdop.doConnection(
 				RD_uris.get(RDPortTypes.REQUEST_DISPATCHER_IN), 
-				RequestDispatherConnector.class.getCanonicalName());
+				ClassFactory.newConnector(RequestDispatcherI.class).getCanonicalName());
 
 		// Vm applications creation
 
 		System.out.println("AC is creating some AVMs");
 		
-		Map<ApplicationVMPortTypes, String> avm0_URIs = 
-				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-0", DEFAULT_CORE_NUMBER, cc);
+		HashMap<ApplicationVMPortTypes, String> avm0_URIs = 
+				cpop.createNewApplicationVM("avm-" + rd_URI + "-0", DEFAULT_CORE_NUMBER, cc);
 		System.out.println("AVM0 done.");
 		
-		Map<ApplicationVMPortTypes, String> avm1_URIs = 
-				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-1", DEFAULT_CORE_NUMBER, cc);
+		HashMap<ApplicationVMPortTypes, String> avm1_URIs = 
+				cpop.createNewApplicationVM("avm-" + rd_URI + "-1", DEFAULT_CORE_NUMBER, cc);
 		System.out.println("AVM1 done.");
 		
-		Map<ApplicationVMPortTypes, String> avm2_URIs = 
-				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-2", DEFAULT_CORE_NUMBER, cc);
+		HashMap<ApplicationVMPortTypes, String> avm2_URIs = 
+				cpop.createNewApplicationVM("avm-" + rd_URI + "-2", DEFAULT_CORE_NUMBER, cc);
 		System.out.println("AVM2 done.");
 
 		System.out.println("AVMs has been successfully created!");
@@ -162,12 +154,9 @@ public class AdmissionController
 		this.addPort(avmcop);
 		avmcop.publishPort();
 		
-//		//BUG avec Javassist en Multi-JVM
-//		avmcop.doConnection(AVMConnectionPort_URI, 
-//				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
-
-		avmcop.doConnection(AVMConnectionPort_URI, 
-				ApplicationVMConnector.class.getCanonicalName());
+		avmcop.doConnection(
+			AVMConnectionPort_URI, 
+			ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
 
 		avmcop.doRequestNotificationConnection(notificationPort_URI);
 		
@@ -205,7 +194,7 @@ public class AdmissionController
 		return this.avmPorts;
 	}
 
-	public static Map<ACPortTypes, String> newInstance(
+	public static HashMap<ACPortTypes, String> newInstance(
 			Map<ComputerPoolPorts, String> computerPoolUri,
 			ComponentCreator cc) throws Exception{
 
@@ -213,7 +202,8 @@ public class AdmissionController
 
 		Object[] constructorParams = new Object[] {
 				computerPoolUri,
-				admissionController_IN
+				admissionController_IN,
+				cc
 		};
 
 		try {

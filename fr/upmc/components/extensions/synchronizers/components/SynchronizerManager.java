@@ -112,10 +112,7 @@ extends AbstractComponent
 	 * @throws Exception
 	 */
 	
-	//DEBUG LEO
-//	protected void				createComponent(
 	public void				createComponent(			
-	//FIN DEBUG
 			Class<?> clas,
 			Object[] constructorParams
 	) throws Exception 

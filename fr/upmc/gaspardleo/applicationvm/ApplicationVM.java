@@ -1,7 +1,6 @@
 package fr.upmc.gaspardleo.applicationvm;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
@@ -116,7 +115,7 @@ public class ApplicationVM
 		}
 	}
 
-	public static Map<ApplicationVMPortTypes, String> newInstance(
+	public static HashMap<ApplicationVMPortTypes, String> newInstance(
 			String component_URI,
 			ComponentCreator cc) throws Exception {
 

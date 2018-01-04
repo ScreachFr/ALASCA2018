@@ -127,7 +127,7 @@ extends		AbstractComponent
 		Object[] constructorParams
 		) throws Exception
 	{
-		System.out.println("[DEBUG LEO] createComponent 6");
+//		System.out.println("[DEBUG LEO] createComponent 6");
 		
 		assert	classname != null ;
 
@@ -139,30 +139,30 @@ extends		AbstractComponent
 		assert	cl != null ;
 		Class<?>[] parameterTypes = new Class[constructorParams.length] ;
 		
-		System.out.println("[DEBUG LEO] constructorParams.length : " + constructorParams.length);
+//		System.out.println("[DEBUG LEO] constructorParams.length : " + constructorParams.length);
 
 		
 		for (int i = 0 ; i < constructorParams.length ; i++) {
-			System.out.println("[DEBUG LEO] !!!!");
+//			System.out.println("[DEBUG LEO] !!!!");
 			parameterTypes[i] = constructorParams[i].getClass() ;
 		}
 		
-		System.out.println("[DEBUG LEO] coucou 1");
+//		System.out.println("[DEBUG LEO] coucou 1");
 
 		Constructor<?> cons = cl.getConstructor(parameterTypes) ;
 		
-		System.out.println("[DEBUG LEO] coucou 2");
-		System.out.flush();;
+//		System.out.println("[DEBUG LEO] coucou 2");
+//		System.out.flush();;
 
 		assert	cons != null ;
 		AbstractComponent component =
 					(AbstractComponent) cons.newInstance(constructorParams) ;
 		
 		assert component != null;
-		System.out.println("[DEBUG LEO] component class : " + component.getClass().getCanonicalName());
-		System.out.println("[DEBUG LEO] coucou");
-		System.out.flush();;
-		
+//		System.out.println("[DEBUG LEO] component class : " + component.getClass().getCanonicalName());
+//		System.out.println("[DEBUG LEO] coucou");
+//		System.out.flush();;
+//		
 //		System.out.println("[DEBUG LEO] toto : " + ((ComputerPool)component).getToto());
 
 		AbstractCVM.theCVM.addDeployedComponent(component) ;

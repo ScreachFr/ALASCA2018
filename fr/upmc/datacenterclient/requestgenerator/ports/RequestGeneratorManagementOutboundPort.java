@@ -63,6 +63,10 @@ implements	RequestGeneratorManagementI
 	// Constructors
 	// ------------------------------------------------------------------------
 
+//	//DEBUG LEO
+//	private static final long serialVersionUID = 2L;
+//	//FIN DEBUG
+	
 	public				RequestGeneratorManagementOutboundPort(
 		ComponentI owner
 		) throws Exception

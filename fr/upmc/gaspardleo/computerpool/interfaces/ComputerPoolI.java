@@ -1,31 +1,16 @@
 package fr.upmc.gaspardleo.computerpool.interfaces;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import fr.upmc.components.interfaces.OfferedI;
 import fr.upmc.components.interfaces.RequiredI;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
+import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 
 public interface ComputerPoolI extends OfferedI, RequiredI {
-	
-	/**
-	 * Ajoute un ordinateur au pool actuel du composant.
-	 * Détails des paramètres disponibles à @see {@link fr.upmc.gaspardleo.computer.Computer}.
-	 * @return
-	 * 		Nouveau Computer.
-	 */
-	public void createNewComputer(String computerURI,
-			HashSet<Integer> possibleFrequencies,
-			HashMap<Integer, Integer> processingPower,
-			Integer defaultFrequency,
-			Integer maxFrequencyGap,
-			Integer numberOfProcessors,
-			Integer numberOfCores,
-			ComponentCreator cc) throws Exception;
-	
+
 	/**
 	 * Créé une nouvelle ApplicationVM.
 	 * @param avmURI 
@@ -35,7 +20,18 @@ public interface ComputerPoolI extends OfferedI, RequiredI {
 	 * @return
 	 * 		La nouvelle ApplicationVM.
 	 */
-	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, 
+	public HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, 
 			Integer numberOfCoreToAllocate,
 			ComponentCreator cc) throws Exception;
+	
+	/**
+	 * Ajoute un ordinateur au pool actuel du composant.
+	 * Détails des paramètres disponibles à @see {@link fr.upmc.gaspardleo.computer.Computer}.
+	 * @return
+	 * 		Nouveau Computer.
+	 */
+	public void addComputer(
+			Map<ComputerPortsTypes, String> computerUris,
+			Integer numberOfProcessors,
+			Integer numberOfCores) throws Exception;
 }

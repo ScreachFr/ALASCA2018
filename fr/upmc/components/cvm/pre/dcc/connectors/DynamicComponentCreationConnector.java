@@ -47,7 +47,7 @@ import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
  * <p><strong>Invariant</strong></p>
  * 
  * <pre>
- * invariant	true
+ * invariant	trues
  * </pre>
  * 
  * <p>Created on : 14 mars 2014</p>
@@ -68,8 +68,8 @@ implements	DynamicComponentCreationI
 		Object[] constructorParams
 		) throws Exception
 	{
-		System.out.println("[DEBUG LEO] createComponent 4");
-		System.out.println("[DEBUG LEO] classname : " + classname);
+//		System.out.println("[DEBUG LEO] createComponent 4");
+//		System.out.println("[DEBUG LEO] classname : " + classname);
 
 		((DynamicComponentCreationI)this.offering).
 								createComponent(classname, constructorParams) ;

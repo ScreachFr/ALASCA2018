@@ -1,14 +1,14 @@
 package fr.upmc.gaspardleo.admissioncontroller.port;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashMap;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractInboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
+import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class AdmissionControllerInboundPort extends AbstractInboundPort
@@ -22,9 +22,8 @@ implements AdmissionControllerI {
 
 	@Override
 	public void addRequestDispatcher(
-			String RD_URI,
-			Map<RGPortTypes, String> requestGeneratorURIs,
-			ComponentCreator cc) throws Exception {
+			HashMap<RDPortTypes, String> RD_uris,
+			HashMap<RGPortTypes, String> RG_uris) throws Exception {
 		
 		AdmissionController ac = (AdmissionController) this.owner;
 
@@ -33,9 +32,8 @@ implements AdmissionControllerI {
 					@Override
 					public AdmissionController call() throws Exception {
 						ac.addRequestDispatcher(
-								RD_URI, 
-								requestGeneratorURIs,
-								cc);
+								RD_uris, 
+								RG_uris);
 						return ac;
 					}
 				});
