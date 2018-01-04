@@ -11,6 +11,8 @@ import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorInboundPort;
 
 public class RequestMonitor extends AbstractComponent implements RequestMonitorI {
+	private Object lock;
+	
 	
 	public enum RequestMonitorPorts {
 		REQUEST_MONITOR_IN;
@@ -53,17 +55,21 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 	}
 
 	private void refreshMeanRequestExecutionTime(Long executionTime) {
-		if (isFirstValue) {
-			meanRequestExecutionTime = executionTime * 1.0;
-			isFirstValue = false;
-		} else
-			meanRequestExecutionTime = (alpha * executionTime + ((1.0-alpha)) * meanRequestExecutionTime);
+		synchronized (lock) {
+			if (isFirstValue) {
+				meanRequestExecutionTime = executionTime * 1.0;
+				isFirstValue = false;
+			} else
+				meanRequestExecutionTime = (alpha * executionTime + ((1.0-alpha)) * meanRequestExecutionTime);
+		}
 	}
 
 
 	@Override
 	public Double getMeanRequestExecutionTime() {
-		return meanRequestExecutionTime;
+		synchronized (lock) {
+			return meanRequestExecutionTime;
+		}
 	}
 	
 	
