@@ -46,4 +46,16 @@ public class RequestDispatcherInboundPort
 						return requestDispatcher;
 					}});
 	}
+	
+	@Override
+	public void unregisterVM() throws Exception {
+		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
+		requestDispatcher.handleRequestAsync(
+				new ComponentI.ComponentService<RequestDispatcher>(){
+					@Override
+					public RequestDispatcher call() throws Exception {
+						requestDispatcher.unregisterVM();
+						return requestDispatcher;
+					}});
+	}
 }

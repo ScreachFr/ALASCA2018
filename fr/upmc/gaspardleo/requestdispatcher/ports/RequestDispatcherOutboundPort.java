@@ -25,4 +25,9 @@ public class RequestDispatcherOutboundPort
 	public void unregisterVM(String vmUri) throws Exception {
 		((RequestDispatcherI)this.connector).unregisterVM(vmUri);
 	}
+	
+	@Override
+	public void unregisterVM() throws Exception {
+		((RequestDispatcherI)this.connector).unregisterVM();
+	}
 }

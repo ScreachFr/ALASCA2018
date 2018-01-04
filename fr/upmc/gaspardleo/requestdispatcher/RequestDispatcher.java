@@ -155,6 +155,11 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		this.toggleLogging();
 		this.toggleTracing();
 	}
+	
+	private synchronized String getNextVmUriFromCursor() {
+		return registeredVmsUri.get(vmCursor++%registeredVmsUri.size())
+				.get(ApplicationVMPortTypes.INTROSPECTION);
+	}
 
 	@Override
 	public String registerVM(Map<ApplicationVMPortTypes, String> avmURIs, Class<?> vmInterface) throws Exception {
@@ -199,6 +204,11 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		registeredVmsRsop.get(vmUri).doDisconnection();
 		
 	}
+	
+	@Override
+	public void unregisterVM() throws Exception {
+		unregisterVM(getNextVmUriFromCursor());
+	}
 
 	@Override
 	public void acceptRequestSubmission(RequestI r) throws Exception {
@@ -209,8 +219,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 			this.logMessage(this.Component_URI + " : no registered vm.");
 			
 		} else {
-			String avmURI = registeredVmsUri
-					.get(vmCursor%registeredVmsUri.size()).get(ApplicationVMPortTypes.INTROSPECTION);
+			String avmURI = getNextVmUriFromCursor();
 			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(
 					avmURI); 
 
@@ -220,7 +229,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 
 			rsop.submitRequest(r);
 
-			vmCursor++;
 		}
 
 	}
@@ -232,10 +240,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		if (this.registeredVmsUri.size() == 0) {
 			this.logMessage(this.Component_URI + " : no registered vm.");
 		} else {
-			vmCursor = (vmCursor+1) % this.registeredVmsUri.size();
 			
-			String avmURI = registeredVmsUri
-					.get(vmCursor).get(ApplicationVMPortTypes.INTROSPECTION);
+			String avmURI = getNextVmUriFromCursor();
 			
 			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(avmURI);
 			

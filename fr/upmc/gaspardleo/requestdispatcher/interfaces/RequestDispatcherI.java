@@ -19,4 +19,5 @@ public interface RequestDispatcherI{
 	public String registerVM(Map<ApplicationVMPortTypes, String> avmURIs, Class<?> vmInterface) throws Exception;
 	
 	public void unregisterVM(String vmUri) throws Exception;
+	public void unregisterVM() throws Exception;
 }

@@ -15,7 +15,7 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 	
 	
 	public enum RequestMonitorPorts {
-		REQUEST_MONITOR_IN;
+		INTROSPECTION, REQUEST_MONITOR_IN;
 	}
 	
 	private Double meanRequestExecutionTime;
@@ -98,6 +98,7 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 		Map<RequestMonitorPorts, String> result = new HashMap<>();
 		
 		result.put(RequestMonitorPorts.REQUEST_MONITOR_IN, requestMonitorIn_URI);		
+		result.put(RequestMonitorPorts.INTROSPECTION, componentUri);
 		
 		return result;
 	}

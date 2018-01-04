@@ -19,4 +19,9 @@ public class RequestDispatherConnector
 	public void unregisterVM(String vmUri) throws Exception {
 		((RequestDispatcherI)this.offering).unregisterVM(vmUri);
 	}
+	
+	@Override
+	public void unregisterVM() throws Exception {
+		((RequestDispatcherI)this.offering).unregisterVM();
+	}
 }

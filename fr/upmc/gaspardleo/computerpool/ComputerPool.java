@@ -63,7 +63,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	}
 
 	@Override
-	public void createNewComputer(String computerURI,
+	public synchronized void createNewComputer(String computerURI,
 			HashSet<Integer> possibleFrequencies,
 			HashMap<Integer, Integer> processingPower,
 			Integer defaultFrequency,
@@ -89,7 +89,7 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	}
 
 	@Override
-	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate)  throws Exception{
+	public synchronized Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate)  throws Exception{
 		// Pas de core sous la main.
 		if (availableCores.size() == 0)
 			throw new NoAvailableResourceException();
