@@ -29,7 +29,7 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 		
 		if (alpha < 0.0 || alpha > 1.0)
 			throw new Error("RequestMonitor constructor : Wrong alpha value. This value must be between 0 and 1. It's current value is " + alpha + ".");
-		
+		this.lock = new Object();
 		this.meanRequestExecutionTime = 0.0;
 		this.alpha = alpha;
 		this.isFirstValue = true;
