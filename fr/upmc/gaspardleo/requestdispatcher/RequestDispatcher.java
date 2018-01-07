@@ -270,9 +270,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
 		
 		rnop.notifyRequestTermination(r);
-		
 		double mean = rmop.getMeanRequestExecutionTime();
-		this.logMessage(this.Component_URI + " : request mean execution time : " + mean + " ms."); 
+		this.logMessage(this.Component_URI + " : request mean execution time : " + mean + " ms.");
 	}
 	
 	@Override
@@ -302,7 +301,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		super.shutdown();
 	}	
 	
-	public static Map<RDPortTypes, String> newInstance(
+	public static HashMap<RDPortTypes, String> newInstance(
 			DynamicComponentCreationOutboundPort dcc, 
 			String Component_URI, 
 			String RG_RequestNotification_In,

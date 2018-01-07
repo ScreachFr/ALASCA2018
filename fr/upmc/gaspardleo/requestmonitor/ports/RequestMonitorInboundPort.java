@@ -37,4 +37,15 @@ public class RequestMonitorInboundPort extends AbstractInboundPort implements Re
 		});
 	}
 
+	@Override
+	public Boolean isDataRelevant() throws Exception {
+		RequestMonitor owner = (RequestMonitor) this.owner;
+		return owner.handleRequestSync(new ComponentService<Boolean>() {
+			@Override
+			public Boolean call() throws Exception {
+				return owner.isDataRelevant();
+			}
+		});
+	}
+
 }

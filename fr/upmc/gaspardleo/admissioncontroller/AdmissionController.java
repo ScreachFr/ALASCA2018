@@ -16,6 +16,11 @@ import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
+import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator;
+import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.PerformanceRegulatorPorts;
+import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.RegulationStrategies;
+import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
+import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
@@ -44,11 +49,11 @@ implements AdmissionControllerI{
 	private ArrayList<ApplicationVMManagementOutboundPort> avmPorts;
 
 	// Map<RequestGenerator, RequestDispatcher>
-	private Map<Map<RGPortTypes, String>, Map<RDPortTypes, String>> requestSources;
+	private HashMap<HashMap<RGPortTypes, String>, HashMap<RDPortTypes, String>> requestSources;
 	// Map<RD_URI, AVM> XXX Peut-être pas utile (gardé pour unregister). 
-	private Map<String, Map<ApplicationVMPortTypes, String>> registeredAVMs;
+	private HashMap<String, HashMap<ApplicationVMPortTypes, String>> registeredAVMs;
 
-	private Map<ComputerPoolPorts, String> computerPoolURIs;
+	private HashMap<ComputerPoolPorts, String> computerPoolURIs;
 	private ComputerPoolOutboundPort cpop;
 
 	public AdmissionController(String AC_URI,
@@ -93,9 +98,9 @@ implements AdmissionControllerI{
 		this.logMessage("Admission controller : adding a request source...");
 		
 		
-		Map<RequestMonitorPorts, String> requestMonitorURIs = RequestMonitor.newInstance(dcc, "rm-" + RD_Component_URI, 0.5);
+		HashMap<RequestMonitorPorts, String> requestMonitorURIs = RequestMonitor.newInstance(dcc, "rm-" + RD_Component_URI, 0.5);
 		
-		Map<RDPortTypes, String> RD_uris = RequestDispatcher.newInstance(dcc,
+		HashMap<RDPortTypes, String> RD_uris = RequestDispatcher.newInstance(dcc,
 				RD_Component_URI,
 				requestGeneratorURIs.get(RGPortTypes.REQUEST_NOTIFICATION_IN),
 				requestGeneratorURIs.get(RGPortTypes.REQUEST_SUBMISSION_OUT),
@@ -104,6 +109,8 @@ implements AdmissionControllerI{
 		
 		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
 
+		
+		
 
 		RequestDispatcherOutboundPort rdop = new RequestDispatcherOutboundPort(this);
 		this.addPort(rdop);
@@ -115,12 +122,12 @@ implements AdmissionControllerI{
 
 		// Vm applications creation
 
-		Map<ApplicationVMPortTypes, String> avm0_URIs = 
+		HashMap<ApplicationVMPortTypes, String> avm0_URIs = 
 				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-0", DEFAULT_CORE_NUMBER);
-		Map<ApplicationVMPortTypes, String> avm1_URIs = 
-				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-1", DEFAULT_CORE_NUMBER);
-		Map<ApplicationVMPortTypes, String> avm2_URIs = 
-				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-2", DEFAULT_CORE_NUMBER);
+//		HashMap<ApplicationVMPortTypes, String> avm1_URIs = 
+//				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-1", DEFAULT_CORE_NUMBER);
+//		HashMap<ApplicationVMPortTypes, String> avm2_URIs = 
+//				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-2", DEFAULT_CORE_NUMBER);
 
 		// RNIP
 		String currentNotifPortUri;
@@ -133,19 +140,32 @@ implements AdmissionControllerI{
 				currentNotifPortUri);
 		this.registeredAVMs.put(rd_URI, avm0_URIs);
 
-		currentNotifPortUri = rdop.registerVM(
-				avm1_URIs,
-				RequestSubmissionI.class);
-		doAVMRequestNotificationConnection(avm1_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
-				currentNotifPortUri);
-		this.registeredAVMs.put(rd_URI, avm1_URIs);
-
-		currentNotifPortUri = rdop.registerVM(
-				avm2_URIs,
-				RequestSubmissionI.class);
-		doAVMRequestNotificationConnection(avm2_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
-				currentNotifPortUri);
-		this.registeredAVMs.put(rd_URI, avm2_URIs);
+//		currentNotifPortUri = rdop.registerVM(
+//				avm1_URIs,
+//				RequestSubmissionI.class);
+//		doAVMRequestNotificationConnection(avm1_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+//				currentNotifPortUri);
+//		this.registeredAVMs.put(rd_URI, avm1_URIs);
+//
+//		currentNotifPortUri = rdop.registerVM(
+//				avm2_URIs,
+//				RequestSubmissionI.class);
+//		doAVMRequestNotificationConnection(avm2_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+//				currentNotifPortUri);
+//		this.registeredAVMs.put(rd_URI, avm2_URIs);
+		
+		
+		HashMap<PerformanceRegulatorPorts,String> pr_uris = PerformanceRegulator.newInstance(
+				dcc,
+				rd_URI + "-pr",
+				RD_uris,
+				requestMonitorURIs,
+				computerPoolURIs,
+				RegulationStrategies.SIMPLE_AVM,
+				new TargetValue(1000.0, 0.0)
+		);
+		
+		
 		this.logMessage("Admission controller : Request source successfully added!");
 	}
 
@@ -170,7 +190,7 @@ implements AdmissionControllerI{
 
 	@Override
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
-		Optional<Map<RGPortTypes,String>> optRD = 
+		Optional<HashMap<RGPortTypes,String>> optRD = 
 				requestSources.keySet().stream()
 				.filter((e) -> e.get(RGPortTypes.INTROSPECTION).equals(requestGeneratorURI))
 				.findFirst();

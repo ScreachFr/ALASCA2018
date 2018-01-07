@@ -114,7 +114,7 @@ implements ApplicationVMConnectionsI, ShutdownableI {
 		}
 	}
 
-	public static Map<ApplicationVMPortTypes, String> newInstance(
+	public static HashMap<ApplicationVMPortTypes, String> newInstance(
 			DynamicComponentCreationOutboundPort dcc,
 			String component_URI) throws Exception {
 

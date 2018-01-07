@@ -2,7 +2,6 @@ package fr.upmc.gaspardleo.requestmonitor;
 
 
 import java.util.HashMap;
-import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
@@ -11,6 +10,8 @@ import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorInboundPort;
 
 public class RequestMonitor extends AbstractComponent implements RequestMonitorI {
+	public final static Long RELEVANCE_WINDOW = 5000L; // 5 sec.
+	
 	private Object lock;
 	
 	
@@ -21,6 +22,8 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 	private Double meanRequestExecutionTime;
 	private Double alpha;
 	private Boolean isFirstValue;
+	
+	private Long lastEntry;
 
 	private RequestMonitorInboundPort rmip;
 	
@@ -31,6 +34,7 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 			throw new Error("RequestMonitor constructor : Wrong alpha value. This value must be between 0 and 1. It's current value is " + alpha + ".");
 		this.lock = new Object();
 		this.meanRequestExecutionTime = 0.0;
+		this.lastEntry = -1L;
 		this.alpha = alpha;
 		this.isFirstValue = true;
 		
@@ -49,6 +53,11 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 
 		refreshMeanRequestExecutionTime(executionTime);
 	}
+	
+	@Override
+	public Boolean isDataRelevant() {
+		return !isFirstValue && (System.currentTimeMillis() - lastEntry) < RELEVANCE_WINDOW;
+	}
 
 	public void addEntry(Long executionTime) {
 		refreshMeanRequestExecutionTime(executionTime);
@@ -61,6 +70,8 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 				isFirstValue = false;
 			} else
 				meanRequestExecutionTime = (alpha * executionTime + ((1.0-alpha)) * meanRequestExecutionTime);
+			
+			lastEntry = System.currentTimeMillis();
 		}
 	}
 
@@ -73,7 +84,7 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 	}
 	
 	
-	public static Map<RequestMonitorPorts, String> newInstance(
+	public static HashMap<RequestMonitorPorts, String> newInstance(
 			DynamicComponentCreationOutboundPort dcc, 
 			String componentUri,
 			Double alpha) throws Exception {
@@ -88,14 +99,14 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 		};
 		
 		try {
-		dcc.createComponent(RequestMonitor.class.getCanonicalName(),
+			dcc.createComponent(RequestMonitor.class.getCanonicalName(),
 				args);
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
 		
-		Map<RequestMonitorPorts, String> result = new HashMap<>();
+		HashMap<RequestMonitorPorts, String> result = new HashMap<>();
 		
 		result.put(RequestMonitorPorts.REQUEST_MONITOR_IN, requestMonitorIn_URI);		
 		result.put(RequestMonitorPorts.INTROSPECTION, componentUri);

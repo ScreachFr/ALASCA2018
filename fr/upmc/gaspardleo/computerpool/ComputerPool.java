@@ -18,7 +18,6 @@ import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.computer.Computer;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
-import fr.upmc.gaspardleo.computerpool.exceptions.NoAvailableResourceException;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort;
 
@@ -89,12 +88,12 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	}
 
 	@Override
-	public synchronized Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate)  throws Exception{
+	public synchronized HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate)  throws Exception{
 		// Pas de core sous la main.
 		if (availableCores.size() == 0)
-			throw new NoAvailableResourceException();
+			return null;
 
-		Map<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(dcc, avmURI);
+		HashMap<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(dcc, avmURI);
 		
 		// Create a mock up port to manage the AVM component (allocate cores).
 		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(

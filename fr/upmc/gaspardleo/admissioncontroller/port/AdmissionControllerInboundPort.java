@@ -8,7 +8,6 @@ import fr.upmc.components.ports.AbstractInboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class AdmissionControllerInboundPort extends AbstractInboundPort

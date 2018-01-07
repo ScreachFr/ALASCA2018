@@ -34,8 +34,8 @@ public class Test {
 	private final static int CPU_FREQUENCY 			= 3000;
 	private final static int CPU_MAX_FREQUENCY_GAP = 1500;
 
-	private final static long RG_INSTR_NB = 100000l; // was 6000000000L
-	private final static double MEAN_INTER_ARRIVAL_TIME = 100.0; // was 500.0
+	private final static long RG_INSTR_NB = 3000000000L; // was 6000000000L
+	private final static double MEAN_INTER_ARRIVAL_TIME = 200.0; // was 500.0
 	
 	private final static int 	NB_DATASOURCE 	= 1;	
 	private final static String AC_URI 			= "AC_URI";
@@ -86,6 +86,20 @@ public class Test {
 			processingPower.put(3000, 3000000); // 3 GHz executes 3 Mips
 
 			cpop.createNewComputer("computer-0",
+					admissibleFrequencies,
+					processingPower,
+					CPU_FREQUENCY,
+					CPU_MAX_FREQUENCY_GAP,
+					NB_CPU,
+					NB_CORES);
+			cpop.createNewComputer("computer-1",
+					admissibleFrequencies,
+					processingPower,
+					CPU_FREQUENCY,
+					CPU_MAX_FREQUENCY_GAP,
+					NB_CPU,
+					NB_CORES);
+			cpop.createNewComputer("computer-2",
 					admissibleFrequencies,
 					processingPower,
 					CPU_FREQUENCY,
@@ -160,7 +174,7 @@ public class Test {
 		}
 
 		// wait 20 seconds
-		Thread.sleep(4000L);
+		Thread.sleep(60000L);
 		// then stop the generation.
 		
 		System.out.println("Stopping RGs..");

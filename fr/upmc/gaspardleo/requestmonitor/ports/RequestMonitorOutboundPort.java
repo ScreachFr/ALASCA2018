@@ -20,4 +20,9 @@ public class RequestMonitorOutboundPort extends AbstractOutboundPort implements 
 		return ((RequestMonitorI)(this.connector)).getMeanRequestExecutionTime();
 	}
 
+	@Override
+	public Boolean isDataRelevant() throws Exception {
+		return ((RequestMonitorI)(this.connector)).isDataRelevant();
+	}
+
 }

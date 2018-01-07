@@ -43,12 +43,12 @@ public class ComputerPoolInbounPort extends AbstractOutboundPort implements Comp
 	}
 
 	@Override
-	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate) throws Exception {
+	public HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate) throws Exception {
 		final ComputerPool computerPool = (ComputerPool)this.owner;
 		return computerPool.handleRequestSync(
-				new ComponentI.ComponentService<Map<ApplicationVMPortTypes, String>>(){
+				new ComponentI.ComponentService<HashMap<ApplicationVMPortTypes, String>>(){
 					@Override
-					public Map<ApplicationVMPortTypes, String> call() throws Exception {
+					public HashMap<ApplicationVMPortTypes, String> call() throws Exception {
 						return computerPool.createNewApplicationVM(avmURI, numberOfCoreToAllocate);
 
 					}});

@@ -34,5 +34,5 @@ public interface ComputerPoolI extends OfferedI, RequiredI {
 	 * @return
 	 * 		La nouvelle ApplicationVM.
 	 */
-	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate) throws Exception;
+	public HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate) throws Exception;
 }

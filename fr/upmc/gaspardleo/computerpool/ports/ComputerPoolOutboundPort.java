@@ -29,7 +29,7 @@ public class ComputerPoolOutboundPort extends AbstractOutboundPort implements Co
 	}
 
 	@Override
-	public Map<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate) throws Exception {
+	public HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate) throws Exception {
 		return ((ComputerPoolI)(this.connector)).createNewApplicationVM(avmURI, numberOfCoreToAllocate);
 	}
 
