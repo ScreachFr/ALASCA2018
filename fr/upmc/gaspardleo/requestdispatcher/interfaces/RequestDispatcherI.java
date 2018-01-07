@@ -1,5 +1,6 @@
 package fr.upmc.gaspardleo.requestdispatcher.interfaces;
 
+import java.util.List;
 import java.util.Map;
 
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
@@ -20,4 +21,6 @@ public interface RequestDispatcherI{
 	
 	public void unregisterVM(String vmUri) throws Exception;
 	public void unregisterVM() throws Exception;
+	
+	public List<String> getRegisteredAVMUris() throws Exception;
 }

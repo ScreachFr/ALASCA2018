@@ -1,5 +1,6 @@
 package fr.upmc.gaspardleo.requestdispatcher.ports;
 
+import java.util.List;
 import java.util.Map;
 
 import fr.upmc.components.ComponentI;
@@ -56,6 +57,16 @@ public class RequestDispatcherInboundPort
 					public RequestDispatcher call() throws Exception {
 						requestDispatcher.unregisterVM();
 						return requestDispatcher;
+					}});
+	}
+	@Override
+	public List<String> getRegisteredAVMUris() throws Exception {
+		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
+		return this.owner.handleRequestSync(
+				new ComponentI.ComponentService<List<String>>(){
+					@Override
+					public List<String> call() throws Exception {
+						return requestDispatcher.getRegisteredAVMUris();
 					}});
 	}
 }

@@ -2,8 +2,10 @@ package fr.upmc.gaspardleo.requestdispatcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
@@ -346,5 +348,12 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		ret.put(RDPortTypes.SHUTDOWNABLE_IN, Shutdownable_In);
 		
 		return ret;
+	}
+
+	@Override
+	public List<String> getRegisteredAVMUris() {
+		return registeredVmsUri.stream()
+							   .map((e) -> e.get(ApplicationVMPortTypes.INTROSPECTION))
+							   .collect(Collectors.toList());
 	}
 }

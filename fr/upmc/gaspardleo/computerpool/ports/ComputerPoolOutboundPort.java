@@ -2,7 +2,6 @@ package fr.upmc.gaspardleo.computerpool.ports;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
@@ -31,6 +30,21 @@ public class ComputerPoolOutboundPort extends AbstractOutboundPort implements Co
 	@Override
 	public HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, Integer numberOfCoreToAllocate) throws Exception {
 		return ((ComputerPoolI)(this.connector)).createNewApplicationVM(avmURI, numberOfCoreToAllocate);
+	}
+
+	@Override
+	public Boolean hasAvailableCore() throws Exception {
+		return ((ComputerPoolI)(this.connector)).hasAvailableCore();
+	}
+
+	@Override
+	public Boolean increaseCoreFrequency(String avmUri) throws Exception {
+		return ((ComputerPoolI)(this.connector)).increaseCoreFrequency(avmUri);
+	}
+
+	@Override
+	public Boolean decreaseCoreFrequency(String avmUri) throws Exception {
+		return ((ComputerPoolI)(this.connector)).decreaseCoreFrequency(avmUri);
 	}
 
 }

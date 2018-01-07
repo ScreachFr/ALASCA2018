@@ -20,7 +20,6 @@ import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.PerformanceRegulatorPorts;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.RegulationStrategies;
 import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
-import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
@@ -161,7 +160,7 @@ implements AdmissionControllerI{
 				RD_uris,
 				requestMonitorURIs,
 				computerPoolURIs,
-				RegulationStrategies.SIMPLE_AVM,
+				RegulationStrategies.SIMPLE_FREQ,
 				new TargetValue(1000.0, 0.0)
 		);
 		

@@ -31,11 +31,11 @@ public class Test {
 
 	private final static int NB_CPU 				= 2;
 	private final static int NB_CORES 				= 4;
-	private final static int CPU_FREQUENCY 			= 3000;
+	private final static int CPU_FREQUENCY 			= 1500;
 	private final static int CPU_MAX_FREQUENCY_GAP = 1500;
 
 	private final static long RG_INSTR_NB = 3000000000L; // was 6000000000L
-	private final static double MEAN_INTER_ARRIVAL_TIME = 200.0; // was 500.0
+	private final static double MEAN_INTER_ARRIVAL_TIME = 300.0; // was 500.0
 	
 	private final static int 	NB_DATASOURCE 	= 1;	
 	private final static String AC_URI 			= "AC_URI";

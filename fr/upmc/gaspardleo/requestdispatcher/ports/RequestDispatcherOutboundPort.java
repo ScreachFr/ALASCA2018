@@ -1,5 +1,6 @@
 package fr.upmc.gaspardleo.requestdispatcher.ports;
 
+import java.util.List;
 import java.util.Map;
 
 import fr.upmc.components.ComponentI;
@@ -29,5 +30,10 @@ public class RequestDispatcherOutboundPort
 	@Override
 	public void unregisterVM() throws Exception {
 		((RequestDispatcherI)this.connector).unregisterVM();
+	}
+
+	@Override
+	public List<String> getRegisteredAVMUris() throws Exception {
+		return ((RequestDispatcherI)this.connector).getRegisteredAVMUris();
 	}
 }

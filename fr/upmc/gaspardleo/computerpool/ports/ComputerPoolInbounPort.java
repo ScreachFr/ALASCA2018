@@ -12,9 +12,6 @@ import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 
 public class ComputerPoolInbounPort extends AbstractOutboundPort implements ComputerPoolI {
 
-
-
-
 	public ComputerPoolInbounPort(String uri, ComponentI owner) throws Exception {
 		super(uri, ComputerPoolI.class, owner);
 
@@ -51,6 +48,39 @@ public class ComputerPoolInbounPort extends AbstractOutboundPort implements Comp
 					public HashMap<ApplicationVMPortTypes, String> call() throws Exception {
 						return computerPool.createNewApplicationVM(avmURI, numberOfCoreToAllocate);
 
+					}});
+	}
+
+	@Override
+	public Boolean hasAvailableCore() throws Exception {
+		final ComputerPool computerPool = (ComputerPool)this.owner;
+		return computerPool.handleRequestSync(
+				new ComponentI.ComponentService<Boolean>(){
+					@Override
+					public Boolean call() throws Exception {
+						return computerPool.hasAvailableCore();
+					}});
+	}
+
+	@Override
+	public Boolean increaseCoreFrequency(String avmUri) throws Exception {
+		final ComputerPool computerPool = (ComputerPool)this.owner;
+		return computerPool.handleRequestSync(
+				new ComponentI.ComponentService<Boolean>(){
+					@Override
+					public Boolean call() throws Exception {
+						return computerPool.increaseCoreFrequency(avmUri);
+					}});
+	}
+
+	@Override
+	public Boolean decreaseCoreFrequency(String avmUri) throws Exception {
+		final ComputerPool computerPool = (ComputerPool)this.owner;
+		return computerPool.handleRequestSync(
+				new ComponentI.ComponentService<Boolean>(){
+					@Override
+					public Boolean call() throws Exception {
+						return computerPool.decreaseCoreFrequency(avmUri);
 					}});
 	}
 

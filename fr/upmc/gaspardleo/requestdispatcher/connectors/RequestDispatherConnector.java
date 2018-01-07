@@ -1,5 +1,6 @@
 package fr.upmc.gaspardleo.requestdispatcher.connectors;
 
+import java.util.List;
 import java.util.Map;
 
 import fr.upmc.components.connectors.AbstractConnector;
@@ -23,5 +24,10 @@ public class RequestDispatherConnector
 	@Override
 	public void unregisterVM() throws Exception {
 		((RequestDispatcherI)this.offering).unregisterVM();
+	}
+
+	@Override
+	public List<String> getRegisteredAVMUris() throws Exception {
+		return ((RequestDispatcherI)this.offering).getRegisteredAVMUris();
 	}
 }

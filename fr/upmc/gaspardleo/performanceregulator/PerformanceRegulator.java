@@ -1,7 +1,9 @@
 package fr.upmc.gaspardleo.performanceregulator;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
@@ -17,6 +19,7 @@ import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
 import fr.upmc.gaspardleo.performanceregulator.strategies.SimpleAVMStrategie;
+import fr.upmc.gaspardleo.performanceregulator.strategies.SimpleFrequencyStrategy;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestdispatcher.connectors.RequestDispatherConnector;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
@@ -24,13 +27,13 @@ import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherOutboundPort;
 import fr.upmc.gaspardleo.requestmonitor.RequestMonitor.RequestMonitorPorts;
 import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class PerformanceRegulator extends AbstractComponent implements PerformanceRegulatorI {
 	private static int DEBUG_LEVEL = 2;
 
 	public final static double CONTROL_FEQUENCY = 30; // Based on a minute.
 	public final static long REGULATION_TRUCE = 2000;
+	public final static long FIRST_PERF_CHECK = 1000;
 
 	private static int newAVMID = 0;
 
@@ -39,7 +42,7 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 	}
 
 	public enum RegulationStrategies {
-		SIMPLE_AVM;
+		SIMPLE_AVM, SIMPLE_FREQ, STRATEGY_TO_SURPASS_METAL_GEAR;
 	}
 
 
@@ -110,6 +113,10 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 		switch(strat) {
 		case SIMPLE_AVM :
 			return new SimpleAVMStrategie();
+		case SIMPLE_FREQ :
+			return new SimpleFrequencyStrategy();
+		case STRATEGY_TO_SURPASS_METAL_GEAR:
+			throw new Error("Such a lust for revenge. WHO? (Not implemented yet)"); // Yes, I'm making bad jokes about video games when I'm too tired to work.
 		default :
 			throw new Error("Performance regulator constructor error : Strategy selection error. This shouldn't happen though.");
 		}
@@ -118,29 +125,45 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 
 	@Override
 	public Boolean increaseCPUFrequency() throws Exception {
-		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		Boolean hasChangedFreq = false;
+		
+		List<String> avms = rdop.getRegisteredAVMUris();
+		
+		for (String avm : avms) {
+			if (cpop.increaseCoreFrequency(avm))
+				hasChangedFreq = true;
+		}
+		
+		
+		return hasChangedFreq;
 	}
 
 
 	@Override
 	public Boolean decreaseCPUFrequency() throws Exception {
-		// TODO Auto-generated method stub
-
-		throw new NotImplementedException();
+		Boolean hasChangedFreq = false;
+		
+		List<String> avms = rdop.getRegisteredAVMUris();
+		
+		for (String avm : avms) {
+			if (cpop.decreaseCoreFrequency(avm))
+				hasChangedFreq = true;
+		}
+		
+		return hasChangedFreq;
 	}
 
 
 	@Override
 	public Boolean addAVMToRD() throws Exception {
 		Map<ApplicationVMPortTypes, String> avm = this.cpop.createNewApplicationVM("avm-"+(newAVMID++), 1);
-		
+
 		if (avm == null) {
 			this.logMessage(this.uri + " : addAVMToRD : No available ressource!");
-			
+
 			return false;
 		}
-		
+
 		rdop.registerVM(avm, RequestSubmissionI.class);
 
 		return true;
@@ -168,15 +191,11 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
-
-		new Thread(() -> {
-			try {
-				this.startRegulationControlLoop();
-			} catch(Exception e) {
-				throw new RuntimeException(e);
-			}
-		}).start();
-
+		try {
+			this.startRegulationControlLoop();
+		} catch(Exception e) {
+			throw new ComponentStartException(e);
+		}
 	}
 
 
@@ -185,10 +204,8 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 		if (DEBUG_LEVEL > 0)
 			this.logMessage(this.uri + " : Regulation is active!");
 
-
-		long sleepTime = (long) (60000 / CONTROL_FEQUENCY);
-		try {
-			while(true) { // TODO Mettre un meilleur condition.
+		this.scheduleTaskAtFixedRate(() -> {
+			try {
 				Double mean = rmop.getMeanRequestExecutionTime();
 
 				if (DEBUG_LEVEL > 1)
@@ -217,12 +234,12 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 						this.logMessage(uri + " : everything seems within bounds, no regullation needed.");
 				}
 
-				Thread.sleep(sleepTime);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
+		}, FIRST_PERF_CHECK, (long) (60000 / CONTROL_FEQUENCY), TimeUnit.MILLISECONDS);
+
+
 	}
 
 	public static HashMap<PerformanceRegulatorPorts, String> newInstance(DynamicComponentCreationOutboundPort dcc,
