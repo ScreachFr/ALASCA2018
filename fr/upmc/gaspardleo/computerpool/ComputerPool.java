@@ -32,7 +32,6 @@ import fr.upmc.gaspardleo.computer.Computer;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 	public final static int DEFAULT_CORE_ALLOC_NUMBER = 2;
@@ -273,8 +272,20 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 		return uri;
 	}
 
-	// TODO pouvoir enlever des avms et rendre les cores de nouveau disponible.
+	@Override
+	public synchronized Boolean hasAvailableCore() throws Exception {
+		return !availableCores.isEmpty();
+	}
 
+	@Override
+	public synchronized void releaseCores(String avmUri) throws Exception {
+		for (Map<ApplicationVMPortTypes, String> uris : avmInUse.keySet()) {
+			if (uris.get(ApplicationVMPortTypes.INTROSPECTION).equals(avmUri)) {
+				availableCores.add(avmInUse.remove(uris));
+			}
+		}
+	}
+	
 	public static Map<ComputerPoolPorts, String> newInstance(String componentURI, DynamicComponentCreationOutboundPort dcc) throws Exception {
 		String computerPoolPort_URI = AbstractPort.generatePortURI();
 
@@ -295,9 +306,6 @@ public class ComputerPool extends AbstractComponent implements ComputerPoolI {
 		return result;
 	}
 
-	@Override
-	public synchronized Boolean hasAvailableCore() throws Exception {
-		return !availableCores.isEmpty();
-	}
+	
 
 }

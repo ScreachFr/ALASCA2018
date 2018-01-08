@@ -33,8 +33,10 @@ import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnection
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
 
 public class RequestDispatcher 
-extends AbstractComponent 
-implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHandlerI, RequestNotificationI, ShutdownableI {
+	extends AbstractComponent 
+	implements 
+		RequestDispatcherI, RequestSubmissionHandlerI,
+		RequestNotificationHandlerI, RequestNotificationI, ShutdownableI {
 
 	public static enum	RDPortTypes {
 		REQUEST_SUBMISSION_IN, 

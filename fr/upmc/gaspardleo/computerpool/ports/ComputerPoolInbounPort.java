@@ -2,7 +2,6 @@ package fr.upmc.gaspardleo.computerpool.ports;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
@@ -81,6 +80,18 @@ public class ComputerPoolInbounPort extends AbstractOutboundPort implements Comp
 					@Override
 					public Boolean call() throws Exception {
 						return computerPool.decreaseCoreFrequency(avmUri);
+					}});
+	}
+
+	@Override
+	public void releaseCores(String avmUri) throws Exception {
+		final ComputerPool computerPool = (ComputerPool)this.owner;
+		computerPool.handleRequestAsync(
+				new ComponentI.ComponentService<ComputerPool>(){
+					@Override
+					public ComputerPool call() throws Exception {
+						computerPool.releaseCores(avmUri);
+						return computerPool;
 					}});
 	}
 

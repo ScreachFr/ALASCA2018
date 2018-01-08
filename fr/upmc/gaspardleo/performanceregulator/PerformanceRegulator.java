@@ -162,8 +162,6 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 
 	@Override
 	public Boolean addAVMToRD() throws Exception {
-		System.out.println("OKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
-		
 		Map<ApplicationVMPortTypes, String> avm = this.cpop.createNewApplicationVM("avm-"+(newAVMID++), 1);
 
 		if (avm == null) {
@@ -171,9 +169,7 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 
 			return false;
 		}
-
-		System.out.println("Adding an avm.... " + avm);
-		
+		this.logMessage(this.uri + " : Adding an avm : " + avm);
 		
 		rdop.registerVM(avm, RequestSubmissionI.class);
 
@@ -182,9 +178,20 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 
 
 	@Override
-	public Boolean removeAVMFromRD() {
-		// TODO Auto-generated method stub
-		return null;
+	public Boolean removeAVMFromRD() throws Exception {
+		List<String> avms = rdop.getRegisteredAVMUris();
+		
+		if (avms.size() <= 1) {
+			this.logMessage(this.uri + " : Can't remove any AVM : there's too few left in RD.");
+			return false;
+		}
+		
+		String avmToRemove = avms.remove(0);
+		
+		rdop.unregisterVM(avmToRemove);
+		cpop.releaseCores(avmToRemove);
+
+		return true;
 	}
 
 

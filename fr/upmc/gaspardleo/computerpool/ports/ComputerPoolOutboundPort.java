@@ -47,4 +47,9 @@ public class ComputerPoolOutboundPort extends AbstractOutboundPort implements Co
 		return ((ComputerPoolI)(this.connector)).decreaseCoreFrequency(avmUri);
 	}
 
+	@Override
+	public void releaseCores(String avmUri) throws Exception {
+		((ComputerPoolI)(this.connector)).releaseCores(avmUri);
+	}
+
 }
