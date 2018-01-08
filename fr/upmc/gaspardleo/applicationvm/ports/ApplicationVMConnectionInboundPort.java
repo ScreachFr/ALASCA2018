@@ -30,4 +30,17 @@ public class ApplicationVMConnectionInboundPort
 		
 	}
 
+	@Override
+	public void doRequestMonitorConnection(String requestMonitor_in) throws Exception {
+		final ApplicationVM avm = (ApplicationVM)this.owner;
+		avm.handleRequestAsync(
+				new ComponentI.ComponentService<ApplicationVM>(){
+					@Override
+					public ApplicationVM call() throws Exception {
+						avm.doRequestMonitorConnection(requestMonitor_in);
+
+						return avm;
+					}});
+	}
+
 }

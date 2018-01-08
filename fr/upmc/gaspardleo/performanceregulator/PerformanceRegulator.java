@@ -33,7 +33,7 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 	private static int DEBUG_LEVEL = 2;
 
 	public final static double CONTROL_FEQUENCY = 30; // Based on a minute.
-	public final static long REGULATION_TRUCE = 2000;
+	public final static long REGULATION_TRUCE = 30000; // 30 sec.
 	public final static long FIRST_PERF_CHECK = 1000;
 
 	private static int newAVMID = 0;

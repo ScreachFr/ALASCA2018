@@ -128,7 +128,7 @@ implements AdmissionControllerI{
 				requestMonitorURIs,
 				computerPoolURIs,
 				RegulationStrategies.SIMPLE_AVM,
-				new TargetValue(1000.0, 0.0)
+				new TargetValue(2000.0, 0.0)
 		);
 		
 		PerformanceRegulatorOutboundPort prop = new PerformanceRegulatorOutboundPort(AbstractPort.generatePortURI(), this);

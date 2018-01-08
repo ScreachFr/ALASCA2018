@@ -31,8 +31,6 @@ import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
 import fr.upmc.gaspardleo.requestgenerator.connectors.RequestGeneraterConnector;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
-import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
-import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
 public class RequestDispatcher 
 extends AbstractComponent 
@@ -68,8 +66,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 	private Integer 									vmCursor;
 
 	//Monitoring
-	private Map<RequestI, Long> requestStartTimeStamps;
-	private RequestMonitorOutboundPort rmop;
+	private String rmop_uri;
 	
 	public RequestDispatcher(
 			String Component_URI, 
@@ -91,7 +88,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		this.registeredVmsUri 	= new ArrayList<>();
 		this.registeredVmsRsop 	= new HashMap<>();
 		this.vmCursor 			= 0;
-		this.requestStartTimeStamps = new HashMap<>();
 
 		// Request submission inbound port connection.
 		this.rsip = new RequestSubmissionInboundPort(RequestSubmission_In, this);
@@ -147,13 +143,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 			throw e;
 		}
 		
-		this.addRequiredInterface(RequestMonitorI.class);
-		this.rmop = new RequestMonitorOutboundPort(AbstractPort.generatePortURI(), this);
-		this.addPort(this.rmop);
-		this.rmop.publishPort();
-		
-		this.rmop.doConnection(RequestMonitor_In,
-				ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
+		this.rmop_uri = RequestMonitor_In;
 		
 		// Request Dispatcher debug
 		this.toggleLogging();
@@ -184,8 +174,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 				ClassFactory.newConnector(vmInterface).getCanonicalName());
 		
 		
-		doAVMRequestNotificationConnection(avmURIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
-				this.rnip.getPortURI());
+		doAVMRequestNotificationAndMonitoringConnection(avmURIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+				this.rnip.getPortURI(), this.rmop_uri);
 		
 		this.registeredVmsRsop.put(avmUri, rsop);
 		this.registeredVmsUri.add(avmURIs);
@@ -262,26 +252,15 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 			}
 			
 			rsop.submitRequestAndNotify(r);
-			Long submissionTimestamp = System.currentTimeMillis();
-			
-			this.requestStartTimeStamps.put(r, submissionTimestamp);
-			
 		}
 	}
 	
 	
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
-		Long requestTerminationTimeStamp = System.currentTimeMillis();
-		
-		this.rmop.addEntry(this.requestStartTimeStamps.get(r), requestTerminationTimeStamp);
-		
-		
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
 		
 		rnop.notifyRequestTermination(r);
-		double mean = rmop.getMeanRequestExecutionTime();
-		this.logMessage(this.Component_URI + " : request mean execution time : " + mean + " ms.");
 	}
 	
 	@Override
@@ -311,8 +290,8 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		super.shutdown();
 	}	
 	
-	private void doAVMRequestNotificationConnection(String AVMConnectionPort_URI,
-			String notificationPort_URI) throws Exception {
+	private void doAVMRequestNotificationAndMonitoringConnection(String AVMConnectionPort_URI,
+			String notificationPort_URI, String requestMonitor_in) throws Exception {
 		this.logMessage("Admission controller : connection on notification port.");
 		ApplicationVMConnectionOutboundPort avmcop 
 				= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
@@ -324,6 +303,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		
 
 		avmcop.doRequestNotificationConnection(notificationPort_URI);
+		avmcop.doRequestMonitorConnection(requestMonitor_in);
 		
 		this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
 	}

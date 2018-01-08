@@ -17,4 +17,9 @@ public class ApplicationVMConnectionOutboundPort
 		((ApplicationVMConnectionsI)this.connector).doRequestNotificationConnection(RD_RequestNotificationInboundPortURI);
 	}
 
+	@Override
+	public void doRequestMonitorConnection(String requestMonitor_in) throws Exception {
+		((ApplicationVMConnectionsI)this.connector).doRequestMonitorConnection(requestMonitor_in);
+	}
+
 }
