@@ -20,6 +20,8 @@ import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.PerformanceRegulatorPorts;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.RegulationStrategies;
 import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
+import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
+import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
@@ -119,74 +121,31 @@ implements AdmissionControllerI{
 				RD_uris.get(RDPortTypes.REQUEST_DISPATCHER_IN), 
 				RequestDispatherConnector.class.getCanonicalName());
 
-		// Vm applications creation
-
-		HashMap<ApplicationVMPortTypes, String> avm0_URIs = 
-				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-0", DEFAULT_CORE_NUMBER);
-//		HashMap<ApplicationVMPortTypes, String> avm1_URIs = 
-//				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-1", DEFAULT_CORE_NUMBER);
-//		HashMap<ApplicationVMPortTypes, String> avm2_URIs = 
-//				cpop.createNewApplicationVM("avm-" + RD_Component_URI + "-2", DEFAULT_CORE_NUMBER);
-
-		// RNIP
-		String currentNotifPortUri;
-
-		// Register application VM in Request Dispatcher
-		currentNotifPortUri = rdop.registerVM(
-				avm0_URIs,
-				RequestSubmissionI.class);
-		doAVMRequestNotificationConnection(avm0_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
-				currentNotifPortUri);
-		this.registeredAVMs.put(rd_URI, avm0_URIs);
-
-//		currentNotifPortUri = rdop.registerVM(
-//				avm1_URIs,
-//				RequestSubmissionI.class);
-//		doAVMRequestNotificationConnection(avm1_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
-//				currentNotifPortUri);
-//		this.registeredAVMs.put(rd_URI, avm1_URIs);
-//
-//		currentNotifPortUri = rdop.registerVM(
-//				avm2_URIs,
-//				RequestSubmissionI.class);
-//		doAVMRequestNotificationConnection(avm2_URIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
-//				currentNotifPortUri);
-//		this.registeredAVMs.put(rd_URI, avm2_URIs);
-		
-		
 		HashMap<PerformanceRegulatorPorts,String> pr_uris = PerformanceRegulator.newInstance(
 				dcc,
 				rd_URI + "-pr",
 				RD_uris,
 				requestMonitorURIs,
 				computerPoolURIs,
-				RegulationStrategies.SIMPLE_FREQ,
+				RegulationStrategies.SIMPLE_AVM,
 				new TargetValue(1000.0, 0.0)
 		);
 		
+		PerformanceRegulatorOutboundPort prop = new PerformanceRegulatorOutboundPort(AbstractPort.generatePortURI(), this);
+		this.addPort(prop);
+		prop.publishPort();
 		
+		
+		prop.doConnection(pr_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
+				ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
+		
+		prop.addAVMToRD();
+
 		this.logMessage("Admission controller : Request source successfully added!");
 	}
 
 	
-	private void doAVMRequestNotificationConnection(String AVMConnectionPort_URI,
-			String notificationPort_URI) throws Exception {
-		this.logMessage("Admission controller : connection on notification port.");
-		ApplicationVMConnectionOutboundPort avmcop 
-				= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
-
-		this.addPort(avmcop);
-		avmcop.publishPort();
- 		avmcop.doConnection(AVMConnectionPort_URI, 
-				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
-		
-
-		avmcop.doRequestNotificationConnection(notificationPort_URI);
-		
-		this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
-	}
-
-
+	
 	@Override
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
 		Optional<HashMap<RGPortTypes,String>> optRD = 

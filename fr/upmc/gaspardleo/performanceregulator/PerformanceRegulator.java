@@ -18,6 +18,7 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
+import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorInboundPort;
 import fr.upmc.gaspardleo.performanceregulator.strategies.SimpleAVMStrategie;
 import fr.upmc.gaspardleo.performanceregulator.strategies.SimpleFrequencyStrategy;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
@@ -49,6 +50,7 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 	private String uri;
 
 	// Ports
+	private PerformanceRegulatorInboundPort prip;
 	private RequestMonitorOutboundPort rmop;
 	private RequestDispatcherOutboundPort rdop;
 	private ComputerPoolOutboundPort cpop;
@@ -76,6 +78,10 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 		this.targetValue = targetValue;
 		this.isUsingUpperBound = false;
 
+		this.addOfferedInterface(PerformanceRegulatorI.class);
+		this.prip = new PerformanceRegulatorInboundPort(performanceRegulator_in, this);
+		this.addPort(this.prip);
+		this.prip.publishPort();
 
 		//Request monitor port creation and connection.
 		this.addRequiredInterface(RequestMonitorI.class);
@@ -156,6 +162,8 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 
 	@Override
 	public Boolean addAVMToRD() throws Exception {
+		System.out.println("OKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
+		
 		Map<ApplicationVMPortTypes, String> avm = this.cpop.createNewApplicationVM("avm-"+(newAVMID++), 1);
 
 		if (avm == null) {
@@ -164,6 +172,9 @@ public class PerformanceRegulator extends AbstractComponent implements Performan
 			return false;
 		}
 
+		System.out.println("Adding an avm.... " + avm);
+		
+		
 		rdop.registerVM(avm, RequestSubmissionI.class);
 
 		return true;

@@ -21,6 +21,8 @@ import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
+import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
@@ -182,6 +184,9 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 				ClassFactory.newConnector(vmInterface).getCanonicalName());
 		
 		
+		doAVMRequestNotificationConnection(avmURIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+				this.rnip.getPortURI());
+		
 		this.registeredVmsRsop.put(avmUri, rsop);
 		this.registeredVmsUri.add(avmURIs);
 		
@@ -217,6 +222,7 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		System.out.println("XXXXXXXXXXXXXXXXx Request accept !");
 		this.logMessage(this.Component_URI + " : incoming request submission");
 		
+		
 		if (this.registeredVmsUri.size() == 0) {
 			this.logMessage(this.Component_URI + " : no registered vm.");
 			
@@ -238,7 +244,9 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 	@Override
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
 		this.logMessage(this.Component_URI + " : incoming request submission and notification.");
-
+		
+		System.out.println("There's " + registeredVmsUri.size() + " registered AVMs.");
+		
 		if (this.registeredVmsUri.size() == 0) {
 			this.logMessage(this.Component_URI + " : no registered vm.");
 		} else {
@@ -302,6 +310,23 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 		
 		super.shutdown();
 	}	
+	
+	private void doAVMRequestNotificationConnection(String AVMConnectionPort_URI,
+			String notificationPort_URI) throws Exception {
+		this.logMessage("Admission controller : connection on notification port.");
+		ApplicationVMConnectionOutboundPort avmcop 
+				= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
+
+		this.addPort(avmcop);
+		avmcop.publishPort();
+ 		avmcop.doConnection(AVMConnectionPort_URI, 
+				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
+		
+
+		avmcop.doRequestNotificationConnection(notificationPort_URI);
+		
+		this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
+	}
 	
 	public static HashMap<RDPortTypes, String> newInstance(
 			DynamicComponentCreationOutboundPort dcc, 
