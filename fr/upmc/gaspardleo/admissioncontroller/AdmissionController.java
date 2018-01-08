@@ -9,8 +9,6 @@ import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
-import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
@@ -23,7 +21,6 @@ import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
-import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherOutboundPort;
@@ -37,8 +34,6 @@ import fr.upmc.gaspardleo.requestdispatcher.connectors.RequestDispatherConnector
 public class AdmissionController 
 extends AbstractComponent
 implements AdmissionControllerI{
-
-	private final static int DEFAULT_CORE_NUMBER = 1;
 
 	public static enum	ACPortTypes {
 		INTROSPECTION,
@@ -127,7 +122,7 @@ implements AdmissionControllerI{
 				RD_uris,
 				requestMonitorURIs,
 				computerPoolURIs,
-				RegulationStrategies.SIMPLE_AVM,
+				RegulationStrategies.SIMPLE_FREQ,
 				new TargetValue(2000.0, 0.0)
 		);
 		

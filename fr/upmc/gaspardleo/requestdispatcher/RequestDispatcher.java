@@ -209,7 +209,6 @@ implements RequestDispatcherI, RequestSubmissionHandlerI, RequestNotificationHan
 
 	@Override
 	public void acceptRequestSubmission(RequestI r) throws Exception {
-		System.out.println("XXXXXXXXXXXXXXXXx Request accept !");
 		this.logMessage(this.Component_URI + " : incoming request submission");
 		
 		
