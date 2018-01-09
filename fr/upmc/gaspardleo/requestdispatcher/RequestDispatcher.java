@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import fr.upmc.components.AbstractComponent;
+import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.exceptions.ComponentShutdownException;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
+import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
@@ -18,18 +20,20 @@ import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
+import fr.upmc.datacenterclient.requestgenerator.interfaces.RequestGeneratorManagementI;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
+import fr.upmc.gaspardleo.admissioncontroller.connectors.AdmissionControllerConnector;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
+import fr.upmc.gaspardleo.requestgenerator.connectors.RequestGeneraterConnector;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
 import fr.upmc.gaspardleo.test.DistributedTest;
@@ -62,12 +66,14 @@ public 	class 		RequestDispatcher
 	
 	//Ports
 	private RequestSubmissionInboundPort 					rsip;
-	private RequestNotificationOutboundPort 				rnop;
-	private RequestSubmissionOutboundPort 					rsop;
+	
+	private String rnop_uri;
+	private HashMap<RGPortTypes, String> rg_uris;
+	
+	private RequestGeneratorOutboundPort					rgop;
 	private RequestNotificationInboundPort 					rnip;
 	private RequestDispatcherInboundPort					rdip;
 	private ShutdownableInboundPort							sip;
-	private RequestGeneratorOutboundPort					rgop;
 	private AdmissionControllerOutboundPort 				acop;
 	private RequestGeneratorManagementOutboundPort 			rgmop;
 	
@@ -95,14 +101,6 @@ public 	class 		RequestDispatcher
 		this.addPort(this.rsip);
 		this.rsip.publishPort();
 		
-		// Request submission outbound port connection.
-		this.addRequiredInterface(RequestSubmissionI.class);
-        this.rsop = new RequestSubmissionOutboundPort(
-        		component_uris.get(RDPortTypes.REQUEST_SUBMISSION_OUT), 
-        		this);
-		this.addPort(this.rsop);
-		this.rsop.publishPort();
-				
 		// Request notification submission inbound port connection.
 		this.addOfferedInterface(RequestNotificationI.class);
 		this.rnip = new RequestNotificationInboundPort(
@@ -111,16 +109,8 @@ public 	class 		RequestDispatcher
 		this.addPort(this.rnip);
 		this.rnip.publishPort();
 		
-		// Request notification submission outbound port connection.
-		this.addRequiredInterface(RequestNotificationI.class);
-		this.rnop = new RequestNotificationOutboundPort(
-				component_uris.get(RDPortTypes.REQUEST_NOTIFICATION_OUT), 
-				this);
-		this.addPort(this.rnop);
-		this.rnop.publishPort();
-		this.rnop.doConnection(
-				rg_uris.get(RGPortTypes.REQUEST_NOTIFICATION_IN), 
-				RequestNotificationConnector.class.getCanonicalName());
+		this.rnop_uri = component_uris.get(RDPortTypes.REQUEST_NOTIFICATION_OUT);
+		this.rg_uris = rg_uris;
 		
 		assert component_uris.get(RDPortTypes.REQUEST_DISPATCHER_IN) != null : "assertion : rg_uris.get(RDPortTypes.REQUEST_DISPATCHER_IN) null";
 		
@@ -142,31 +132,26 @@ public 	class 		RequestDispatcher
 				this);
 		this.addPort(this.sip);
 		this.sip.publishPort();
-		
-		//Request Generator port
-		this.addRequiredInterface(RequestGeneratorConnectionI.class);
-		this.rgop = new RequestGeneratorOutboundPort(this);
-		this.addPort(this.rgop);
-		this.rgop.publishPort();
-		this.rgop.doConnection(
-				rg_uris.get(RGPortTypes.CONNECTION_IN), 
-				ClassFactory.newConnector(RequestGeneratorConnectionI.class).getCanonicalName());
-		this.rgop.doConnectionWithRD(
-				component_uris.get(RDPortTypes.REQUEST_SUBMISSION_IN));
-		
+			
 		//Admission Crontroler port
 		this.addRequiredInterface(AdmissionControllerI.class);
 		this.acop = new AdmissionControllerOutboundPort(this);
 		this.acop.publishPort();
 		this.addPort(acop);
+		
+//		this.acop.doConnection(
+//				ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
+//				ClassFactory.newConnector(AdmissionControllerI.class).getCanonicalName());
+
 		this.acop.doConnection(
 				ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
-				ClassFactory.newConnector(AdmissionControllerI.class).getCanonicalName());
-
-		// Addition by AC the new RD for a specific RG
+				AdmissionControllerConnector.class.getCanonicalName());
+		
+		 //Addition by AC the new RD for a specific RG
 		this.acop.addRequestDispatcher(component_uris, rg_uris);
 		
 		// Request Generator Management port
+		this.addRequiredInterface(RequestGeneratorManagementI.class);
 		rgmop = new RequestGeneratorManagementOutboundPort(
 				component_uris.get(RDPortTypes.REQUEST_GENERATOR_MANAGER_OUT),
 				this);
@@ -177,10 +162,13 @@ public 	class 		RequestDispatcher
 				RequestGeneratorManagementConnector.class.getCanonicalName());
 		
 		// Execution of the main senario
-		DistributedTest.testScenario(rgmop);;
-		
+		DistributedTest.testScenario(rgmop);;	
+				
 		// Request Dispatcher debug
 		this.toggleLogging();
+		this.toggleTracing();
+		
+		this.logMessage("RequestDispatcher made");
 	}
 
 	@Override
@@ -199,8 +187,12 @@ public 	class 		RequestDispatcher
 		this.addPort(rsop);
 		rsop.publishPort();
 		
+//		rsop.doConnection(avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
+//				ClassFactory.newConnector(vmInterface).getCanonicalName());
+
 		rsop.doConnection(avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
-				ClassFactory.newConnector(vmInterface).getCanonicalName());
+				RequestSubmissionConnector.class.getCanonicalName());
+
 		
 		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
 		this.addPort(rnip);
@@ -290,12 +282,35 @@ public 	class 		RequestDispatcher
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		
+		//DEBUG LEO 
+		RequestNotificationOutboundPort rnop = 
+				(RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
+		
+		if (rnop == null){
+			this.addRequiredInterface(RequestSubmissionI.class) ;
+			rnop = new RequestNotificationOutboundPort(this.rnop_uri, this) ;
+			this.addPort(rnop) ;
+			rnop.publishPort() ;
+			
+			rnop.doConnection(
+					rg_uris.get(RGPortTypes.REQUEST_NOTIFICATION_IN), 
+					RequestNotificationConnector.class.getCanonicalName());
+		}
+		
+		//FIN DEBUG LEO 
+		
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
 		rnop.notifyRequestTermination(r);
 	}
 	
 	@Override
 	public void notifyRequestTermination(RequestI r) throws Exception {
+		
+		//DEBUG LEO 
+		RequestNotificationOutboundPort rnop = 
+				(RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
+		//FIN DEBUG LEO 
+		
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
 		// TODO Pas utilisé.
 		rnop.notifyRequestTermination(r);
@@ -326,7 +341,7 @@ public 	class 		RequestDispatcher
 			HashMap<RGPortTypes, String> rg_uris,
 			HashMap<ACPortTypes, String> ac_uris,
 			ComponentCreator cc) throws Exception {
-		
+				
 		String RequestSubmission_In = AbstractPort.generatePortURI();
 		String RequestSubmission_Out = AbstractPort.generatePortURI();
 		String RequestNotification_In = AbstractPort.generatePortURI();
@@ -350,13 +365,14 @@ public 	class 		RequestDispatcher
 				rg_uris,
 				ac_uris
 		};
-		
+				
 		try {
 			cc.createComponent(RequestDispatcher.class, constructorParams);
 		} catch (Exception e) {
-		    e.getCause().printStackTrace();
+		    e.printStackTrace();
+		    throw e;
 		}
-		
+				
 		return component_uris;
 	}
 }

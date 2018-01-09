@@ -2,12 +2,11 @@ package fr.upmc.gaspardleo.computer;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import fr.upmc.components.ports.AbstractPort;
-import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
+import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 
@@ -26,7 +25,6 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 	private static final int NB_CORES = 4;
 	
 	public Computer(
-			String computerURI,
 			HashMap<ComputerPortsTypes, String> computer_uris,
 			HashMap<ComputerPoolPorts, String> cp_uris,
 			HashSet<Integer> admissibleFrequencies, 
@@ -36,7 +34,7 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 			String computerDynamicStateDataInboundPortURI) throws Exception {
 		
 		super(
-			computerURI,
+			computer_uris.get(ComputerPortsTypes.INTROSPECTION),
 			admissibleFrequencies,
 			processingPower,
 			CPU_FREQUENCY,
@@ -51,16 +49,24 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 		ComputerPoolOutboundPort cpop = new ComputerPoolOutboundPort(this);
 		cpop.publishPort();
 		this.addPort(cpop);
+
+//		cpop.doConnection(
+//				cp_uris.get(ComputerPoolPorts.COMPUTER_POOL),
+//				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
 		
 		cpop.doConnection(
-				cp_uris.get(ComputerPoolPorts.COMPUTER_POOL),
-				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
+			cp_uris.get(ComputerPoolPorts.COMPUTER_POOL),
+			ComputerPoolConnector.class.getCanonicalName());
 		
 		cpop.addComputer(computer_uris, numberOfProcessors, numberOfCores);
+		
+		this.toggleTracing();
+		
+		this.logMessage("Computer made");
 	}
 
 
-	public static Map<ComputerPortsTypes, String> newInstance(
+	public static HashMap<ComputerPortsTypes, String> newInstance(
 			String computerURI,
 			HashMap<ComputerPoolPorts, String> cp_uris,
 			ComponentCreator cc) throws Exception {
@@ -84,7 +90,6 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 		processingPower.put(3000, 3000000);
 
 		Object[] constructorParams = new Object[] {
-				computerURI,
 				computer_uris,
 				cp_uris,
 				admissibleFrequencies,
@@ -93,8 +98,6 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 				computerStaticStateDataInboundPortURI,
 				computerDynamicStateDataInboundPortURI,
 		};
-
-		System.out.println("Computer factory call");
 		
 		try {
 			cc.createComponent(Computer.class, constructorParams);
@@ -102,8 +105,6 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 			e.printStackTrace();
 			throw e;
 		}
-
-		System.out.println("Computer factory done");
 
 		return computer_uris;
 	}

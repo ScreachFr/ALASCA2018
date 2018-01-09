@@ -74,6 +74,12 @@
     	                <rmic classpath="${classpath}:../GaspardLeo/bin"
     	                    classname="fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort"
     	                    base="../GaspardLeo"/>
+    	<!-- DEBUG LEO -->
+    	<echo message="Recompiling fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort" />
+    	                        <rmic classpath="${classpath}:../GaspardLeo/bin"
+    	                            classname="fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort"
+    	                            base="../GaspardLeo"/>
+    	<!-- FIN DEBUG LEO -->
     	
         <!--<echo message="Recompiling fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionInboundPort" />
                  <rmic classpath="${classpath}:../GaspardLeo/bin"

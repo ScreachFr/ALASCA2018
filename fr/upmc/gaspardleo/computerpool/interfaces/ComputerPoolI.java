@@ -1,7 +1,6 @@
 package fr.upmc.gaspardleo.computerpool.interfaces;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import fr.upmc.components.interfaces.OfferedI;
 import fr.upmc.components.interfaces.RequiredI;
@@ -31,7 +30,7 @@ public interface ComputerPoolI extends OfferedI, RequiredI {
 	 * 		Nouveau Computer.
 	 */
 	public void addComputer(
-			Map<ComputerPortsTypes, String> computerUris,
+			HashMap<ComputerPortsTypes, String> computerUris,
 			Integer numberOfProcessors,
 			Integer numberOfCores) throws Exception;
 }

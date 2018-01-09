@@ -2,9 +2,12 @@ package fr.upmc.gaspardleo.requestdispatcher.interfaces;
 
 import java.util.HashMap;
 
+import fr.upmc.components.interfaces.OfferedI;
+import fr.upmc.components.interfaces.RequiredI;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 
-public interface RequestDispatcherI{
+public interface RequestDispatcherI
+		extends	OfferedI, RequiredI{
 
 	/**
 	 * Connect une ApplicationVM au RequestDispatcher.

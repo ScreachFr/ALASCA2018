@@ -2,6 +2,7 @@ package fr.upmc.gaspardleo.test;
 
 import java.util.HashMap;
 
+import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
@@ -28,16 +29,18 @@ public class Test {
 		try {
 			//TODO
 			this.cvm = new CVM();
-
+			
 			ComponentCreator cc = new ComponentCreator(cvm);
 			
 			HashMap<ComputerPoolPorts, String> cp_uris = 
 					ComputerPool.newInstance(cc);
 			
 			Computer.newInstance("computer-0", cp_uris,	cc);
-
-			HashMap<ACPortTypes, String> ac_uris = 
-					AdmissionController.newInstance(cp_uris, cc);
+			
+			HashMap<ACPortTypes, String> ac_uris = new HashMap<ACPortTypes, String>();		
+			ac_uris.put(ACPortTypes.ADMISSION_CONTROLLER_IN, AbstractPort.generatePortURI());
+			
+			AdmissionController.newInstance(cp_uris, ac_uris, cc);
 			
 			System.out.println("computer creation launched.");
 

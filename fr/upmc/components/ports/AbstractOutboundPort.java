@@ -68,6 +68,12 @@ public abstract class	AbstractOutboundPort
 extends		AbstractPort
 implements	OutboundPortI
 {
+	/**
+	 * 
+	 */
+	//DEBUG LEO 
+	private static final long serialVersionUID = 1L;
+	//FIN DEBUG LEO 
 	/** URI of the server port to which this port is connected.			*/
 	protected String	serverPortURI ;
 	/** connector used to link with the provider component.				*/
@@ -255,7 +261,9 @@ implements	OutboundPortI
 	public void			doConnection(String otherPortURI, String ccname)
 	throws	Exception
 	{
-		assert	otherPortURI != null && ccname != null && !this.connected() ;
+		assert	otherPortURI != null : "otherPortURI is null";
+		assert ccname != null : "ccname is null";
+		assert !this.connected() : "port is already connected";
 
 		// FIXME: should use a proper state machine model to implement the
 		// connection and disconnection protocol
@@ -313,14 +321,12 @@ implements	OutboundPortI
 	public void			obeyConnection(String otherPortURI, String ccname)
 	throws	Exception
 	{
-//				System.err.println("[DEBUG LEO] otherPortURI != null : " + (otherPortURI != null));
-//				System.out.flush();
-//				System.err.println("\n[DEBUG LEO]  ccname != null : " + (ccname != null));;
-//				System.out.flush();
-//				System.err.println("\n[DEBUG LEO]  !this.connected() : " + !this.connected());
-//		
-//				
-//				System.err.println("\n[DEBUG LEO]  otherPortURI : " + otherPortURI +
+//				System.out.println("[DEBUG LEO] otherPortURI != null : " + (otherPortURI != null));
+//				System.out.println("\n[DEBUG LEO]  ccname != null : " + (ccname != null));;
+//				System.out.println("\n[DEBUG LEO]  !this.connected() : " + !this.connected());
+		
+				
+//				System.out.println("\n[DEBUG LEO]  otherPortURI : " + otherPortURI +
 //						"\nccname : " + ccname);
 				
 		assert	otherPortURI != null && ccname != null && !this.connected() ;

@@ -3,7 +3,6 @@ package fr.upmc.gaspardleo.computerpool;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ports.AbstractPort;
@@ -30,9 +29,9 @@ public class ComputerPool
 	
 	public final static int DEFAULT_CORE_ALLOC_NUMBER = 2;
 	private ComputerPoolInbounPort cpi;
-	private List<Map<ComputerPortsTypes, String>> computers;
+	private List<HashMap<ComputerPortsTypes, String>> computers;
 	private List<AllocatedCore[]> availableCores;
-	private Map<Map<ApplicationVMPortTypes, String>, AllocatedCore[]> avmInUse;
+	private HashMap<HashMap<ApplicationVMPortTypes, String>, AllocatedCore[]> avmInUse;
 	
 	public ComputerPool(
 			String computerPoolPort_URI) throws Exception {
@@ -43,9 +42,7 @@ public class ComputerPool
 		this.cpi = new ComputerPoolInbounPort(computerPoolPort_URI, this);
 		this.cpi.publishPort();
 		this.addPort(this.cpi);
-		
-//		System.out.println("[DEBUG LEO] yoooooo");
-		
+				
 		assert cpi.isPublished();
 		
 		this.computers = new ArrayList<>();
@@ -53,39 +50,14 @@ public class ComputerPool
 		this.avmInUse = new HashMap<>();
 		
 		this.toggleLogging();
+		this.toggleTracing();
+		
+		this.logMessage("ComputerPool made");
 	}
-
-//	@Override
-//	public void createNewComputer(
-//			String computerURI,
-//			HashSet<Integer> possibleFrequencies,
-//			HashMap<Integer, Integer> processingPower,
-//			Integer defaultFrequency,
-//			Integer maxFrequencyGap,
-//			Integer numberOfProcessors,
-//			Integer numberOfCores,
-//			ComponentCreator cc) throws Exception {
-//
-//		System.out.println("Computer creation and core allocation.");
-//		
-//		Map<ComputerPortsTypes, String> computerUris = Computer.newInstance(computerURI, possibleFrequencies, 
-//				processingPower, defaultFrequency, maxFrequencyGap, numberOfProcessors, numberOfCores, cc);
-//
-//		ComputerServicesOutboundPort csop = new ComputerServicesOutboundPort(this);
-//		this.addPort(csop);
-//		csop.publishPort();
-//		csop.doConnection(computerUris.get(ComputerPortsTypes.SERVICE_IN), ComputerServicesConnector.class.getCanonicalName());
-//		
-//		for (int i = 0; i < (numberOfProcessors * numberOfCores)/2; i++) {
-//			availableCores.add(csop.allocateCores(DEFAULT_CORE_ALLOC_NUMBER));
-//		}
-//		
-//		this.computers.add(computerUris);
-//	}
 	
 	@Override
 	public void addComputer(
-			Map<ComputerPortsTypes, String> computerUris,
+			HashMap<ComputerPortsTypes, String> computerUris,
 			Integer numberOfProcessors,
 			Integer numberOfCores
 			) throws Exception {

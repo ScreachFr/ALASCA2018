@@ -1222,17 +1222,21 @@ implements	ComponentI
 //							})));
 		assert	this.notInStateAmong(new ComponentStateI[]{
 							ComponentState.TERMINATED
-							}) ;
+							}) : "assertion 1";
 		
 //		System.out.println("[DEBUG LEO] equals : " + (this.equals(p.getOwner())));
-		assert	this.equals(p.getOwner()) ;
+		assert	this.equals(p.getOwner()) : "assertion 2";
 		
 //		System.out.println("[DEBUG LEO] getImplementedInterface : " + p.getImplementedInterface());
 //		System.out.println("[DEBUG LEO] isInterface : " + (this.isInterface(p.getImplementedInterface())));
-		assert	this.isInterface(p.getImplementedInterface()) ;
+		assert	this.isInterface(p.getImplementedInterface()) : 
+			"assertion 3"
+			+ "\n-> p = " + p
+			+ "\n-> ImplementedInterface = " + p.getImplementedInterface()
+			+ "\n-> isInterface : "	+ this.isInterface(p.getImplementedInterface());
 		
 //		System.out.println("[DEBUG LEO] get : " + (this.portURIs2ports.get(p.getPortURI()) == null));
-		assert	this.portURIs2ports.get(p.getPortURI()) == null ;
+		assert	this.portURIs2ports.get(p.getPortURI()) == null : "assertion 4";
 
 		Vector<PortI> vps = null ;
 		synchronized (this.interfaces2ports) {
@@ -1250,8 +1254,8 @@ implements	ComponentI
 		synchronized (this.portURIs2ports) {
 			this.portURIs2ports.put(p.getPortURI(), p) ;
 		}
-		assert	this.interfaces2ports.containsKey(p.getImplementedInterface()) ;
-		assert	this.portURIs2ports.containsKey(p.getPortURI()) ;
+		assert	this.interfaces2ports.containsKey(p.getImplementedInterface()) : "assertion 5";
+		assert	this.portURIs2ports.containsKey(p.getPortURI()) : "assertion 6";
 	}
 
 	/**

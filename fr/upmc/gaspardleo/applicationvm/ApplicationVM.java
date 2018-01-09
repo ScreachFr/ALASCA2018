@@ -61,6 +61,9 @@ public class ApplicationVM
 		
 		// VM debug
 		this.toggleLogging();
+		this.toggleTracing();
+		
+		this.logMessage("ApplicationVM made");
 	}
 
 	@Override

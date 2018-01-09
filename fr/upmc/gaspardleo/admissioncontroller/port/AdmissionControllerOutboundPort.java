@@ -14,6 +14,8 @@ import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 public class AdmissionControllerOutboundPort 
 		extends AbstractOutboundPort
 		implements AdmissionControllerI{
+	
+	private static final long serialVersionUID = 2L;
 
 	public AdmissionControllerOutboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, AdmissionControllerI.class, owner);

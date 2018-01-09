@@ -56,11 +56,12 @@ import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  * @version	$Name$ -- $Revision$ -- $Date$
  */
+
 public class				RequestSubmissionOutboundPort
 extends		AbstractOutboundPort
 implements	RequestSubmissionI
 {
-	//private static final long serialVersionUID = 2L;
+	
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
@@ -71,7 +72,7 @@ implements	RequestSubmissionI
 	{
 		super(RequestSubmissionI.class, owner);
 	}
-
+	
 	public				RequestSubmissionOutboundPort(
 		String uri,
 		ComponentI owner

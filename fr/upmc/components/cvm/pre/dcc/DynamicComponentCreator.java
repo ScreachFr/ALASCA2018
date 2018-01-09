@@ -40,8 +40,6 @@ import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationInboundPort;
-import fr.upmc.components.ports.PortI;
-import fr.upmc.gaspardleo.computerpool.ComputerPool;
 
 /**
  * The class <code>DynamicComponentCreator</code> defines components that will
@@ -95,7 +93,6 @@ extends		AbstractComponent
 		this.addPort(p) ;
 		if (AbstractCVM.isDistributed) {
 			p.publishPort() ;
-//			System.out.println("[DEBUG LEO] *************** dccip published");
 		} else {
 			p.localPublishPort() ;
 		}
@@ -127,43 +124,53 @@ extends		AbstractComponent
 		Object[] constructorParams
 		) throws Exception
 	{
-//		System.out.println("[DEBUG LEO] createComponent 6");
+		assert	classname != null;
+		assert constructorParams != null;
 		
-		assert	classname != null ;
+//		System.out.println("[DEBUG LEO] DCC 1 : " + classname);
 
 		if (AbstractCVM.DEBUG) {
 			System.out.println("DynamicComponentCreator creates: " + classname) ;
 		}
-
+		
+		
 		Class<?> cl = Class.forName(classname) ;
-		assert	cl != null ;
+		assert	cl != null;
+		
 		Class<?>[] parameterTypes = new Class[constructorParams.length] ;
 		
-//		System.out.println("[DEBUG LEO] constructorParams.length : " + constructorParams.length);
-
 		
 		for (int i = 0 ; i < constructorParams.length ; i++) {
-//			System.out.println("[DEBUG LEO] !!!!");
-			parameterTypes[i] = constructorParams[i].getClass() ;
+			parameterTypes[i] = constructorParams[i].getClass();
+//			System.out.println("[DEBUG LEO] parameterTypes[" + i + "] : " + parameterTypes[i]);
+			assert parameterTypes[i] != null;
+		}
+
+//		System.out.println("[DEBUG LEO] DCC 2");
+		
+		Constructor<?> cons = null;
+		try{
+			cons = cl.getConstructor(parameterTypes) ;
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		assert	cons != null ;
+		
+//		System.out.println("[DEBUG LEO] DCC 3");
+//		System.out.println("[DEBUG LEO] cons : " + cons.getName());
+		
+		AbstractComponent component;
+		try{
+		component =	(AbstractComponent) cons.newInstance(constructorParams) ;
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
 		}
 		
-//		System.out.println("[DEBUG LEO] coucou 1");
-
-		Constructor<?> cons = cl.getConstructor(parameterTypes) ;
-		
-//		System.out.println("[DEBUG LEO] coucou 2");
-//		System.out.flush();;
-
-		assert	cons != null ;
-		AbstractComponent component =
-					(AbstractComponent) cons.newInstance(constructorParams) ;
+//		System.out.println("[DEBUG LEO] DCC 4");
 		
 		assert component != null;
-//		System.out.println("[DEBUG LEO] component class : " + component.getClass().getCanonicalName());
-//		System.out.println("[DEBUG LEO] coucou");
-//		System.out.flush();;
-//		
-//		System.out.println("[DEBUG LEO] toto : " + ((ComputerPool)component).getToto());
 
 		AbstractCVM.theCVM.addDeployedComponent(component) ;
 		component.start() ;

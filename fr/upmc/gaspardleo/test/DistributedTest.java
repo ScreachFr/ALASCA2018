@@ -2,7 +2,9 @@ package fr.upmc.gaspardleo.test;
 
 import java.util.HashMap;
 
+import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.cvm.AbstractDistributedCVM;
+import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
@@ -21,9 +23,13 @@ public class DistributedTest
 	private static final String DatacenterClient = "datacenterclient";
 	private static final int NB_DATASOURCE = 1;
 	private HashMap<ACPortTypes, String> ac_uris;
-		
+	private ComponentCreator cc;
+	
 	public DistributedTest(String[] args) throws Exception {
 		super(args);
+		
+		ac_uris = new HashMap<ACPortTypes, String>();		
+		ac_uris.put(ACPortTypes.ADMISSION_CONTROLLER_IN, AbstractPort.generatePortURI());
 	}
 		
 	@Override
@@ -31,8 +37,8 @@ public class DistributedTest
 
 		super.start();
 		
-		ComponentCreator cc = new ComponentCreator(this);
-		
+		cc = new ComponentCreator(this);
+				
 		if(thisJVMURI.equals(Datacenter)){
 			
 			assert cc != null;
@@ -42,28 +48,32 @@ public class DistributedTest
 			
 			Computer.newInstance("computer-0", cp_uris,	cc);
 
-			ac_uris = AdmissionController.newInstance(cp_uris, cc);
+			ac_uris = AdmissionController.newInstance(cp_uris, ac_uris, cc);
 			
-			System.out.println("DataCenter started !");
+			System.out.println("### DataCenter started !");
 			
 		} else {
 			if (thisJVMURI.equals(DatacenterClient)){
 
+				assert cc != null;
+				
+				Thread.sleep(5000L);
+				
 				for (int i = 0; i < NB_DATASOURCE; i++) {
 					
 					HashMap<RGPortTypes, String> rg_uris  = 
-							RequestGenerator.newInstance("rg-"+i, 500.0, 6000000000L, cc);
-					
+							RequestGenerator.newInstance("rg-"+i, new Double(500.0), new Long(6000000000L), cc);
+										
 					RequestDispatcher.newInstance("rd-"+i, rg_uris, ac_uris, cc);
 				}
 				
-				System.out.println("DataCenterClient started !");
+				System.out.println("### DataCenterClient started !");
 			}
 		}
 	}
 	
 	public static void testScenario(RequestGeneratorManagementOutboundPort rgmop) throws Exception {
-
+		
 		new Thread(new Runnable() {
 			@Override
 			public void run() {

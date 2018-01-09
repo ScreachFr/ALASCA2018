@@ -83,7 +83,6 @@ implements	DynamicComponentCreationI{
 		Object[] constructorParams
 		) throws Exception
 	{
-//		System.out.println("[DEBUG LEO] createComponent 3");
 		((DynamicComponentCreationI)this.connector).
 								createComponent(classname, constructorParams) ;
 	}

@@ -128,6 +128,7 @@ public class			ConfigurationFileParser
 	public boolean		validateConfigurationFile(File configFile)
 	throws	Exception
 	{
+		//DEBUG LEO 
 //		boolean result = false ;
 //		// Specify you want a factory for RELAX NG
 //		System.setProperty(
@@ -149,7 +150,10 @@ public class			ConfigurationFileParser
 //		validator.validate(new StreamSource(configFile));
 //		result = true ;
 //		return result ;
+		
 		return true;
+		
+		//FIN DEBUG LEO
 	}
 
 	/**

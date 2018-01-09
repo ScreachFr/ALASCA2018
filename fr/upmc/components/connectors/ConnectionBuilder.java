@@ -152,6 +152,8 @@ public class			ConnectionBuilder {
 	protected ComponentImplementedI	getRemoteReference(String remoteURI)
 	throws	Exception
 	{
+//		System.out.println("[DEBUG LEO] ### getRemoteReference");
+//		System.out.println("[DEBUG LEO] remoteURI : " + remoteURI);
 		ComponentImplementedI inter = null ;
 		String info = this.globalRegistryClient.lookup(remoteURI) ;
 		ConnectionData cd = new ConnectionData(info) ;
@@ -217,23 +219,28 @@ public class			ConnectionBuilder {
 		PortI localServerPort = this.localRegistry.get(serverPortURI) ;
 		PortI localClientPort = this.localRegistry.get(clientPortURI) ;
 		if (localServerPort != null) {
+//			System.out.println("[DEBUG LEO] connectWith 1");
 			localServerPort.setClientPortURI(clientPortURI) ;
 			localServerPort.setServerPortURI(serverPortURI) ;
 		}
 		if (localClientPort != null) {
+//			System.out.println("[DEBUG LEO] connectWith 2");
 			localClientPort.setClientPortURI(clientPortURI) ;
 			localClientPort.setServerPortURI(serverPortURI) ;
 		}
 		if (localServerPort != null && localClientPort != null) {
+//			System.out.println("[DEBUG LEO] connectWith 3");
 			// local connection
 			connector.setRemote(false) ;
 			if (AbstractCVM.DEBUG) {
+//				System.out.println("[DEBUG LEO] connectWith 4");
 				System.out.println("local connection of client " + 
 								clientPortURI + " to server " + serverPortURI) ;
 			}
 			connector.connect(
 					(OfferedI)localServerPort, (RequiredI)localClientPort) ;
 		} else if (localServerPort != null && localClientPort == null) {
+//			System.out.println("[DEBUG LEO] connectWith 5");
 			// remote connection
 			connector.setRemote(true) ;
 			if (AbstractCVM.DEBUG) {
@@ -241,6 +248,7 @@ public class			ConnectionBuilder {
 						clientPortURI + " to local server " + serverPortURI) ;
 			}
 			if (localServerPort instanceof DataOfferedI.PullI) {
+//				System.out.println("[DEBUG LEO] connectWith 6");
 				if (AbstractCVM.DEBUG) {
 					System.out.println("connecting data interfaces...");
 				}
@@ -250,25 +258,33 @@ public class			ConnectionBuilder {
 				((DataConnectorI)connector).connectServer(
 					(OfferedI)localServerPort, (RequiredI)remoteClientPort) ;
 			} else if (localServerPort instanceof DataTwoWayI.PullI) {
+//				System.out.println("[DEBUG LEO] connectWith 7");
 				PortI remoteClientPort =
 							(PortI) this.getRemoteReference(clientPortURI) ;
 				remoteClientPort.setServerPortURI(serverPortURI) ;
 				((DataTwoWayConnectorI)connector).connectServer(
 					(OfferedI)localServerPort, (RequiredI)remoteClientPort) ;
 			} else if (localServerPort instanceof TwoWayI) {
+//				System.out.println("[DEBUG LEO] connectWith 8]");
 				PortI remoteClientPort =
 							(PortI) this.getRemoteReference(clientPortURI) ;
 				remoteClientPort.setServerPortURI(serverPortURI) ;
 				((TwoWayConnectorI)connector).connectServer(
 					(OfferedI)localServerPort, (RequiredI)remoteClientPort) ;
 			} else if (localServerPort instanceof OfferedI) {
+//				System.out.println("[DEBUG LEO] connectWith 9");
 				// do nothing, passive connection
 			} else {
+//				System.out.println("[DEBUG LEO] connectWith 10");
 				throw new Exception("unknown interface " + localServerPort) ;
 			}
 		} else if (localServerPort == null && localClientPort != null) {
+//			System.out.println("[BEBUG LEO] localClientPort : " + localClientPort);
+//			System.out.println("[DEBUG LEO] connectWith 11");
 			// remote connection
 			connector.setRemote(true) ;
+//			System.out.println("[DEBUG LEO] clientPortURI : " + clientPortURI);
+//			System.out.println("[DEBUG LEO] serverPortURI : " + serverPortURI);
 			if (AbstractCVM.DEBUG) {
 				System.out.println("remote connection of local client " +
 					clientPortURI + " to remote server " + serverPortURI) ;
@@ -279,6 +295,7 @@ public class			ConnectionBuilder {
 			connector.connectClient(
 					(OfferedI)remoteServerPort, (RequiredI)localClientPort) ;
 		} else { // localServerPort == null && localClientPort == null
+//			System.out.println("[DEBUG LEO] connectWith 12");
 			throw new Exception(
 					"ConnectionBuilder: can't connect two remote components!") ;
 		}

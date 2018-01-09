@@ -64,7 +64,7 @@ extends SynchronizerManager
 		// Création du composant sur le serveur de composant
 		DynamicComponentCreationOutboundPort portToDCCServer =
 			connectToDCCServer(getJVMURIToDeploy());
-		System.out.println("[DEBUG LEO] createComponent 2");
+//		System.out.println("[DEBUG LEO] createComponent 2");
 		portToDCCServer.createComponent(clas.getName(), constructorParams);
 		disconnectFromDCCServer(portToDCCServer);
 		
@@ -93,7 +93,7 @@ extends SynchronizerManager
 		this.addPort(portToDCCServer);
 		
 		portToDCCServer.doConnection(
-				server_uri +
+				server_uri + 
 				AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
 				DynamicComponentCreationConnector.class.getCanonicalName());
 		

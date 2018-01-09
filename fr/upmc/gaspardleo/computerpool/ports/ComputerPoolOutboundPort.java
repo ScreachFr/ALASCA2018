@@ -1,7 +1,6 @@
 package fr.upmc.gaspardleo.computerpool.ports;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
@@ -25,7 +24,7 @@ public class ComputerPoolOutboundPort
 	
 	@Override
 	public void addComputer(
-			Map<ComputerPortsTypes, String> computerUris,
+			HashMap<ComputerPortsTypes, String> computerUris,
 			Integer numberOfProcessors,
 			Integer numberOfCores) throws Exception {
 		

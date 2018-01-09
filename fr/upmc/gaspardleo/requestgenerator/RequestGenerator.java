@@ -6,6 +6,8 @@ import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.components.ports.PortI;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
+import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
+import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
@@ -23,42 +25,38 @@ public 	class RequestGenerator
 		REQUEST_NOTIFICATION_HANDLER_IN;
 	}
 
-	private String rgURI;
 	private RequestGeneratorInboundPort rgip;
 	
 	public RequestGenerator(
-			String rgURI,
-			String connection_In,
+			HashMap<RGPortTypes, String> rg_uris,
 			Double meanInterArrivalTime,
-			Long meanNumberOfInstructions,
-			String managementInboundPortURI,
-			String requestSubmissionOutboundPortURI,
-			String requestNotificationInboundPortURI) throws Exception {
+			Long meanNumberOfInstructions) throws Exception {
 		
-		super(rgURI,
-				meanInterArrivalTime,
-				meanNumberOfInstructions,
-				managementInboundPortURI,
-				requestSubmissionOutboundPortURI,
-				requestNotificationInboundPortURI);
+		super(
+			rg_uris.get(RGPortTypes.INTROSPECTION),
+			meanInterArrivalTime,
+			meanNumberOfInstructions,
+			rg_uris.get(RGPortTypes.MANAGEMENT_IN),
+			rg_uris.get(RGPortTypes.REQUEST_SUBMISSION_OUT),
+			rg_uris.get(RGPortTypes.REQUEST_NOTIFICATION_IN)
+		);
 		
-		this.rgURI = rgURI;
-
 		this.addOfferedInterface(RequestGeneratorConnectionI.class);
-		this.rgip = new RequestGeneratorInboundPort(connection_In, this);
+		this.rgip = new RequestGeneratorInboundPort(rg_uris.get(RGPortTypes.CONNECTION_IN), this);
 		this.addPort(this.rgip);
 		this.rgip.publishPort();
 		
 		// Rg debug
-		//this.toggleTracing();
+		this.toggleTracing();
 		this.toggleLogging();
+		
+		this.logMessage("RequestGenerator made");
 	}
 
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		
 		super.logMessage(rgURI  + " : gettting an answer for " + r.getRequestURI());
-		System.out.println(rgURI  + " : gettting an answer for " + r.getRequestURI());
 		super.acceptRequestTerminationNotification(r);
 	}
 	
@@ -81,9 +79,20 @@ public 	class RequestGenerator
 
 	@Override
 	public void doConnectionWithRD(String RD_Request_Submission_In) throws Exception {
+		
+		RequestSubmissionOutboundPort rsop = 
+				(RequestSubmissionOutboundPort) super.findPortFromURI(super.requestSubmissionOutboundPortURI);
+		
+		if (rsop == null){
+			super.addRequiredInterface(RequestSubmissionI.class) ;
+			rsop = new RequestSubmissionOutboundPort(requestSubmissionOutboundPortURI, this) ;
+			super.addPort(rsop) ;
+			rsop.publishPort() ;
+		}
+
 		try {
 				
-			super.rsop.doConnection(
+			rsop.doConnection(
 					RD_Request_Submission_In, 
 					RequestSubmissionConnector.class.getCanonicalName());	
 
@@ -95,8 +104,8 @@ public 	class RequestGenerator
 	
 	public static HashMap<RGPortTypes, String> newInstance(
 			String rgURI, 
-			double meanInterArrivalTime,
-			long meanNumberOfInstructions,
+			Double meanInterArrivalTime,
+			Long meanNumberOfInstructions,
 			ComponentCreator cc) throws Exception {
 		
 		String managementInboundPortURI = AbstractPort.generatePortURI();
@@ -104,14 +113,17 @@ public 	class RequestGenerator
 		String requestSubmissionOutboundPortURI = AbstractPort.generatePortURI();
 		String connection_In = AbstractPort.generatePortURI();
 		
+		HashMap<RGPortTypes, String> rg_uris = new HashMap<RGPortTypes, String>();		
+		rg_uris.put(RGPortTypes.INTROSPECTION, rgURI);
+		rg_uris.put(RGPortTypes.CONNECTION_IN, connection_In);
+		rg_uris.put(RGPortTypes.MANAGEMENT_IN, managementInboundPortURI) ;
+		rg_uris.put(RGPortTypes.REQUEST_SUBMISSION_OUT, requestSubmissionOutboundPortURI);
+		rg_uris.put(RGPortTypes.REQUEST_NOTIFICATION_IN, requestNotificationInboundPortURI);
+		
 		Object[] constructorParams = new Object[] {
-				rgURI,
-				connection_In,
+				rg_uris,
 				meanInterArrivalTime,
-				meanNumberOfInstructions,
-				managementInboundPortURI,
-				requestSubmissionOutboundPortURI,
-				requestNotificationInboundPortURI
+				meanNumberOfInstructions
 		};
 		
 		try {
@@ -119,15 +131,8 @@ public 	class RequestGenerator
 		} catch(Exception e) {
 			e.printStackTrace();
 			throw e;
-		}	
-		
-		HashMap<RGPortTypes, String> ret = new HashMap<RGPortTypes, String>();		
-		ret.put(RGPortTypes.INTROSPECTION, rgURI);
-		ret.put(RGPortTypes.CONNECTION_IN, connection_In);
-		ret.put(RGPortTypes.MANAGEMENT_IN, managementInboundPortURI) ;
-		ret.put(RGPortTypes.REQUEST_SUBMISSION_OUT, requestSubmissionOutboundPortURI);
-		ret.put(RGPortTypes.REQUEST_NOTIFICATION_IN, requestNotificationInboundPortURI);
+		}
 
-		return ret;
+		return rg_uris;
 	}
 }

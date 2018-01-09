@@ -111,9 +111,14 @@ implements	RequestNotificationHandlerI
 
 	/** the inbound port provided to manage the component.					*/
 	protected RequestGeneratorManagementInboundPort rgmip ;
-	/** the output port used to send requests to the service provider.		*/
-	protected RequestSubmissionOutboundPort		rsop ;
-	/** the inbound port receiving end of execution notifications.			*/
+	
+//	//DEBUG LEO 
+//	/** the output port used to send requests to the service provider.		*/
+//	protected RequestSubmissionOutboundPort		rsop ;
+	protected String requestSubmissionOutboundPortURI;
+//	//FIN DEBUG LEO 
+	
+	/** the inbound port receiving end of execution notifications.			*/	
 	protected RequestNotificationInboundPort	rnip ;
 	/** a future pointing to the next request generation task.				*/
 	protected Future<?>							nextRequestTaskFuture ;
@@ -139,6 +144,7 @@ implements	RequestNotificationHandlerI
 	 * @param requestNotificationInboundPortURI URI of the inbound port to receive notifications of the request execution progress.
 	 * @throws Exception
 	 */
+	
 	public				RequestGenerator(
 		String rgURI,
 		double meanInterArrivalTime,
@@ -149,6 +155,10 @@ implements	RequestNotificationHandlerI
 		) throws Exception
 	{
 		super(1, 1) ;
+		
+		//DEBUG LEO 
+		this.requestSubmissionOutboundPortURI = requestSubmissionOutboundPortURI;
+		//FIN DEBUG LEO 
 
 		// preconditions check
 		assert	meanInterArrivalTime > 0.0 && meanNumberOfInstructions > 0 ;
@@ -172,11 +182,13 @@ implements	RequestNotificationHandlerI
 		this.addPort(this.rgmip) ;
 		this.rgmip.publishPort() ;
 
-		this.addRequiredInterface(RequestSubmissionI.class) ;
-		this.rsop = new RequestSubmissionOutboundPort(requestSubmissionOutboundPortURI, this) ;
-		this.addPort(this.rsop) ;
-		this.rsop.publishPort() ;
-
+		//DEBUG LEO 
+//		this.addRequiredInterface(RequestSubmissionI.class) ;
+//		this.rsop = new RequestSubmissionOutboundPort(requestSubmissionOutboundPortURI, this) ;
+//		this.addPort(this.rsop) ;
+//		this.rsop.publishPort() ;
+		//FIN DEBUG LEO 
+		
 		this.addOfferedInterface(RequestNotificationI.class) ;
 		this.rnip =
 			new RequestNotificationInboundPort(requestNotificationInboundPortURI, this) ;
@@ -187,7 +199,10 @@ implements	RequestNotificationHandlerI
 		assert	this.rng != null && this.counter >= 0 ;
 		assert	this.meanInterArrivalTime > 0.0 ;
 		assert	this.meanNumberOfInstructions > 0 ;
-		assert	this.rsop != null && this.rsop instanceof RequestSubmissionI ;
+		
+		//DEBUG LEO 
+//		assert	this.rsop != null && this.rsop instanceof RequestSubmissionI ;
+		//FIN DEBUG LEO 
 	}
 
 	// -------------------------------------------------------------------------
@@ -207,9 +222,16 @@ implements	RequestNotificationHandlerI
 	 * 
 	 * @see fr.upmc.components.AbstractComponent#shutdown()
 	 */
+	
 	@Override
 	public void			shutdown() throws ComponentShutdownException
 	{
+		
+		//DEBUG LEO 
+		RequestSubmissionOutboundPort rsop = 
+				(RequestSubmissionOutboundPort) this.findPortFromURI(this.requestSubmissionOutboundPortURI);
+		//FIN DEBUG LEO 
+		
 		if (this.nextRequestTaskFuture != null &&
 							!(this.nextRequestTaskFuture.isCancelled() ||
 							  this.nextRequestTaskFuture.isDone())) {
@@ -217,8 +239,8 @@ implements	RequestNotificationHandlerI
 		}
 
 		try {
-			if (this.rsop.connected()) {
-				this.rsop.doDisconnection() ;
+			if (rsop.connected()) {
+				rsop.doDisconnection() ;
 			}
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
@@ -327,6 +349,11 @@ implements	RequestNotificationHandlerI
 	 */
 	public void			generateNextRequest() throws Exception
 	{
+		//DEBUG LEO 
+		RequestSubmissionOutboundPort rsop = 
+				(RequestSubmissionOutboundPort) this.findPortFromURI(this.requestSubmissionOutboundPortURI);
+		//FIN DEBUG LEO 
+
 		// generate a random number of instructions for the request.
 		long noi =
 			(long) this.rng.nextExponential(this.meanNumberOfInstructions) ;
@@ -346,7 +373,7 @@ implements	RequestNotificationHandlerI
 		}
 
 		// submit the current request.
-		this.rsop.submitRequestAndNotify(r) ;
+		rsop.submitRequestAndNotify(r) ;
 		// schedule the next request generation.
 		this.nextRequestTaskFuture =
 			this.scheduleTask(

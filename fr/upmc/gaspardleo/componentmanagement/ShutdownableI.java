@@ -1,5 +1,9 @@
 package fr.upmc.gaspardleo.componentmanagement;
 
-public interface ShutdownableI {
+import fr.upmc.components.interfaces.OfferedI;
+import fr.upmc.components.interfaces.RequiredI;
+
+public interface ShutdownableI 
+		extends	OfferedI, RequiredI{
 	public void shutdown() throws Exception;
 }

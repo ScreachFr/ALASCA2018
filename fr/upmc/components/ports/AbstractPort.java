@@ -1,5 +1,9 @@
 package fr.upmc.components.ports;
 
+import java.rmi.server.UnicastRemoteObject;
+
+import com.sun.org.apache.xml.internal.utils.SerializableLocatorImpl;
+
 // Copyright Jacques Malenfant, Univ. Pierre et Marie Curie.
 // 
 // Jacques.Malenfant@lip6.fr
@@ -63,8 +67,16 @@ import fr.upmc.components.interfaces.OfferedI;
  * @version	$Name$ -- $Revision$ -- $Date$
  */
 public abstract class	AbstractPort
+//DEBUG LEO 
+extends UnicastRemoteObject
+//FIN DEBUG LEO 
 implements	PortI
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	// ------------------------------------------------------------------------
 	// Port unique identifier management
 	// ------------------------------------------------------------------------

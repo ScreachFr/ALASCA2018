@@ -1,6 +1,7 @@
 package fr.upmc.gaspardleo.componentCreator;
 
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.AbstractCVM;
@@ -8,18 +9,27 @@ import fr.upmc.components.cvm.AbstractDistributedCVM;
 import fr.upmc.components.cvm.pre.dcc.connectors.DynamicComponentCreationConnector;
 import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
-import fr.upmc.components.exceptions.ComponentStartException;
+import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
+import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
+import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
+import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort;
 
 public class ComponentCreator 
 	extends AbstractComponent {
 	
 	AbstractCVM cvm;
-	
-	
-	public ComponentCreator(AbstractCVM cvm) throws ComponentStartException{
-		super(1,0);
+		
+	public ComponentCreator(AbstractCVM cvm) throws Exception{
+
+		super(1,1);
+		
 		this.cvm = cvm;
 		this.cvm.addDeployedComponent(this);
+		
+		this.toggleTracing();
+		
+		this.logMessage("ComponentCreator made");
+		
 	}
 		
 	public void createComponent(
@@ -43,14 +53,9 @@ public class ComponentCreator
 	public void componentCreation(Class<?> clas,
 			Object[] constructorParams
 			) throws Exception{
-		
-//		System.out.println("[DEBUG LEO] clas : " + clas);
-		
+				
 		Class<?>[] parameterTypes = new Class[constructorParams.length] ;
-		for(int i = 0 ; i < constructorParams.length ; i++) {
-			
-//			System.out.println("[DEBUG LEO] constructorParams : " + constructorParams[i].getClass()); 
-			
+		for(int i = 0 ; i < constructorParams.length ; i++) {			
 			parameterTypes[i] = constructorParams[i].getClass() ;
 		}
 		
@@ -58,19 +63,19 @@ public class ComponentCreator
 		cons = clas.getConstructor(parameterTypes);
 		
 		assert cons != null : "assertion : cons null";
-//		System.out.println("[DEBUG LEO] cons : " + cons);
 		
 		AbstractComponent component = 
 				(AbstractComponent) cons.newInstance(constructorParams);
 		
 		component.start();
-		
 		this.cvm.addDeployedComponent(component);
 	}
 	
 	public void distributedComponetCreation(Class<?> clas,
 			Object[] constructorParams
 			) throws Exception{
+		
+//		System.out.println("[DEBUG LEO] CC 1");
 		
 		if(!this.isRequiredInterface(DynamicComponentCreationI.class)){
 			this.addRequiredInterface(DynamicComponentCreationI.class);
@@ -88,6 +93,8 @@ public class ComponentCreator
 				DynamicComponentCreationConnector.class.getCanonicalName());
 		
 		dccop.createComponent(clas.getCanonicalName(), constructorParams);
+		
+//		System.out.println("[DEBUG LEO] CC 2");
 		
 		dccop.doDisconnection();
 		dccop.destroyPort();
