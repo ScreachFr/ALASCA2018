@@ -30,11 +30,13 @@ public class AdmissionControllerOutboundPort
 	@Override
 	public void addRequestDispatcher(
 			HashMap<RDPortTypes, String> RD_uris,
-			HashMap<RGPortTypes, String> RG_uris) throws Exception { 
+			HashMap<RGPortTypes, String> RG_uris,
+			String rg_monitor_in) throws Exception { 
 		
 		((AdmissionControllerI)this.connector).addRequestDispatcher(
 				RD_uris, 
-				RG_uris);	
+				RG_uris,
+				rg_monitor_in);	
 	}
 
 	@Override

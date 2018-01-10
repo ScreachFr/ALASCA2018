@@ -412,7 +412,8 @@ public class				Core
 		long delay =
 			this.computeCurrentProcessingTime(
 					task.getRequest().getPredictedNumberOfInstructions()) ;
-
+		
+		
 		if (Processor.DEBUG) {
 			this.owner.logMessage("core " + this.coreNo + " of " +
 							  this.owner.processorURI + " starts a task for " +

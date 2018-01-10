@@ -2,10 +2,11 @@ package fr.upmc.gaspardleo.requestdispatcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.exceptions.ComponentShutdownException;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
@@ -27,15 +28,14 @@ import fr.upmc.gaspardleo.admissioncontroller.connectors.AdmissionControllerConn
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+import fr.upmc.gaspardleo.applicationvm.connectors.ApplicationVMConnector;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
+import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
-import fr.upmc.gaspardleo.requestgenerator.connectors.RequestGeneraterConnector;
-import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
-import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
 import fr.upmc.gaspardleo.test.DistributedTest;
 
 public 	class 		RequestDispatcher 
@@ -70,7 +70,6 @@ public 	class 		RequestDispatcher
 	private String rnop_uri;
 	private HashMap<RGPortTypes, String> rg_uris;
 	
-	private RequestGeneratorOutboundPort					rgop;
 	private RequestNotificationInboundPort 					rnip;
 	private RequestDispatcherInboundPort					rdip;
 	private ShutdownableInboundPort							sip;
@@ -80,17 +79,23 @@ public 	class 		RequestDispatcher
 	//Misc
 	private Integer 										vmCursor;
 
+	//Monitoring
+	private String rmop_uri;
+	
 	public RequestDispatcher(
-			HashMap<RDPortTypes, String> component_uris, 
+		 	HashMap<RDPortTypes, String> component_uris, 
 			HashMap<RGPortTypes, String> rg_uris,
-			HashMap<ACPortTypes, String> ac_uris) throws Exception {
+			HashMap<ACPortTypes, String> ac_uris,
+			String RequestMonitor_In
+			) throws Exception {
 		
 		super(1, 1);
 			
 		this.Component_URI 		= component_uris.get(RDPortTypes.INTROSPECTION);
 		this.registeredVmsUri 	= new ArrayList<>();
 		this.registeredVmsRsop 	= new HashMap<>();
-		this.registeredVmsRnip	= new HashMap<>();
+		this.registeredVmsRnip = new HashMap<>();
+		
 		this.vmCursor 			= 0;
 
 		// Request submission inbound port connection.
@@ -146,9 +151,11 @@ public 	class 		RequestDispatcher
 		this.acop.doConnection(
 				ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
 				AdmissionControllerConnector.class.getCanonicalName());
+	
+		this.rmop_uri = RequestMonitor_In;
 		
 		 //Addition by AC the new RD for a specific RG
-		this.acop.addRequestDispatcher(component_uris, rg_uris);
+		this.acop.addRequestDispatcher(component_uris, rg_uris, this.rmop_uri);
 		
 		// Request Generator Management port
 		this.addRequiredInterface(RequestGeneratorManagementI.class);
@@ -160,7 +167,7 @@ public 	class 		RequestDispatcher
 		rgmop.doConnection(
 				rg_uris.get(RGPortTypes.MANAGEMENT_IN),
 				RequestGeneratorManagementConnector.class.getCanonicalName());
-		
+				
 		// Execution of the main senario
 		DistributedTest.testScenario(rgmop);;	
 				
@@ -170,11 +177,19 @@ public 	class 		RequestDispatcher
 		
 		this.logMessage("RequestDispatcher made");
 	}
+	
+	private synchronized String getNextVmUriFromCursor() {
+		return registeredVmsUri.get(vmCursor++%registeredVmsUri.size())
+				.get(ApplicationVMPortTypes.INTROSPECTION);
+	}
 
 	@Override
 	public String registerVM(
 			HashMap<ApplicationVMPortTypes, String> avmURIs, 
 			Class<?> vmInterface) throws Exception {
+		
+		this.logMessage("Register avm : " + avmURIs + "...");
+		
 		String avmUri = avmURIs.get(ApplicationVMPortTypes.INTROSPECTION);
 		
 		// Verifi si l'AVM est déjà registered.
@@ -193,12 +208,15 @@ public 	class 		RequestDispatcher
 		rsop.doConnection(avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
 				RequestSubmissionConnector.class.getCanonicalName());
 
-		
 		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
 		this.addPort(rnip);
 		rnip.publishPort();
 				
 		this.registeredVmsRnip.put(avmUri, rnip);
+		
+		doAVMRequestNotificationAndMonitoringConnection(avmURIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+				this.rnip.getPortURI(), this.rmop_uri);
+		
 		this.registeredVmsRsop.put(avmUri, rsop);
 		this.registeredVmsUri.add(avmURIs);
 		
@@ -206,7 +224,6 @@ public 	class 		RequestDispatcher
 		
 		return rnip.getPortURI();
 	}
-
 
 	@Override
 	public void unregisterVM(String vmUri) throws Exception {
@@ -221,23 +238,24 @@ public 	class 		RequestDispatcher
 		}
 		
 		registeredVmsUri.remove(URIs.get());
-		registeredVmsRnip.get(vmUri).doDisconnection();
 		registeredVmsRsop.get(vmUri).doDisconnection();
+	}
+	
+	@Override
+	public void unregisterVM() throws Exception {
+		unregisterVM(getNextVmUriFromCursor());
 	}
 
 	@Override
 	public void acceptRequestSubmission(RequestI r) throws Exception {
-		
-		System.out.println("XXXXXXXXXXXXXXXXx Request accept !");
+
 		this.logMessage(this.Component_URI + " : incoming request submission");
 		
 		if (this.registeredVmsUri.size() == 0) {
 			this.logMessage(this.Component_URI + " : no registered vm.");
 			
 		} else {
-			
-			String avmURI = registeredVmsUri
-					.get(vmCursor%registeredVmsUri.size()).get(ApplicationVMPortTypes.INTROSPECTION);
+			String avmURI = getNextVmUriFromCursor();
 			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(
 					avmURI); 
 
@@ -247,7 +265,6 @@ public 	class 		RequestDispatcher
 
 			rsop.submitRequest(r);
 
-			vmCursor++;
 		}
 	}
 
@@ -255,7 +272,9 @@ public 	class 		RequestDispatcher
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
 		
 		this.logMessage(this.Component_URI + " : incoming request submission and notification.");
-
+		
+		System.out.println("There's " + registeredVmsUri.size() + " registered AVMs.");
+		
 		if (this.registeredVmsUri.size() == 0) {
 			
 			this.logMessage(this.Component_URI + " : no registered vm.");
@@ -264,8 +283,7 @@ public 	class 		RequestDispatcher
 			
 			vmCursor = (vmCursor+1) % this.registeredVmsUri.size();
 			
-			String avmURI = registeredVmsUri
-					.get(vmCursor).get(ApplicationVMPortTypes.INTROSPECTION);
+			String avmURI = getNextVmUriFromCursor();
 			
 			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(avmURI);
 			
@@ -278,29 +296,37 @@ public 	class 		RequestDispatcher
 			rsop.submitRequestAndNotify(r);
 		}
 	}
-
+	
+	
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		
-		//DEBUG LEO 
-		RequestNotificationOutboundPort rnop = 
-				(RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
+		System.out.println("acceptRequestTerminationNotification function");
 		
-		if (rnop == null){
-			this.addRequiredInterface(RequestSubmissionI.class) ;
-			rnop = new RequestNotificationOutboundPort(this.rnop_uri, this) ;
-			this.addPort(rnop) ;
-			rnop.publishPort() ;
+		try {
+			RequestNotificationOutboundPort rnop = 
+					(RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
 			
-			rnop.doConnection(
-					rg_uris.get(RGPortTypes.REQUEST_NOTIFICATION_IN), 
-					RequestNotificationConnector.class.getCanonicalName());
+			if (rnop == null){
+				this.addRequiredInterface(RequestSubmissionI.class) ;
+				rnop = new RequestNotificationOutboundPort(this.rnop_uri, this) ;
+				this.addPort(rnop) ;
+				rnop.publishPort() ;
+				
+				rnop.doConnection(
+						rg_uris.get(RGPortTypes.REQUEST_NOTIFICATION_IN), 
+						RequestNotificationConnector.class.getCanonicalName());
+			}
+			
+			
+			this.logMessage(this.Component_URI + " : incoming request termination notification.");
+			rnop.notifyRequestTermination(r);
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
 		}
-		
-		//FIN DEBUG LEO 
-		
-		this.logMessage(this.Component_URI + " : incoming request termination notification.");
-		rnop.notifyRequestTermination(r);
 	}
 	
 	@Override
@@ -312,7 +338,8 @@ public 	class 		RequestDispatcher
 		//FIN DEBUG LEO 
 		
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
-		// TODO Pas utilisé.
+
+		// XXX Pas utilisé.
 		rnop.notifyRequestTermination(r);
 	}
 	
@@ -322,7 +349,6 @@ public 	class 		RequestDispatcher
 			String avmUri = e.get(ApplicationVMPortTypes.INTROSPECTION);
 			
 			try {
-				registeredVmsRnip.get(avmUri).doDisconnection();
 				registeredVmsRsop.get(avmUri).doDisconnection();
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -336,34 +362,72 @@ public 	class 		RequestDispatcher
 		super.shutdown();
 	}	
 	
+	private void doAVMRequestNotificationAndMonitoringConnection(String AVMConnectionPort_URI,
+			String notificationPort_URI, String requestMonitor_in) throws Exception {
+		
+		try {
+			this.logMessage("Admission controller : connection on notification port.");
+			
+			ApplicationVMConnectionOutboundPort avmcop 
+					= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
+	
+			this.addPort(avmcop);
+			avmcop.publishPort();
+			
+	// 		avmcop.doConnection(AVMConnectionPort_URI, 
+	//				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
+			
+			avmcop.doConnection(AVMConnectionPort_URI, 
+					ApplicationVMConnector.class.getCanonicalName());
+			
+			avmcop.doRequestNotificationConnection(notificationPort_URI);
+			avmcop.doRequestMonitorConnection(requestMonitor_in);
+			
+			this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+	}
+	
+
+	@Override
+	public List<String> getRegisteredAVMUris() {
+		return registeredVmsUri.stream()
+							   .map((e) -> e.get(ApplicationVMPortTypes.INTROSPECTION))
+							   .collect(Collectors.toList());
+	}
+	
 	public static HashMap<RDPortTypes, String> newInstance( 
 			String Component_URI, 
 			HashMap<RGPortTypes, String> rg_uris,
 			HashMap<ACPortTypes, String> ac_uris,
+			String requestMonitor_in,
 			ComponentCreator cc) throws Exception {
-				
-		String RequestSubmission_In = AbstractPort.generatePortURI();
-		String RequestSubmission_Out = AbstractPort.generatePortURI();
-		String RequestNotification_In = AbstractPort.generatePortURI();
-		String RequestNotification_Out = AbstractPort.generatePortURI();
-		String RequestDispatcher_In = AbstractPort.generatePortURI();
-		String Shutdownable_In = AbstractPort.generatePortURI();
-		String RequestGeneratorManager_Out = AbstractPort.generatePortURI();
 		
 		HashMap<RDPortTypes, String> component_uris = new HashMap<RDPortTypes, String>() ;		
 		component_uris.put(RDPortTypes.INTROSPECTION, Component_URI);
-		component_uris.put(RDPortTypes.REQUEST_SUBMISSION_IN, RequestSubmission_In);
-		component_uris.put(RDPortTypes.REQUEST_SUBMISSION_OUT, RequestSubmission_Out);
-		component_uris.put(RDPortTypes.REQUEST_NOTIFICATION_IN, RequestNotification_In);
-		component_uris.put(RDPortTypes.REQUEST_NOTIFICATION_OUT, RequestNotification_Out);
-		component_uris.put(RDPortTypes.REQUEST_DISPATCHER_IN, RequestDispatcher_In);
-		component_uris.put(RDPortTypes.SHUTDOWNABLE_IN, Shutdownable_In);
-		component_uris.put(RDPortTypes.REQUEST_GENERATOR_MANAGER_OUT, RequestGeneratorManager_Out);
+		component_uris.put(RDPortTypes.REQUEST_SUBMISSION_IN, AbstractPort.generatePortURI());
+		component_uris.put(RDPortTypes.REQUEST_SUBMISSION_OUT, AbstractPort.generatePortURI());
+		component_uris.put(RDPortTypes.REQUEST_NOTIFICATION_IN, AbstractPort.generatePortURI());
+		component_uris.put(RDPortTypes.REQUEST_NOTIFICATION_OUT, AbstractPort.generatePortURI());
+		component_uris.put(RDPortTypes.REQUEST_DISPATCHER_IN, AbstractPort.generatePortURI());
+		component_uris.put(RDPortTypes.SHUTDOWNABLE_IN, AbstractPort.generatePortURI());
+		component_uris.put(RDPortTypes.REQUEST_GENERATOR_MANAGER_OUT, AbstractPort.generatePortURI());
+
+		/* Constructeur :
+		 
+		 	HashMap<RDPortTypes, String> component_uris, 
+			HashMap<RGPortTypes, String> rg_uris,
+			HashMap<ACPortTypes, String> ac_uris,
+			String RequestMonitor_In
+		 */
 		
 		Object[] constructorParams = new Object[]{ 
 				component_uris,
 				rg_uris,
-				ac_uris
+				ac_uris,
+				requestMonitor_in
 		};
 				
 		try {

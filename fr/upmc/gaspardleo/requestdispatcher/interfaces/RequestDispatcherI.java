@@ -1,6 +1,7 @@
 package fr.upmc.gaspardleo.requestdispatcher.interfaces;
 
 import java.util.HashMap;
+import java.util.List;
 
 import fr.upmc.components.interfaces.OfferedI;
 import fr.upmc.components.interfaces.RequiredI;
@@ -19,7 +20,12 @@ public interface RequestDispatcherI
 	 * 		Uri du port de notification de terminaison des requètes.
 	 * @throws Exception
 	 */
-	public String registerVM(HashMap<ApplicationVMPortTypes, String> avmURIs, Class<?> vmInterface) throws Exception;
+	public String registerVM(
+			HashMap<ApplicationVMPortTypes, String> avmURIs, 
+			Class<?> vmInterface) throws Exception;
 	
 	public void unregisterVM(String vmUri) throws Exception;
+	public void unregisterVM() throws Exception;
+	
+	public List<String> getRegisteredAVMUris() throws Exception;
 }

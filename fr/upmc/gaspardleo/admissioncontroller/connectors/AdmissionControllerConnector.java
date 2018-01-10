@@ -25,8 +25,11 @@ public class AdmissionControllerConnector
 	}
 
 	@Override
-	public void addRequestDispatcher(HashMap<RDPortTypes, String> RD_uris, HashMap<RGPortTypes, String> RG_uris)
+	public void addRequestDispatcher(
+			HashMap<RDPortTypes, String> RD_uris, 
+			HashMap<RGPortTypes, String> RG_uris,
+			String rg_monitor_in)
 			throws Exception {
-		((AdmissionControllerI)this.offering).addRequestDispatcher(RD_uris, RG_uris);
+		((AdmissionControllerI)this.offering).addRequestDispatcher(RD_uris, RG_uris, rg_monitor_in);
 	}
 }

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import fr.upmc.components.interfaces.OfferedI;
 import fr.upmc.components.interfaces.RequiredI;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 
 public interface ComputerPoolI extends OfferedI, RequiredI {
@@ -19,9 +18,9 @@ public interface ComputerPoolI extends OfferedI, RequiredI {
 	 * @return
 	 * 		La nouvelle ApplicationVM.
 	 */
-	public HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(String avmURI, 
-			Integer numberOfCoreToAllocate,
-			ComponentCreator cc) throws Exception;
+	public HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(
+			String avmURI, 
+			Integer numberOfCoreToAllocate) throws Exception;
 	
 	/**
 	 * Ajoute un ordinateur au pool actuel du composant.
@@ -32,5 +31,37 @@ public interface ComputerPoolI extends OfferedI, RequiredI {
 	public void addComputer(
 			HashMap<ComputerPortsTypes, String> computerUris,
 			Integer numberOfProcessors,
-			Integer numberOfCores) throws Exception;
+			Integer numberOfCores) throws Exception;	
+	
+	public void releaseCores(String avmUri) throws Exception;
+	
+	/**
+	 * La pool a-t-il des core disponnible ?
+	 * @return
+	 * 		true : core disponnible, false : aucun core n'est disponible.
+	 * @throws Exception
+	 */
+	public Boolean hasAvailableCore() throws Exception;
+	
+	/**
+	 * Incremente la fréquence des cores alloués à une AVM d'un pallier.
+	 * @param avmUri
+	 * 		AVM concernée.
+	 * @return
+	 * 		true : Une augmentation de la fréquence a été effectué sur au moins un core. 
+	 * 		false : Tout les cores sont à la fréquence maximale.
+	 * @throws Exception
+	 */
+	public Boolean increaseCoreFrequency(String avmUri) throws Exception;
+	
+	/**
+	 * Decremente la fréquence des cores alloués à une AVM d'un pallier
+	 * @param avmUri
+	 * 		AVM concernée.
+	 * @return
+	 * 		true : Une diminution de la fréquence a été effectué sur au moins un core. 
+	 * 		false : Tout les cores sont à la fréquence minimale.
+	 * @throws Exception
+	 */
+	public Boolean decreaseCoreFrequency(String avmUri) throws Exception;
 }

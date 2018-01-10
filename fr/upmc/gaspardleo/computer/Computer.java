@@ -28,10 +28,8 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 			HashMap<ComputerPortsTypes, String> computer_uris,
 			HashMap<ComputerPoolPorts, String> cp_uris,
 			HashSet<Integer> admissibleFrequencies, 
-			HashMap<Integer, Integer> processingPower,
-			String computerServicesInboundPortURI,
-			String computerStaticStateDataInboundPortURI,
-			String computerDynamicStateDataInboundPortURI) throws Exception {
+			HashMap<Integer, Integer> processingPower
+			) throws Exception {
 		
 		super(
 			computer_uris.get(ComputerPortsTypes.INTROSPECTION),
@@ -41,9 +39,9 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 			CPU_MAX_FREQUENCY_GAP,
 			NB_CPU,
 			NB_CORES,
-			computerServicesInboundPortURI,
-			computerStaticStateDataInboundPortURI,
-			computerDynamicStateDataInboundPortURI);	
+			computer_uris.get(ComputerPortsTypes.SERVICE_IN),
+			computer_uris.get(ComputerPortsTypes.STATIC_STATE_IN),
+			computer_uris.get(ComputerPortsTypes.DYNAMIC_STATE_IN));	
 		
 		this.addRequiredInterface(ComputerPoolI.class);
 		ComputerPoolOutboundPort cpop = new ComputerPoolOutboundPort(this);
@@ -70,16 +68,12 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 			String computerURI,
 			HashMap<ComputerPoolPorts, String> cp_uris,
 			ComponentCreator cc) throws Exception {
-
-		String computerServicesInboundPortURI = AbstractPort.generatePortURI();
-		String computerStaticStateDataInboundPortURI = AbstractPort.generatePortURI();
-		String computerDynamicStateDataInboundPortURI = AbstractPort.generatePortURI();
 		
 		HashMap<ComputerPortsTypes, String> computer_uris = new HashMap<>();
 		computer_uris.put(ComputerPortsTypes.INTROSPECTION, computerURI);
-		computer_uris.put(ComputerPortsTypes.SERVICE_IN, computerServicesInboundPortURI);
-		computer_uris.put(ComputerPortsTypes.STATIC_STATE_IN, computerStaticStateDataInboundPortURI);
-		computer_uris.put(ComputerPortsTypes.DYNAMIC_STATE_IN, computerDynamicStateDataInboundPortURI);
+		computer_uris.put(ComputerPortsTypes.SERVICE_IN, AbstractPort.generatePortURI());
+		computer_uris.put(ComputerPortsTypes.STATIC_STATE_IN, AbstractPort.generatePortURI());
+		computer_uris.put(ComputerPortsTypes.DYNAMIC_STATE_IN, AbstractPort.generatePortURI());
 
 		HashSet<Integer> admissibleFrequencies = new HashSet<Integer>() ;
 		admissibleFrequencies.add(1500);
@@ -89,14 +83,18 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 		processingPower.put(1500, 1500000);
 		processingPower.put(3000, 3000000);
 
+		/* Constructeur :
+		 
+			HashMap<ComputerPortsTypes, String> computer_uris,
+			HashMap<ComputerPoolPorts, String> cp_uris,
+			HashSet<Integer> admissibleFrequencies, 
+			HashMap<Integer, Integer> processingPower
+		 */
 		Object[] constructorParams = new Object[] {
 				computer_uris,
 				cp_uris,
 				admissibleFrequencies,
-				processingPower,
-				computerServicesInboundPortURI, 
-				computerStaticStateDataInboundPortURI,
-				computerDynamicStateDataInboundPortURI,
+				processingPower
 		};
 		
 		try {

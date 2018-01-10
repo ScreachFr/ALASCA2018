@@ -1,6 +1,7 @@
 package fr.upmc.gaspardleo.requestdispatcher.connectors;
 
 import java.util.HashMap;
+import java.util.List;
 
 import fr.upmc.components.connectors.AbstractConnector;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
@@ -18,5 +19,15 @@ public class RequestDispatherConnector
 	@Override
 	public String registerVM(HashMap<ApplicationVMPortTypes, String> avmURIs, Class<?> vmInterface) throws Exception {
 		return ((RequestDispatcherI)this.offering).registerVM(avmURIs, vmInterface);
+	}
+	
+	@Override
+	public void unregisterVM() throws Exception {
+		((RequestDispatcherI)this.offering).unregisterVM();
+	}
+
+	@Override
+	public List<String> getRegisteredAVMUris() throws Exception {
+		return ((RequestDispatcherI)this.offering).getRegisteredAVMUris();
 	}
 }

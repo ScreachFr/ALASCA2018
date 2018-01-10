@@ -30,7 +30,8 @@ public 	class RequestGenerator
 	public RequestGenerator(
 			HashMap<RGPortTypes, String> rg_uris,
 			Double meanInterArrivalTime,
-			Long meanNumberOfInstructions) throws Exception {
+			Long meanNumberOfInstructions
+			) throws Exception {
 		
 		super(
 			rg_uris.get(RGPortTypes.INTROSPECTION),
@@ -108,18 +109,19 @@ public 	class RequestGenerator
 			Long meanNumberOfInstructions,
 			ComponentCreator cc) throws Exception {
 		
-		String managementInboundPortURI = AbstractPort.generatePortURI();
-		String requestNotificationInboundPortURI = AbstractPort.generatePortURI();
-		String requestSubmissionOutboundPortURI = AbstractPort.generatePortURI();
-		String connection_In = AbstractPort.generatePortURI();
-		
 		HashMap<RGPortTypes, String> rg_uris = new HashMap<RGPortTypes, String>();		
 		rg_uris.put(RGPortTypes.INTROSPECTION, rgURI);
-		rg_uris.put(RGPortTypes.CONNECTION_IN, connection_In);
-		rg_uris.put(RGPortTypes.MANAGEMENT_IN, managementInboundPortURI) ;
-		rg_uris.put(RGPortTypes.REQUEST_SUBMISSION_OUT, requestSubmissionOutboundPortURI);
-		rg_uris.put(RGPortTypes.REQUEST_NOTIFICATION_IN, requestNotificationInboundPortURI);
+		rg_uris.put(RGPortTypes.CONNECTION_IN, AbstractPort.generatePortURI());
+		rg_uris.put(RGPortTypes.MANAGEMENT_IN, AbstractPort.generatePortURI()) ;
+		rg_uris.put(RGPortTypes.REQUEST_SUBMISSION_OUT, AbstractPort.generatePortURI());
+		rg_uris.put(RGPortTypes.REQUEST_NOTIFICATION_IN, AbstractPort.generatePortURI());
 		
+		/* Constructeur :
+		 
+		  	HashMap<RGPortTypes, String> rg_uris,
+			Double meanInterArrivalTime,
+			Long meanNumberOfInstructions
+		 */
 		Object[] constructorParams = new Object[] {
 				rg_uris,
 				meanInterArrivalTime,

@@ -23,7 +23,8 @@ implements AdmissionControllerI {
 	@Override
 	public void addRequestDispatcher(
 			HashMap<RDPortTypes, String> RD_uris,
-			HashMap<RGPortTypes, String> RG_uris) throws Exception {
+			HashMap<RGPortTypes, String> RG_uris,
+			String rg_monitor_in) throws Exception {
 		
 		AdmissionController ac = (AdmissionController) this.owner;
 
@@ -33,7 +34,8 @@ implements AdmissionControllerI {
 					public AdmissionController call() throws Exception {
 						ac.addRequestDispatcher(
 								RD_uris, 
-								RG_uris);
+								RG_uris,
+								rg_monitor_in);
 						return ac;
 					}
 				});

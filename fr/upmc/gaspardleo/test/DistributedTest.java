@@ -2,7 +2,6 @@ package fr.upmc.gaspardleo.test;
 
 import java.util.HashMap;
 
-import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.cvm.AbstractDistributedCVM;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
@@ -64,7 +63,9 @@ public class DistributedTest
 					HashMap<RGPortTypes, String> rg_uris  = 
 							RequestGenerator.newInstance("rg-"+i, new Double(500.0), new Long(6000000000L), cc);
 										
-					RequestDispatcher.newInstance("rd-"+i, rg_uris, ac_uris, cc);
+					String requestMonitor_in = AbstractPort.generatePortURI();
+
+					RequestDispatcher.newInstance("rd-"+i, rg_uris, ac_uris, requestMonitor_in, cc);
 				}
 				
 				System.out.println("### DataCenterClient started !");

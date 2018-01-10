@@ -3,7 +3,6 @@ package fr.upmc.gaspardleo.test;
 import java.util.HashMap;
 
 import fr.upmc.components.ports.AbstractPort;
-import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
@@ -37,44 +36,29 @@ public class Test {
 			
 			Computer.newInstance("computer-0", cp_uris,	cc);
 			
+			Computer.newInstance("computer-1", cp_uris,	cc);
+			
+			Computer.newInstance("computer-2", cp_uris, cc);
+
+			System.out.println("computer creation launched.");
+
 			HashMap<ACPortTypes, String> ac_uris = new HashMap<ACPortTypes, String>();		
 			ac_uris.put(ACPortTypes.ADMISSION_CONTROLLER_IN, AbstractPort.generatePortURI());
 			
 			AdmissionController.newInstance(cp_uris, ac_uris, cc);
 			
-			System.out.println("computer creation launched.");
-
 			for (int i = 0; i < NB_DATASOURCE; i++) {
 				
 				HashMap<RGPortTypes, String> rg_uris  = 
 						RequestGenerator.newInstance("rg-"+i, 500.0, 6000000000L, cc);
+				String requestMonitor_in = AbstractPort.generatePortURI();
 				
-				RequestDispatcher.newInstance("rd-"+i, rg_uris, ac_uris, cc);				
+				RequestDispatcher.newInstance("rd-"+i, rg_uris, ac_uris, requestMonitor_in, cc); 
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	//TODO proposer un scénario qui permet de mettre en évidence le refus de requêtes
-	
-	public static void testScenario(RequestGeneratorManagementOutboundPort rgmop) throws Exception {
-
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(1000L);
-					rgmop.startGeneration();
-					Thread.sleep(20000L);
-					rgmop.stopGeneration();
-				} catch (Exception e) {
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-			}
-		}).start();
 	}
 	
 	public CVM getCvm() {

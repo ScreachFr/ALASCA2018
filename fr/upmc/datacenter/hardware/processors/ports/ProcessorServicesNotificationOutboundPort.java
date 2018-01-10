@@ -96,7 +96,7 @@ implements	ProcessorServicesNotificationI
 				"ProcessorServicesNotificationOutboundPort>>notifyEndOfTask(" +
 				t.getTaskURI() + ")") ;
 		}
-
+		
 		((ProcessorServicesNotificationI)this.connector).notifyEndOfTask(t) ;
 	}
 }

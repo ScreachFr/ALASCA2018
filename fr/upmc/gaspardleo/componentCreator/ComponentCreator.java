@@ -1,7 +1,6 @@
 package fr.upmc.gaspardleo.componentCreator;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.AbstractCVM;
@@ -9,10 +8,6 @@ import fr.upmc.components.cvm.AbstractDistributedCVM;
 import fr.upmc.components.cvm.pre.dcc.connectors.DynamicComponentCreationConnector;
 import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
-import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
-import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
-import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
-import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort;
 
 public class ComponentCreator 
 	extends AbstractComponent {

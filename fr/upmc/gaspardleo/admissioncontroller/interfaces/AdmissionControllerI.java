@@ -14,7 +14,8 @@ public interface AdmissionControllerI
 
 	public void addRequestDispatcher(
 		HashMap<RDPortTypes, String> RD_uris,
-		HashMap<RGPortTypes, String> RG_uris) throws Exception;
+		HashMap<RGPortTypes, String> RG_uris,
+		String rg_monitor_in) throws Exception;
 		
 	/**
 	 * Supprime le RequestDispatcher associé à l'URI du port donné en paramètre.

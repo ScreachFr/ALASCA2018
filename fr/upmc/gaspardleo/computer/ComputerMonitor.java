@@ -13,7 +13,8 @@ public class ComputerMonitor
 	
 	public ComputerMonitor(
 		String computerURI, 
-		boolean active) throws Exception {
+		boolean active
+		) throws Exception {
 		
 		super(
 			computerURI, 
