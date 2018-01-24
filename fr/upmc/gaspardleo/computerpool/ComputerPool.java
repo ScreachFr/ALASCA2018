@@ -1,6 +1,7 @@
 package fr.upmc.gaspardleo.computerpool;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,6 @@ import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.connectors.DataConnector;
-import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.ComputerStaticState;
 import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
@@ -224,8 +224,12 @@ public class ComputerPool
 
 		Set<Integer> admissibleFreqs = pss.getAdmissibleFrequencies();
 
+		int maxFrequency = Arrays.stream(pds.getCurrentCoreFrequencies()).max().getAsInt();
+		int minFrequency = Arrays.stream(pds.getCurrentCoreFrequencies()).min().getAsInt();
+		int maxGap = pss.getMaxFrequencyGap();
+		
 		return admissibleFreqs.stream()
-				.filter(e -> e > currentFreq)
+				.filter(e -> (e > currentFreq) && isFrequencyGapAdmissible(minFrequency, maxFrequency, e, maxGap))
 				.min((x, y) -> Integer.compare(x, y));
 	}
 
@@ -234,9 +238,17 @@ public class ComputerPool
 
 		Set<Integer> admissibleFreqs = pss.getAdmissibleFrequencies();
 		
+		int maxFrequency = Arrays.stream(pds.getCurrentCoreFrequencies()).max().getAsInt();
+		int minFrequency = Arrays.stream(pds.getCurrentCoreFrequencies()).min().getAsInt();
+		int maxGap = pss.getMaxFrequencyGap();
+		
 		return admissibleFreqs.stream()
-				.filter(e -> e < currentFreq)
+				.filter(e -> e < currentFreq && isFrequencyGapAdmissible(minFrequency, maxFrequency, e, maxGap))
 				.max((x, y) -> Integer.compare(x, y));
+	}
+	
+	private boolean isFrequencyGapAdmissible(int min, int max, int candidate, int maxGap) {
+		return Math.max(Math.abs(candidate - min), Math.abs(max - candidate)) <= maxGap;
 	}
 
 	@Override
