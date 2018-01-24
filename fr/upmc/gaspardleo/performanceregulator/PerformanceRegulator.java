@@ -285,46 +285,46 @@ public class PerformanceRegulator
 
 	}
 
-	public static HashMap<PerformanceRegulatorPorts, String> newInstance(
-			ComponentCreator cc,
-			String componentURI,
-			HashMap<RDPortTypes, String> requestDispatcher,
-			HashMap<RequestMonitorPorts, String> requestMonitor,
-			HashMap<ComputerPoolPorts, String> computerPool,
-			RegulationStrategies strategy, 
-			TargetValue targetValue) throws Exception {
-		
-		HashMap<PerformanceRegulatorPorts, String> component_uris = new HashMap<>();
-		component_uris.put(PerformanceRegulatorPorts.INTROSPECTION, componentURI);
-		component_uris.put(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN, AbstractPort.generatePortURI());
-
-		/* Constructeur :
-		 
-		    HashMap<PerformanceRegulatorPorts, String> component_uris,
-			HashMap<RDPortTypes, String> requestDispatcher,
-			HashMap<RequestMonitorPorts, String> requestMonitor,
-			HashMap<ComputerPoolPorts, String> computerPool,
-			RegulationStrategies strategy,
-			TargetValue targetValue
-		 */
-
-		Object[] args = new Object[] {
-				component_uris,
-				requestDispatcher, 
-				requestMonitor,
-				computerPool,
-				strategy,
-				targetValue
-		};
-
-		try {
-			cc.createComponent(PerformanceRegulator.class, args);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
-
-		return component_uris;
-	}
+//	public static HashMap<PerformanceRegulatorPorts, String> newInstance(
+//			ComponentCreator cc,
+//			String componentURI,
+//			HashMap<RDPortTypes, String> requestDispatcher,
+//			HashMap<RequestMonitorPorts, String> requestMonitor,
+//			HashMap<ComputerPoolPorts, String> computerPool,
+//			RegulationStrategies strategy, 
+//			TargetValue targetValue) throws Exception {
+//		
+//		HashMap<PerformanceRegulatorPorts, String> component_uris = new HashMap<>();
+//		component_uris.put(PerformanceRegulatorPorts.INTROSPECTION, componentURI);
+//		component_uris.put(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN, AbstractPort.generatePortURI());
+//
+//		/* Constructeur :
+//		 
+//		    HashMap<PerformanceRegulatorPorts, String> component_uris,
+//			HashMap<RDPortTypes, String> requestDispatcher,
+//			HashMap<RequestMonitorPorts, String> requestMonitor,
+//			HashMap<ComputerPoolPorts, String> computerPool,
+//			RegulationStrategies strategy,
+//			TargetValue targetValue
+//		 */
+//
+//		Object[] args = new Object[] {
+//				component_uris,
+//				requestDispatcher, 
+//				requestMonitor,
+//				computerPool,
+//				strategy,
+//				targetValue
+//		};
+//
+//		try {
+//			cc.createComponent(PerformanceRegulator.class, args);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			throw e;
+//		}
+//
+//		return component_uris;
+//	}
 
 }

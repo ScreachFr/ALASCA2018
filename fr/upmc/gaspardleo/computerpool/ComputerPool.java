@@ -287,32 +287,32 @@ public class ComputerPool
 		}
 	}
 	
-	public static HashMap<ComputerPoolPorts, String> newInstance(
-			ComponentCreator cc) throws Exception {
-			
-		HashMap<ComputerPoolPorts, String> component_uris = new HashMap<>();
-		component_uris.put(ComputerPoolPorts.COMPUTER_POOL, AbstractPort.generatePortURI());
-		component_uris.put(ComputerPoolPorts.INTROSPECTION, AbstractPort.generatePortURI());
-		
-		/* Constructeur :
-		 
-			HashMap<ComputerPoolPorts, String> component_uris,
-			ComponentCreator cc
-		 */
-		
-		Object[] constructorParams = new Object[]{
-				component_uris,
-				cc
-		};
-		
-		try{
-			cc.createComponent(ComputerPool.class, constructorParams);
-		}catch (Exception e){
-			e.printStackTrace();
-			throw e;
-		}
-		
-		
-		return component_uris;
-	}
+//	public static HashMap<ComputerPoolPorts, String> newInstance(
+//			ComponentCreator cc) throws Exception {
+//			
+//		HashMap<ComputerPoolPorts, String> component_uris = new HashMap<>();
+//		component_uris.put(ComputerPoolPorts.COMPUTER_POOL, AbstractPort.generatePortURI());
+//		component_uris.put(ComputerPoolPorts.INTROSPECTION, AbstractPort.generatePortURI());
+//		
+//		/* Constructeur :
+//		 
+//			HashMap<ComputerPoolPorts, String> component_uris,
+//			ComponentCreator cc
+//		 */
+//		
+//		Object[] constructorParams = new Object[]{
+//				component_uris,
+//				cc
+//		};
+//		
+//		try{
+//			cc.createComponent(ComputerPool.class, constructorParams);
+//		}catch (Exception e){
+//			e.printStackTrace();
+//			throw e;
+//		}
+//		
+//		
+//		return component_uris;
+//	}
 }

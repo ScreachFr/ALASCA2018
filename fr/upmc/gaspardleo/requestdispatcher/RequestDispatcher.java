@@ -398,45 +398,45 @@ public 	class 		RequestDispatcher
 							   .collect(Collectors.toList());
 	}
 	
-	public static HashMap<RDPortTypes, String> newInstance( 
-			String Component_URI, 
-			HashMap<RGPortTypes, String> rg_uris,
-			HashMap<ACPortTypes, String> ac_uris,
-			String requestMonitor_in,
-			ComponentCreator cc) throws Exception {
-		
-		HashMap<RDPortTypes, String> component_uris = new HashMap<RDPortTypes, String>() ;		
-		component_uris.put(RDPortTypes.INTROSPECTION, Component_URI);
-		component_uris.put(RDPortTypes.REQUEST_SUBMISSION_IN, AbstractPort.generatePortURI());
-		component_uris.put(RDPortTypes.REQUEST_SUBMISSION_OUT, AbstractPort.generatePortURI());
-		component_uris.put(RDPortTypes.REQUEST_NOTIFICATION_IN, AbstractPort.generatePortURI());
-		component_uris.put(RDPortTypes.REQUEST_NOTIFICATION_OUT, AbstractPort.generatePortURI());
-		component_uris.put(RDPortTypes.REQUEST_DISPATCHER_IN, AbstractPort.generatePortURI());
-		component_uris.put(RDPortTypes.SHUTDOWNABLE_IN, AbstractPort.generatePortURI());
-		component_uris.put(RDPortTypes.REQUEST_GENERATOR_MANAGER_OUT, AbstractPort.generatePortURI());
-
-		/* Constructeur :
-		 
-		 	HashMap<RDPortTypes, String> component_uris, 
-			HashMap<RGPortTypes, String> rg_uris,
-			HashMap<ACPortTypes, String> ac_uris,
-			String RequestMonitor_In
-		 */
-		
-		Object[] constructorParams = new Object[]{ 
-				component_uris,
-				rg_uris,
-				ac_uris,
-				requestMonitor_in
-		};
-				
-		try {
-			cc.createComponent(RequestDispatcher.class, constructorParams);
-		} catch (Exception e) {
-		    e.printStackTrace();
-		    throw e;
-		}
-				
-		return component_uris;
-	}
+//	public static HashMap<RDPortTypes, String> newInstance( 
+//			String Component_URI, 
+//			HashMap<RGPortTypes, String> rg_uris,
+//			HashMap<ACPortTypes, String> ac_uris,
+//			String requestMonitor_in,
+//			ComponentCreator cc) throws Exception {
+//		
+//		HashMap<RDPortTypes, String> component_uris = new HashMap<RDPortTypes, String>() ;		
+//		component_uris.put(RDPortTypes.INTROSPECTION, Component_URI);
+//		component_uris.put(RDPortTypes.REQUEST_SUBMISSION_IN, AbstractPort.generatePortURI());
+//		component_uris.put(RDPortTypes.REQUEST_SUBMISSION_OUT, AbstractPort.generatePortURI());
+//		component_uris.put(RDPortTypes.REQUEST_NOTIFICATION_IN, AbstractPort.generatePortURI());
+//		component_uris.put(RDPortTypes.REQUEST_NOTIFICATION_OUT, AbstractPort.generatePortURI());
+//		component_uris.put(RDPortTypes.REQUEST_DISPATCHER_IN, AbstractPort.generatePortURI());
+//		component_uris.put(RDPortTypes.SHUTDOWNABLE_IN, AbstractPort.generatePortURI());
+//		component_uris.put(RDPortTypes.REQUEST_GENERATOR_MANAGER_OUT, AbstractPort.generatePortURI());
+//
+//		/* Constructeur :
+//		 
+//		 	HashMap<RDPortTypes, String> component_uris, 
+//			HashMap<RGPortTypes, String> rg_uris,
+//			HashMap<ACPortTypes, String> ac_uris,
+//			String RequestMonitor_In
+//		 */
+//		
+//		Object[] constructorParams = new Object[]{ 
+//				component_uris,
+//				rg_uris,
+//				ac_uris,
+//				requestMonitor_in
+//		};
+//				
+//		try {
+//			cc.createComponent(RequestDispatcher.class, constructorParams);
+//		} catch (Exception e) {
+//		    e.printStackTrace();
+//		    throw e;
+//		}
+//				
+//		return component_uris;
+//	}
 }

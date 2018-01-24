@@ -85,36 +85,36 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 	}
 	
 	
-	public static HashMap<RequestMonitorPorts, String> newInstance(
-			ComponentCreator cc, 
-			String componentUri,
-			String rg_monito_in,
-			Double alpha) throws Exception {
-				
-		HashMap<RequestMonitorPorts, String> component_uris = new HashMap<>();
-		component_uris.put(RequestMonitorPorts.REQUEST_MONITOR_IN, rg_monito_in);		
-		component_uris.put(RequestMonitorPorts.INTROSPECTION, componentUri);
-
-		
-		/* Constructeur :
-		 
-		  	HashMap<RequestMonitorPorts, String> component_uris,
-			Double alpha
-		 */
-		Object[] args = new Object[] {
-				component_uris,
-				alpha
-		};
-		
-		try {
-			cc.createComponent(RequestMonitor.class, args);
-		} catch(Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
-				
-		return component_uris;
-	}
+//	public static HashMap<RequestMonitorPorts, String> newInstance(
+//			ComponentCreator cc, 
+//			String componentUri,
+//			String rg_monito_in,
+//			Double alpha) throws Exception {
+//				
+//		HashMap<RequestMonitorPorts, String> component_uris = new HashMap<>();
+//		component_uris.put(RequestMonitorPorts.REQUEST_MONITOR_IN, rg_monito_in);		
+//		component_uris.put(RequestMonitorPorts.INTROSPECTION, componentUri);
+//
+//		
+//		/* Constructeur :
+//		 
+//		  	HashMap<RequestMonitorPorts, String> component_uris,
+//			Double alpha
+//		 */
+//		Object[] args = new Object[] {
+//				component_uris,
+//				alpha
+//		};
+//		
+//		try {
+//			cc.createComponent(RequestMonitor.class, args);
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//			throw e;
+//		}
+//				
+//		return component_uris;
+//	}
 
 
 }

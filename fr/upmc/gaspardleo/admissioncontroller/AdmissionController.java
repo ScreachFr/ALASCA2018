@@ -102,13 +102,13 @@ public class AdmissionController
 		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
 		
 		HashMap<RequestMonitorPorts, String> requestMonitorURIs;
-		try{
-			requestMonitorURIs = 
-				RequestMonitor.newInstance(cc, "rm-" + rd_URI, rg_monitor_in, 0.5);
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		
+		HashMap<RequestMonitorPorts, String> rm_uris = new HashMap<>();
+		rm_uris.put(RequestMonitorPorts.REQUEST_MONITOR_IN, rg_monitor_in);		
+		rm_uris.put(RequestMonitorPorts.INTROSPECTION, "rm-" + rd_URI);
+		
+		RequestMonitor rm = new RequestMonitor(rm_uris, 0.5);
+		
 		//Request Generator port
 		this.addRequiredInterface(RequestGeneratorConnectionI.class);
 		RequestGeneratorOutboundPort rgop = new RequestGeneratorOutboundPort(this);
@@ -127,16 +127,17 @@ public class AdmissionController
 				RD_uris.get(RDPortTypes.REQUEST_SUBMISSION_IN));	
 				
 		// Performance regulator creation
+
+		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = new HashMap<>();
+		performanceRegulator_uris.put(PerformanceRegulatorPorts.INTROSPECTION, rd_URI + "-pr");
+		performanceRegulator_uris.put(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN, AbstractPort.generatePortURI());
 		
-		HashMap<PerformanceRegulatorPorts,String> pr_uris = PerformanceRegulator.newInstance(
-				cc,
-				rd_URI + "-pr",
-				RD_uris,
-				requestMonitorURIs,
+		PerformanceRegulator pr = new PerformanceRegulator(
+				performanceRegulator_uris, 
+				RD_uris, rm_uris, 
 				computerPoolURIs,
 				RegulationStrategies.SIMPLE_AVM,
-				new TargetValue(2000.0, 0.0)
-		);
+				new TargetValue(2000.0, 0.0));
 		
 		PerformanceRegulatorOutboundPort prop = new PerformanceRegulatorOutboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(prop);
@@ -145,7 +146,7 @@ public class AdmissionController
 //		prop.doConnection(pr_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
 //				ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
 		
-		prop.doConnection(pr_uris.get(
+		prop.doConnection(performanceRegulator_uris.get(
 				PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
 				PerformanceRegulatorConnector.class.getCanonicalName());
 		
@@ -185,31 +186,31 @@ public class AdmissionController
 		return this.avmPorts;
 	}
 	
-	public static HashMap<ACPortTypes, String> newInstance(
-			HashMap<ComputerPoolPorts, String> computerPoolUri,
-			HashMap<ACPortTypes, String> ac_uris,
-			ComponentCreator cc) throws Exception{
-		
-		/*Constructeur :
-		 
-		  	HashMap<ComputerPoolPorts, String> computerPoolUri,
-			HashMap<ACPortTypes, String> ac_uris,
-			ComponentCreator cc
-		 */
-		
-		Object[] constructorParams = new Object[] {
-				computerPoolUri,
-				ac_uris,
-				cc
-		};
-
-		try {
-			cc.createComponent(AdmissionController.class, constructorParams);
-		} catch(Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
-
-		return ac_uris;		
-	}
+//	public static HashMap<ACPortTypes, String> newInstance(
+//			HashMap<ComputerPoolPorts, String> computerPoolUri,
+//			HashMap<ACPortTypes, String> ac_uris,
+//			ComponentCreator cc) throws Exception{
+//		
+//		/*Constructeur :
+//		 
+//		  	HashMap<ComputerPoolPorts, String> computerPoolUri,
+//			HashMap<ACPortTypes, String> ac_uris,
+//			ComponentCreator cc
+//		 */
+//		
+//		Object[] constructorParams = new Object[] {
+//				computerPoolUri,
+//				ac_uris,
+//				cc
+//		};
+//
+//		try {
+//			cc.createComponent(AdmissionController.class, constructorParams);
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//			throw e;
+//		}
+//
+//		return ac_uris;		
+//	}
 }

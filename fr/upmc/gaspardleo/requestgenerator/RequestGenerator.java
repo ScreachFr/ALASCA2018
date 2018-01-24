@@ -103,38 +103,38 @@ public 	class RequestGenerator
 		}
 	}
 	
-	public static HashMap<RGPortTypes, String> newInstance(
-			String rgURI, 
-			Double meanInterArrivalTime,
-			Long meanNumberOfInstructions,
-			ComponentCreator cc) throws Exception {
-		
-		HashMap<RGPortTypes, String> rg_uris = new HashMap<RGPortTypes, String>();		
-		rg_uris.put(RGPortTypes.INTROSPECTION, rgURI);
-		rg_uris.put(RGPortTypes.CONNECTION_IN, AbstractPort.generatePortURI());
-		rg_uris.put(RGPortTypes.MANAGEMENT_IN, AbstractPort.generatePortURI()) ;
-		rg_uris.put(RGPortTypes.REQUEST_SUBMISSION_OUT, AbstractPort.generatePortURI());
-		rg_uris.put(RGPortTypes.REQUEST_NOTIFICATION_IN, AbstractPort.generatePortURI());
-		
-		/* Constructeur :
-		 
-		  	HashMap<RGPortTypes, String> rg_uris,
-			Double meanInterArrivalTime,
-			Long meanNumberOfInstructions
-		 */
-		Object[] constructorParams = new Object[] {
-				rg_uris,
-				meanInterArrivalTime,
-				meanNumberOfInstructions
-		};
-		
-		try {
-			cc.createComponent(RequestGenerator.class, constructorParams);
-		} catch(Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
-
-		return rg_uris;
-	}
+//	public static HashMap<RGPortTypes, String> newInstance(
+//			String rgURI, 
+//			Double meanInterArrivalTime,
+//			Long meanNumberOfInstructions,
+//			ComponentCreator cc) throws Exception {
+//		
+//		HashMap<RGPortTypes, String> rg_uris = new HashMap<RGPortTypes, String>();		
+//		rg_uris.put(RGPortTypes.INTROSPECTION, rgURI);
+//		rg_uris.put(RGPortTypes.CONNECTION_IN, AbstractPort.generatePortURI());
+//		rg_uris.put(RGPortTypes.MANAGEMENT_IN, AbstractPort.generatePortURI()) ;
+//		rg_uris.put(RGPortTypes.REQUEST_SUBMISSION_OUT, AbstractPort.generatePortURI());
+//		rg_uris.put(RGPortTypes.REQUEST_NOTIFICATION_IN, AbstractPort.generatePortURI());
+//		
+//		/* Constructeur :
+//		 
+//		  	HashMap<RGPortTypes, String> rg_uris,
+//			Double meanInterArrivalTime,
+//			Long meanNumberOfInstructions
+//		 */
+//		Object[] constructorParams = new Object[] {
+//				rg_uris,
+//				meanInterArrivalTime,
+//				meanNumberOfInstructions
+//		};
+//		
+//		try {
+//			cc.createComponent(RequestGenerator.class, constructorParams);
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//			throw e;
+//		}
+//
+//		return rg_uris;
+//	}
 }
