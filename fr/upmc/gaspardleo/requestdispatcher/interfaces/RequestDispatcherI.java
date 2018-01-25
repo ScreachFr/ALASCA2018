@@ -24,8 +24,26 @@ public interface RequestDispatcherI
 			HashMap<ApplicationVMPortTypes, String> avmURIs, 
 			Class<?> vmInterface) throws Exception;
 	
+	/**
+	 * Deconnecte une ApplicationVM du RequestDispatcher. 
+	 * @param vmUri
+	 * 	Uri de composant de l'ApplicationVM à deconnecter.
+	 * @throws Exception
+	 */
 	public void unregisterVM(String vmUri) throws Exception;
+	
+	/**
+	 * Deconnect une ApplicationVM du RequestDispatcher.
+	 * Il es probable que cette methode deconnecte une ApplicationVM aléatoire.
+	 * @throws Exception
+	 */
 	public void unregisterVM() throws Exception;
 	
+	/**
+	 * Permet de disposer de la liste des ApplicationVM utilisées par le RequestDispatcher.
+	 * @return
+	 * 		Liste des URI de composant des ApplicationVM.
+	 * @throws Exception
+	 */
 	public List<String> getRegisteredAVMUris() throws Exception;
 }
