@@ -21,12 +21,12 @@ import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
-import fr.upmc.gaspardleo.admissioncontroller.connectors.AdmissionControllerConnector;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.applicationvm.connectors.ApplicationVMConnector;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
@@ -117,12 +117,9 @@ public 	class 		RequestDispatcher
 		this.acop = new AdmissionControllerOutboundPort(this);
 		this.acop.publishPort();
 		this.addPort(acop);
-//		this.acop.doConnection(
-//				ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
-//				ClassFactory.newConnector(AdmissionControllerI.class).getCanonicalName());
 		this.acop.doConnection(
-			ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
-			AdmissionControllerConnector.class.getCanonicalName());
+				ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
+				ClassFactory.newConnector(AdmissionControllerI.class).getCanonicalName());
 		this.rmop_uri = component_uris.get(RDPortTypes.RQUEST_MONITOR_IN);
 		 //Addition by AC the new RD for a specific RG
 		this.acop.addRequestDispatcher(component_uris, rg_uris, this.rmop_uri);
