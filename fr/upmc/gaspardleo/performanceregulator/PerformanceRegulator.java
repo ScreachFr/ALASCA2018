@@ -76,11 +76,8 @@ public class PerformanceRegulator
 		super(1, 1);
 
 		this.uri = component_uris.get(PerformanceRegulatorPorts.INTROSPECTION);
-
 		this.strategy = getStrategyFromEnum(strategy);
-
 		this.targetValue = targetValue;
-//		this.isUsingUpperBound = false;
 
 		this.addOfferedInterface(PerformanceRegulatorI.class);
 		this.prip = new PerformanceRegulatorInboundPort(component_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN), this);
@@ -98,7 +95,7 @@ public class PerformanceRegulator
 
 		this.rmop.doConnection(requestMonitor.get(RequestMonitorPorts.REQUEST_MONITOR_IN),
 				RequestMonitorConnector.class.getCanonicalName());
-		
+
 		//Request dispatcher port creation and connection.
 		this.addRequiredInterface(RequestDispatcherI.class);
 		this.rdop = new RequestDispatcherOutboundPort(this);
@@ -116,7 +113,7 @@ public class PerformanceRegulator
 
 //		this.cpop.doConnection(computerPool.get(ComputerPoolPorts.COMPUTER_POOL), 
 //				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
-		
+
 		try{
 		this.cpop.doConnection(computerPool.get(ComputerPoolPorts.COMPUTER_POOL), 
 				ComputerPoolConnector.class.getCanonicalName());
@@ -125,10 +122,11 @@ public class PerformanceRegulator
 			throw e;
 		}
 		
-		
 		//Debug
 		this.toggleTracing();
 		this.toggleLogging();
+		
+		this.logMessage("PerformanceRegulator made");
 	}
 
 	private RegulationStrategyI getStrategyFromEnum(RegulationStrategies strat) {

@@ -1,6 +1,9 @@
 package fr.upmc.gaspardleo.performanceregulator.interfaces;
 
-public interface PerformanceRegulatorI {
+import fr.upmc.components.interfaces.OfferedI;
+import fr.upmc.components.interfaces.RequiredI;
+
+public interface PerformanceRegulatorI extends OfferedI, RequiredI {
 	
 	
 	public Boolean increaseCPUFrequency() throws Exception;
