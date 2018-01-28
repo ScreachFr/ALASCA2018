@@ -20,7 +20,6 @@ import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorInbound
 import fr.upmc.gaspardleo.performanceregulator.strategies.SimpleAVMStrategie;
 import fr.upmc.gaspardleo.performanceregulator.strategies.SimpleFrequencyStrategy;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
-import fr.upmc.gaspardleo.requestdispatcher.connectors.RequestDispatherConnector;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherOutboundPort;
 import fr.upmc.gaspardleo.requestmonitor.RequestMonitor.RequestMonitorPorts;
@@ -101,8 +100,9 @@ public class PerformanceRegulator
 		this.addPort(rdop);
 		this.rdop.publishPort();
 
-		this.rdop.doConnection(requestDispatcher.get(RDPortTypes.REQUEST_DISPATCHER_IN), 
-				RequestDispatherConnector.class.getCanonicalName());
+		this.rdop.doConnection(
+				requestDispatcher.get(RDPortTypes.REQUEST_DISPATCHER_IN),
+				ClassFactory.newConnector(RequestDispatcherI.class).getCanonicalName());
 
 		//Computer pool port creation and connection.
 		this.addRequiredInterface(ComputerPoolI.class);
