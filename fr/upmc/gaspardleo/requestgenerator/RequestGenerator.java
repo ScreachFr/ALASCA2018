@@ -8,6 +8,7 @@ import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
 
@@ -83,8 +84,8 @@ public 	class RequestGenerator
 		}
 		try {
 			rsop.doConnection(
-					RD_Request_Submission_In, 
-					RequestSubmissionConnector.class.getCanonicalName());	
+				RD_Request_Submission_In, 
+				ClassFactory.newConnector(RequestSubmissionI.class).getCanonicalName());
 		}catch(Exception e){
 			e.printStackTrace();
 			throw e;

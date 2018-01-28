@@ -12,7 +12,6 @@ import fr.upmc.components.connectors.DataConnector;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.ComputerStaticState;
-import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
 import fr.upmc.datacenter.hardware.computers.interfaces.ComputerServicesI;
 import fr.upmc.datacenter.hardware.computers.interfaces.ComputerStaticStateDataI;
 import fr.upmc.datacenter.hardware.computers.ports.ComputerServicesOutboundPort;
@@ -20,17 +19,17 @@ import fr.upmc.datacenter.hardware.computers.ports.ComputerStaticStateDataOutbou
 import fr.upmc.datacenter.hardware.processors.Processor.ProcessorPortTypes;
 import fr.upmc.datacenter.hardware.processors.ProcessorDynamicState;
 import fr.upmc.datacenter.hardware.processors.ProcessorStaticState;
-import fr.upmc.datacenter.hardware.processors.connectors.ProcessorManagementConnector;
 import fr.upmc.datacenter.hardware.processors.interfaces.ProcessorManagementI;
 import fr.upmc.datacenter.hardware.processors.interfaces.ProcessorStaticStateDataI;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorDynamicStateDataOutboundPort;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorManagementOutboundPort;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorStaticStateDataOutboundPort;
 import fr.upmc.datacenter.interfaces.ControlledDataRequiredI;
-import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
+import fr.upmc.datacenter.software.applicationvm.interfaces.ApplicationVMManagementI;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
@@ -101,7 +100,7 @@ public class ComputerPool
 		try{
 			csop.doConnection(
 				computerUris.get(ComputerPortsTypes.SERVICE_IN), 
-				ComputerServicesConnector.class.getCanonicalName());
+				ClassFactory.newConnector(ComputerServicesI.class).getCanonicalName());
 		}catch(Exception e){
 			e.printStackTrace();
 			throw e;
@@ -114,8 +113,8 @@ public class ComputerPool
 		
 		try{
 			csop.doConnection(computerUris.get(
-					ComputerPortsTypes.SERVICE_IN), 
-					ComputerServicesConnector.class.getCanonicalName());
+				ComputerPortsTypes.SERVICE_IN),
+				ClassFactory.newConnector(ComputerServicesI.class).getCanonicalName());
 		}catch(Exception e){
 			e.printStackTrace();
 			throw e;
@@ -128,7 +127,8 @@ public class ComputerPool
 		cssdop.publishPort();
 
 		try{
-			cssdop.doConnection(computerUris.get(ComputerPortsTypes.STATIC_STATE_IN),
+			cssdop.doConnection(
+				computerUris.get(ComputerPortsTypes.STATIC_STATE_IN),
 				DataConnector.class.getCanonicalName());
 		}catch(Exception e){
 			e.printStackTrace();
@@ -150,7 +150,8 @@ public class ComputerPool
 			this.addPort(pdsdop);
 			pdsdop.publishPort();
 			try{
-				pdsdop.doConnection(cpuPortMap.get(cpuUri).get(ProcessorPortTypes.DYNAMIC_STATE_2),
+				pdsdop.doConnection(
+					cpuPortMap.get(cpuUri).get(ProcessorPortTypes.DYNAMIC_STATE_2),
 					DataConnector.class.getCanonicalName());
 			}catch(Exception e){
 				e.printStackTrace();
@@ -165,7 +166,8 @@ public class ComputerPool
 			this.addPort(pssdop);
 			pssdop.publishPort();
 			try{
-				pssdop.doConnection(cpuPortMap.get(cpuUri).get(ProcessorPortTypes.STATIC_STATE_2),
+				pssdop.doConnection(
+					cpuPortMap.get(cpuUri).get(ProcessorPortTypes.STATIC_STATE_2),
 					DataConnector.class.getCanonicalName());
 			}catch(Exception e){
 				e.printStackTrace();
@@ -180,8 +182,9 @@ public class ComputerPool
 				this.addPort(pmob);
 				pmob.publishPort();
 				try{
-					pmob.doConnection(cpuPortMap.get(cpuUri).get(ProcessorPortTypes.MANAGEMENT),
-						ProcessorManagementConnector.class.getCanonicalName());
+					pmob.doConnection(
+						cpuPortMap.get(cpuUri).get(ProcessorPortTypes.MANAGEMENT),
+						ClassFactory.newConnector(ProcessorManagementI.class).getCanonicalName());
 				}catch(Exception e){
 					e.printStackTrace();
 					throw e;
@@ -220,7 +223,7 @@ public class ComputerPool
 
 		avmPort.doConnection(
 				result.get(ApplicationVMPortTypes.MANAGEMENT),
-				ApplicationVMManagementConnector.class.getCanonicalName());
+				ClassFactory.newConnector(ApplicationVMManagementI.class).getCanonicalName());
 		AllocatedCore[] cores = availableCores.remove(0);
 		avmPort.allocateCores(cores);
 

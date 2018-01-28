@@ -148,10 +148,9 @@ public 	class 		RequestDispatcher
 		RequestSubmissionOutboundPort rsop = new RequestSubmissionOutboundPort(this);
 		this.addPort(rsop);
 		rsop.publishPort();
-//		rsop.doConnection(avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
-//				ClassFactory.newConnector(vmInterface).getCanonicalName());
-		rsop.doConnection(avmURIs.get(ApplicationVMPortTypes.REQUEST_SUBMISSION), 
-				RequestSubmissionConnector.class.getCanonicalName());
+		rsop.doConnection(avmURIs.get(
+				ApplicationVMPortTypes.REQUEST_SUBMISSION), 
+				ClassFactory.newConnector(RequestSubmissionI.class).getCanonicalName());
 		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
 		this.addPort(rnip);
 		rnip.publishPort();
@@ -230,7 +229,7 @@ public 	class 		RequestDispatcher
 				rnop.publishPort() ;
 				rnop.doConnection(
 						rg_uris.get(RGPortTypes.REQUEST_NOTIFICATION_IN), 
-						RequestNotificationConnector.class.getCanonicalName());
+						ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
 			}
 			this.logMessage(this.Component_URI + " : incoming request termination notification.");
 			rnop.notifyRequestTermination(r);
@@ -273,16 +272,9 @@ public 	class 		RequestDispatcher
 					= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
 			this.addPort(avmcop);
 			avmcop.publishPort();
-			try{
-				avmcop.doConnection(AVMConnectionPort_URI, 
+			avmcop.doConnection(
+					AVMConnectionPort_URI, 
 					ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
-			}catch(Exception e){
-				e.printStackTrace();
-				throw e;
-			}
-			assert avmcop.connected() : "avmop not connected";
-//			avmcop.doConnection(AVMConnectionPort_URI, 
-//					ApplicationVMConnector.class.getCanonicalName());
 			avmcop.doRequestNotificationConnection(notificationPort_URI);
 			avmcop.doRequestMonitorConnection(requestMonitor_in);
 			this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());

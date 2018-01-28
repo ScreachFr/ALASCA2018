@@ -9,7 +9,6 @@ import fr.upmc.datacenter.hardware.processors.ports.ProcessorServicesNotificatio
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorServicesOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.Task;
 import fr.upmc.datacenter.software.applicationvm.interfaces.TaskI;
-import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
@@ -91,9 +90,9 @@ public class ApplicationVM
 			this.requestNotificationOutboundPort.publishPort();
 			this.addRequiredInterface(RequestNotificationI.class);
 	
-			this.requestNotificationOutboundPort
-					.doConnection(RD_RequestNotificationInboundPortURI,
-							RequestNotificationConnector.class.getCanonicalName());
+			this.requestNotificationOutboundPort.doConnection(
+				RD_RequestNotificationInboundPortURI,
+				ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
 			
 			assert this.requestNotificationOutboundPort.connected() : "rnop is not connect";
 		}catch(Exception e){

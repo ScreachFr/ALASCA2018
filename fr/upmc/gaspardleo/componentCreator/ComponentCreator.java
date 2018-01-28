@@ -5,9 +5,9 @@ import java.lang.reflect.Constructor;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.cvm.AbstractDistributedCVM;
-import fr.upmc.components.cvm.pre.dcc.connectors.DynamicComponentCreationConnector;
 import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 
 public class ComponentCreator 
 	extends AbstractComponent {
@@ -81,9 +81,8 @@ public class ComponentCreator
 		assert dccop != null;
 		
 		dccop.doConnection(
-				AbstractDistributedCVM.thisJVMURI +
-				AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX, 
-				DynamicComponentCreationConnector.class.getCanonicalName());
+				AbstractDistributedCVM.thisJVMURI +	AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX,
+				ClassFactory.newConnector(DynamicComponentCreationI.class).getCanonicalName());
 		
 		dccop.createComponent(clas.getCanonicalName(), constructorParams);
 		
