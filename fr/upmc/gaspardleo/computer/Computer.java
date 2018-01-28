@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import fr.upmc.components.ports.AbstractPort;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
-import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 
@@ -47,14 +47,10 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 		cpop.publishPort();
 		this.addPort(cpop);
 
-//		cpop.doConnection(
-//				cp_uris.get(ComputerPoolPorts.COMPUTER_POOL),
-//				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
-		
 		cpop.doConnection(
 			cp_uris.get(ComputerPoolPorts.COMPUTER_POOL),
-			ComputerPoolConnector.class.getCanonicalName());
-		
+			ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
+
 		cpop.addComputer(computer_uris, numberOfProcessors, numberOfCores);
 		
 		this.toggleTracing();
