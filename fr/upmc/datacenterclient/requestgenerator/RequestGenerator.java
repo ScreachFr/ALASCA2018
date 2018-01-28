@@ -350,8 +350,10 @@ implements	RequestNotificationHandlerI
 	public void			generateNextRequest() throws Exception
 	{
 		//DEBUG LEO 
+		
 		RequestSubmissionOutboundPort rsop = 
 				(RequestSubmissionOutboundPort) this.findPortFromURI(this.requestSubmissionOutboundPortURI);
+
 		//FIN DEBUG LEO 
 
 		// generate a random number of instructions for the request.
@@ -371,6 +373,9 @@ implements	RequestNotificationHandlerI
 														interArrivalDelay) +
 			" with number of instructions " + noi) ;
 		}
+
+		System.out.println("[DEBUG LEO] rsop == null ? : "  + (rsop == null));
+		System.out.println("[DEBUG LEO] r == null ? : "  + (r == null));
 
 		// submit the current request.
 		rsop.submitRequestAndNotify(r) ;

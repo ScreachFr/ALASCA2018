@@ -103,11 +103,15 @@ public class AdmissionController
 		
 		HashMap<RequestMonitorPorts, String> requestMonitorURIs;
 		
+		System.out.println("[DEBUG LEO] 1");
+		
 		HashMap<RequestMonitorPorts, String> rm_uris = new HashMap<>();
 		rm_uris.put(RequestMonitorPorts.REQUEST_MONITOR_IN, rg_monitor_in);		
 		rm_uris.put(RequestMonitorPorts.INTROSPECTION, "rm-" + rd_URI);
 		
 		RequestMonitor rm = new RequestMonitor(rm_uris, 0.5);
+		
+		System.out.println("[DEBUG LEO] 2");
 		
 		//Request Generator port
 		this.addRequiredInterface(RequestGeneratorConnectionI.class);
@@ -119,13 +123,19 @@ public class AdmissionController
 //				RG_uris.get(RGPortTypes.CONNECTION_IN), 
 //				ClassFactory.newConnector(RequestGeneratorConnectionI.class).getCanonicalName());
 		
+		System.out.println("[DEBUG LEO] 3");
+		
+		try{
 		rgop.doConnection(
 				RG_uris.get(RGPortTypes.CONNECTION_IN), 
 				RequestGeneraterConnector.class.getCanonicalName());
 
 		rgop.doConnectionWithRD(
 				RD_uris.get(RDPortTypes.REQUEST_SUBMISSION_IN));	
-				
+		} catch (Exception e){
+			e.printStackTrace();
+			throw e;
+		}
 		// Performance regulator creation
 
 		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = new HashMap<>();

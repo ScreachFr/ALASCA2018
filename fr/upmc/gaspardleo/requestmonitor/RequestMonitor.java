@@ -32,6 +32,8 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 			) throws Exception {
 		super(1, 1);
 		
+		System.out.println("[DEBUG LEO] RequestMonitor 1");
+		
 		if (alpha < 0.0 || alpha > 1.0)
 			throw new Error("RequestMonitor constructor : Wrong alpha value. This value must be between 0 and 1. It's current value is " + alpha + ".");
 		this.lock = new Object();
@@ -40,11 +42,25 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 		this.alpha = alpha;
 		this.isFirstValue = true;
 		
-		
+		System.out.println("[DEBUG LEO] RequestMonitor 2");
+
+		try{
 		this.addOfferedInterface(RequestMonitorI.class);
 		this.rmip = new RequestMonitorInboundPort(component_uris.get(RequestMonitorPorts.REQUEST_MONITOR_IN), this);
 		this.addPort(this.rmip);
 		this.rmip.publishPort();
+		} catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+
+		
+		this.toggleLogging();
+		this.toggleTracing();		
+		this.logMessage("RequestMonitor made");
+		
+		System.out.println("[DEBUG LEO] RequestMonitor 3");
+		
 	}
 
 

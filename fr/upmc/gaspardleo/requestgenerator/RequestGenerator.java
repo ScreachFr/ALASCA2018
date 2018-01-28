@@ -81,6 +81,9 @@ public 	class RequestGenerator
 	@Override
 	public void doConnectionWithRD(String RD_Request_Submission_In) throws Exception {
 		
+		
+		System.out.println("[DEBUG LEO] doConnectionWithRD ...");
+		
 		RequestSubmissionOutboundPort rsop = 
 				(RequestSubmissionOutboundPort) super.findPortFromURI(super.requestSubmissionOutboundPortURI);
 		
@@ -101,6 +104,8 @@ public 	class RequestGenerator
 			e.printStackTrace();
 			throw e;
 		}
+		
+		System.out.println("[DEBUG LEO] doConnectionWithRD done");
 	}
 	
 //	public static HashMap<RGPortTypes, String> newInstance(
