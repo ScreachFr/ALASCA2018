@@ -127,7 +127,7 @@ implements	PushModeControllingI
 	public static boolean	DEBUG = true ;
 
 	public static enum		ProcessorPortTypes {
-		SERVICES, INTROSPECTION, MANAGEMENT, STATIC_STATE, DYNAMIC_STATE
+		SERVICES, INTROSPECTION, MANAGEMENT, STATIC_STATE, DYNAMIC_STATE, STATIC_STATE_2, DYNAMIC_STATE_2
 	}
 
 	// ------------------------------------------------------------------------
@@ -150,6 +150,10 @@ implements	PushModeControllingI
 										processorDynamicStateDataInboundPort ;
 	protected ProcessorStaticStateDataInboundPort
 										processorStaticStateDataInboundPort ;
+	protected ProcessorDynamicStateDataInboundPort
+										processorDynamicStateDataInboundPort_2 ;
+	protected ProcessorStaticStateDataInboundPort
+										processorStaticStateDataInboundPort_2 ;
 	/** Possible frequencies in MHz.										*/
 	protected final Set<Integer>		admissibleFrequencies ;
 	/** Default frequency of the cores, when powering up the processor.		*/
@@ -212,7 +216,9 @@ implements	PushModeControllingI
 		String introspectionInboundPortURI,
 		String managementInboundPortURI,
 		String processorStaticStateDataInboundPortURI,
-		String processorDynamicStateDataInboundPortURI
+		String processorDynamicStateDataInboundPortURI,
+		String processorStaticStateDataInboundPortURI_2,
+		String processorDynamicStateDataInboundPortURI_2
 		) throws Exception
 	{
 		// The normal thread pool is used to process component services, while
@@ -292,6 +298,20 @@ implements	PushModeControllingI
 								processorDynamicStateDataInboundPortURI, this) ;
 		this.addPort(this.processorDynamicStateDataInboundPort) ;
 		this.processorDynamicStateDataInboundPort.publishPort() ;
+		
+		
+		this.processorStaticStateDataInboundPort_2 =
+			new ProcessorStaticStateDataInboundPort(
+								processorStaticStateDataInboundPortURI_2, this) ;
+		this.addPort(this.processorStaticStateDataInboundPort_2) ;
+		this.processorStaticStateDataInboundPort_2.publishPort() ;
+
+		this.processorDynamicStateDataInboundPort_2 =
+			new ProcessorDynamicStateDataInboundPort(
+								processorDynamicStateDataInboundPortURI_2, this) ;
+		this.addPort(this.processorDynamicStateDataInboundPort_2) ;
+		this.processorDynamicStateDataInboundPort_2.publishPort() ;
+
 
 		this.pushingFuture = null ;
 		this.notificationInboundPortURIs = new HashMap<TaskI,String>() ;

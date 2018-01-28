@@ -12,8 +12,6 @@ public class RequestDispatcherOutboundPort
 	extends AbstractOutboundPort
 	implements RequestDispatcherI{
 
-	private static final long serialVersionUID = 1L;
-
 	public RequestDispatcherOutboundPort(ComponentI owner) throws Exception {
 		super(RequestDispatcherI.class, owner);
 	}

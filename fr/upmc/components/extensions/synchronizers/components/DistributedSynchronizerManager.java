@@ -1,10 +1,7 @@
 package fr.upmc.components.extensions.synchronizers.components;
 
 import fr.upmc.components.cvm.pre.dcc.connectors.DynamicComponentCreationConnector;
-import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
-import fr.upmc.components.connectors.ConnectionBuilder;
-import fr.upmc.components.connectors.ConnectorI;
 import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.cvm.AbstractDistributedCVM;
 
@@ -60,15 +57,11 @@ extends SynchronizerManager
 	{
 		assert clas != null;
 		assert constructorParams != null;
-		
 		// Création du composant sur le serveur de composant
 		DynamicComponentCreationOutboundPort portToDCCServer =
 			connectToDCCServer(getJVMURIToDeploy());
-//		System.out.println("[DEBUG LEO] createComponent 2");
 		portToDCCServer.createComponent(clas.getName(), constructorParams);
 		disconnectFromDCCServer(portToDCCServer);
-		
-		
 	}
 
 	

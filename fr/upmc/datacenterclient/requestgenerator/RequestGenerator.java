@@ -43,7 +43,6 @@ import fr.upmc.datacenter.TimeManagement;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
-import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.datacenter.software.ports.RequestNotificationInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
 import fr.upmc.datacenterclient.requestgenerator.interfaces.RequestGeneratorManagementI;
@@ -108,16 +107,9 @@ implements	RequestNotificationHandlerI
 	protected double							meanInterArrivalTime ;
 	/** the mean processing time of requests in ms.							*/
 	protected long								meanNumberOfInstructions ;
-
 	/** the inbound port provided to manage the component.					*/
 	protected RequestGeneratorManagementInboundPort rgmip ;
-	
-//	//DEBUG LEO 
-//	/** the output port used to send requests to the service provider.		*/
-//	protected RequestSubmissionOutboundPort		rsop ;
 	protected String requestSubmissionOutboundPortURI;
-//	//FIN DEBUG LEO 
-	
 	/** the inbound port receiving end of execution notifications.			*/	
 	protected RequestNotificationInboundPort	rnip ;
 	/** a future pointing to the next request generation task.				*/
@@ -155,11 +147,7 @@ implements	RequestNotificationHandlerI
 		) throws Exception
 	{
 		super(1, 1) ;
-		
-		//DEBUG LEO 
 		this.requestSubmissionOutboundPortURI = requestSubmissionOutboundPortURI;
-		//FIN DEBUG LEO 
-
 		// preconditions check
 		assert	meanInterArrivalTime > 0.0 && meanNumberOfInstructions > 0 ;
 		assert	requestSubmissionOutboundPortURI != null ;
@@ -181,14 +169,6 @@ implements	RequestNotificationHandlerI
 												managementInboundPortURI, this) ;
 		this.addPort(this.rgmip) ;
 		this.rgmip.publishPort() ;
-
-		//DEBUG LEO 
-//		this.addRequiredInterface(RequestSubmissionI.class) ;
-//		this.rsop = new RequestSubmissionOutboundPort(requestSubmissionOutboundPortURI, this) ;
-//		this.addPort(this.rsop) ;
-//		this.rsop.publishPort() ;
-		//FIN DEBUG LEO 
-		
 		this.addOfferedInterface(RequestNotificationI.class) ;
 		this.rnip =
 			new RequestNotificationInboundPort(requestNotificationInboundPortURI, this) ;
@@ -199,10 +179,6 @@ implements	RequestNotificationHandlerI
 		assert	this.rng != null && this.counter >= 0 ;
 		assert	this.meanInterArrivalTime > 0.0 ;
 		assert	this.meanNumberOfInstructions > 0 ;
-		
-		//DEBUG LEO 
-//		assert	this.rsop != null && this.rsop instanceof RequestSubmissionI ;
-		//FIN DEBUG LEO 
 	}
 
 	// -------------------------------------------------------------------------
@@ -226,18 +202,13 @@ implements	RequestNotificationHandlerI
 	@Override
 	public void			shutdown() throws ComponentShutdownException
 	{
-		
-		//DEBUG LEO 
 		RequestSubmissionOutboundPort rsop = 
 				(RequestSubmissionOutboundPort) this.findPortFromURI(this.requestSubmissionOutboundPortURI);
-		//FIN DEBUG LEO 
-		
 		if (this.nextRequestTaskFuture != null &&
 							!(this.nextRequestTaskFuture.isCancelled() ||
 							  this.nextRequestTaskFuture.isDone())) {
 			this.nextRequestTaskFuture.cancel(true) ;
 		}
-
 		try {
 			if (rsop.connected()) {
 				rsop.doDisconnection() ;
@@ -245,7 +216,6 @@ implements	RequestNotificationHandlerI
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
 		}
-
 		super.shutdown();
 	}
 
@@ -349,13 +319,8 @@ implements	RequestNotificationHandlerI
 	 */
 	public void			generateNextRequest() throws Exception
 	{
-		//DEBUG LEO 
-		
 		RequestSubmissionOutboundPort rsop = 
 				(RequestSubmissionOutboundPort) this.findPortFromURI(this.requestSubmissionOutboundPortURI);
-
-		//FIN DEBUG LEO 
-
 		// generate a random number of instructions for the request.
 		long noi =
 			(long) this.rng.nextExponential(this.meanNumberOfInstructions) ;
@@ -373,9 +338,6 @@ implements	RequestNotificationHandlerI
 														interArrivalDelay) +
 			" with number of instructions " + noi) ;
 		}
-
-		System.out.println("[DEBUG LEO] rsop == null ? : "  + (rsop == null));
-		System.out.println("[DEBUG LEO] r == null ? : "  + (r == null));
 
 		// submit the current request.
 		rsop.submitRequestAndNotify(r) ;

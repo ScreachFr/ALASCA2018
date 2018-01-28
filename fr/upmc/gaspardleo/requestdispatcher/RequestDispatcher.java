@@ -29,7 +29,6 @@ import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.applicationvm.connectors.ApplicationVMConnector;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
@@ -331,14 +330,9 @@ public 	class 		RequestDispatcher
 	
 	@Override
 	public void notifyRequestTermination(RequestI r) throws Exception {
-		
-		//DEBUG LEO 
 		RequestNotificationOutboundPort rnop = 
 				(RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
-		//FIN DEBUG LEO 
-		
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
-
 		// XXX Pas utilisé.
 		rnop.notifyRequestTermination(r);
 	}

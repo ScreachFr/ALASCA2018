@@ -9,13 +9,16 @@ public class PerformanceRegulatorOutboundPort
 extends AbstractOutboundPort 
 implements PerformanceRegulatorI {
 
-	private static final long serialVersionUID = 1L;
-
 	public PerformanceRegulatorOutboundPort(String uri, ComponentI owner)
 			throws Exception {
 		super(uri, PerformanceRegulatorI.class, owner);
 	}
 
+	public PerformanceRegulatorOutboundPort(ComponentI owner)
+			throws Exception {
+		super(PerformanceRegulatorI.class, owner);
+	}
+	
 	@Override
 	public Boolean increaseCPUFrequency() throws Exception {
 		return ((PerformanceRegulatorI)(this.connector)).increaseCPUFrequency();

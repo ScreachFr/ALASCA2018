@@ -126,28 +126,16 @@ extends		AbstractComponent
 	{
 		assert	classname != null;
 		assert constructorParams != null;
-		
-//		System.out.println("[DEBUG LEO] DCC 1 : " + classname);
-
 		if (AbstractCVM.DEBUG) {
 			System.out.println("DynamicComponentCreator creates: " + classname) ;
 		}
-		
-		
 		Class<?> cl = Class.forName(classname) ;
 		assert	cl != null;
-		
 		Class<?>[] parameterTypes = new Class[constructorParams.length] ;
-		
-		
 		for (int i = 0 ; i < constructorParams.length ; i++) {
 			parameterTypes[i] = constructorParams[i].getClass();
-//			System.out.println("[DEBUG LEO] parameterTypes[" + i + "] : " + parameterTypes[i]);
 			assert parameterTypes[i] != null;
 		}
-
-//		System.out.println("[DEBUG LEO] DCC 2");
-		
 		Constructor<?> cons = null;
 		try{
 			cons = cl.getConstructor(parameterTypes) ;
@@ -156,10 +144,6 @@ extends		AbstractComponent
 			throw e;
 		}
 		assert	cons != null ;
-		
-//		System.out.println("[DEBUG LEO] DCC 3");
-//		System.out.println("[DEBUG LEO] cons : " + cons.getName());
-		
 		AbstractComponent component;
 		try{
 		component =	(AbstractComponent) cons.newInstance(constructorParams) ;
@@ -167,11 +151,7 @@ extends		AbstractComponent
 			e.printStackTrace();
 			throw e;
 		}
-		
-//		System.out.println("[DEBUG LEO] DCC 4");
-		
 		assert component != null;
-
 		AbstractCVM.theCVM.addDeployedComponent(component) ;
 		component.start() ;
 	}

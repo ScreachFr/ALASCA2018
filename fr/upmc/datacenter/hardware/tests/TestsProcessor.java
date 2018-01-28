@@ -137,7 +137,9 @@ extends		AbstractCVM
 								  ProcessorIntrospectionInboundPortURI,
 								  ProcessorManagementInboundPortURI,
 								  ProcessorStaticStateDataInboundPortURI,
-								  ProcessorDynamicStateDataInboundPortURI) ;
+								  ProcessorDynamicStateDataInboundPortURI,
+								  ProcessorStaticStateDataInboundPortURI+"_2",
+								  ProcessorDynamicStateDataInboundPortURI+"_2") ;
 		this.proc.toggleTracing() ;
 		this.proc.toggleLogging() ;
 		this.addDeployedComponent(this.proc) ;

@@ -103,9 +103,6 @@ implements	RequestSubmissionI
 	public void			submitRequestAndNotify(RequestI r)
 	throws Exception
 	{
-		System.out.println("[DEBUG LEO] connector == null ? : " + (((RequestSubmissionI)this.connector) == null));
-		System.out.println("[DEBUG LEO] r == null ? : " + (r == null));
-		
 		((RequestSubmissionI)this.connector).submitRequestAndNotify(r) ;
 	}
 }

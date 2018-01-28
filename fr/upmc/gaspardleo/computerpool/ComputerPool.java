@@ -9,19 +9,23 @@ import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.connectors.DataConnector;
-import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.ComputerStaticState;
 import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
+import fr.upmc.datacenter.hardware.computers.interfaces.ComputerServicesI;
+import fr.upmc.datacenter.hardware.computers.interfaces.ComputerStaticStateDataI;
 import fr.upmc.datacenter.hardware.computers.ports.ComputerServicesOutboundPort;
 import fr.upmc.datacenter.hardware.computers.ports.ComputerStaticStateDataOutboundPort;
 import fr.upmc.datacenter.hardware.processors.Processor.ProcessorPortTypes;
 import fr.upmc.datacenter.hardware.processors.ProcessorDynamicState;
 import fr.upmc.datacenter.hardware.processors.ProcessorStaticState;
 import fr.upmc.datacenter.hardware.processors.connectors.ProcessorManagementConnector;
+import fr.upmc.datacenter.hardware.processors.interfaces.ProcessorManagementI;
+import fr.upmc.datacenter.hardware.processors.interfaces.ProcessorStaticStateDataI;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorDynamicStateDataOutboundPort;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorManagementOutboundPort;
 import fr.upmc.datacenter.hardware.processors.ports.ProcessorStaticStateDataOutboundPort;
+import fr.upmc.datacenter.interfaces.ControlledDataRequiredI;
 import fr.upmc.datacenter.software.applicationvm.connectors.ApplicationVMManagementConnector;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
@@ -33,7 +37,7 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort;
 
 public class ComputerPool 
 		extends AbstractComponent 
-		implements ComputerPoolI {
+		implements ComputerPoolI{
 	
 	public enum ComputerPoolPorts {
 		INTROSPECTION,
@@ -87,29 +91,49 @@ public class ComputerPool
 		
 		this.logMessage("Computer Pool : Computer creation and core allocation.");
 		
+		if(!this.isRequiredInterface(ComputerServicesI.class))
+			this.addRequiredInterface(ComputerServicesI.class);
 		ComputerServicesOutboundPort csop = new ComputerServicesOutboundPort(this);
 		this.addPort(csop);
 		csop.publishPort();
 		
-		csop.doConnection(
+		try{
+			csop.doConnection(
 				computerUris.get(ComputerPortsTypes.SERVICE_IN), 
 				ComputerServicesConnector.class.getCanonicalName());
-		
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
 		for (int i = 0; i < (numberOfProcessors * numberOfCores)/2; i++) {
 			availableCores.add(csop.allocateCores(DEFAULT_CORE_ALLOC_NUMBER));
 		}
 		
 		this.computers.add(computerUris);
 		
-		csop.doConnection(computerUris.get(ComputerPortsTypes.SERVICE_IN), ComputerServicesConnector.class.getCanonicalName());
-
+		try{
+			csop.doConnection(computerUris.get(
+					ComputerPortsTypes.SERVICE_IN), 
+					ComputerServicesConnector.class.getCanonicalName());
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		
+		if(!this.isRequiredInterface(ComputerStaticStateDataI.class))
+			this.addRequiredInterface(ComputerStaticStateDataI.class);
 		ComputerStaticStateDataOutboundPort cssdop = new ComputerStaticStateDataOutboundPort(this, computerUris.get(ComputerPortsTypes.INTROSPECTION));
 		this.addPort(cssdop);
 		cssdop.publishPort();
 
-		cssdop.doConnection(computerUris.get(ComputerPortsTypes.STATIC_STATE_IN),
+		try{
+			cssdop.doConnection(computerUris.get(ComputerPortsTypes.STATIC_STATE_IN),
 				DataConnector.class.getCanonicalName());
-
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		
 		ComputerStaticState css = (ComputerStaticState) cssdop.request();
 
 		int nbProcessor = css.getNumberOfProcessors();
@@ -119,32 +143,48 @@ public class ComputerPool
 
 		for (String cpuUri : css.getProcessorURIs().values()) {
 
-			ProcessorDynamicStateDataOutboundPort pdsdop 
-			= new ProcessorDynamicStateDataOutboundPort(this, cpuUri);
+			if(!this.isRequiredInterface(ControlledDataRequiredI.ControlledPullI.class))
+				this.addRequiredInterface(ControlledDataRequiredI.ControlledPullI.class);
+			ProcessorDynamicStateDataOutboundPort pdsdop = new ProcessorDynamicStateDataOutboundPort(this, cpuUri);
 			this.addPort(pdsdop);
 			pdsdop.publishPort();
-			pdsdop.doConnection(cpuPortMap.get(cpuUri).get(ProcessorPortTypes.DYNAMIC_STATE),
+			try{
+				pdsdop.doConnection(cpuPortMap.get(cpuUri).get(ProcessorPortTypes.DYNAMIC_STATE_2),
 					DataConnector.class.getCanonicalName());
-
+			}catch(Exception e){
+				e.printStackTrace();
+				throw e;
+			}
 			processorDynamicStatePort.put(cpuUri, pdsdop);
 
+			if(!this.isRequiredInterface(ProcessorStaticStateDataI.class))
+				this.addRequiredInterface(ProcessorStaticStateDataI.class);
 			ProcessorStaticStateDataOutboundPort pssdop 
 			= new ProcessorStaticStateDataOutboundPort(this, cpuUri);
 			this.addPort(pssdop);
 			pssdop.publishPort();
-			pssdop.doConnection(cpuPortMap.get(cpuUri).get(ProcessorPortTypes.STATIC_STATE),
+			try{
+				pssdop.doConnection(cpuPortMap.get(cpuUri).get(ProcessorPortTypes.STATIC_STATE_2),
 					DataConnector.class.getCanonicalName());
-
+			}catch(Exception e){
+				e.printStackTrace();
+				throw e;
+			}
 			processorStaticStatePort.put(cpuUri, pssdop);
 
 			if (processorManagmentPorts.get(cpuUri) == null) {
+				if(!this.isRequiredInterface(ProcessorManagementI.class))
+					this.addRequiredInterface(ProcessorManagementI.class);
 				ProcessorManagementOutboundPort pmob = new ProcessorManagementOutboundPort(this);
 				this.addPort(pmob);
 				pmob.publishPort();
-
-				pmob.doConnection(cpuPortMap.get(cpuUri).get(ProcessorPortTypes.MANAGEMENT),
+				try{
+					pmob.doConnection(cpuPortMap.get(cpuUri).get(ProcessorPortTypes.MANAGEMENT),
 						ProcessorManagementConnector.class.getCanonicalName());
-
+				}catch(Exception e){
+					e.printStackTrace();
+					throw e;
+				}
 				this.processorManagmentPorts.put(cpuUri, pmob);
 			}
 		}

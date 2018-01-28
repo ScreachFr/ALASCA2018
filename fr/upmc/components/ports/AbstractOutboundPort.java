@@ -68,12 +68,6 @@ public abstract class	AbstractOutboundPort
 extends		AbstractPort
 implements	OutboundPortI
 {
-	/**
-	 * 
-	 */
-	//DEBUG LEO 
-	private static final long serialVersionUID = 1L;
-	//FIN DEBUG LEO 
 	/** URI of the server port to which this port is connected.			*/
 	protected String	serverPortURI ;
 	/** connector used to link with the provider component.				*/
@@ -321,30 +315,17 @@ implements	OutboundPortI
 	public void			obeyConnection(String otherPortURI, String ccname)
 	throws	Exception
 	{
-//				System.out.println("[DEBUG LEO] otherPortURI != null : " + (otherPortURI != null));
-//				System.out.println("\n[DEBUG LEO]  ccname != null : " + (ccname != null));;
-//				System.out.println("\n[DEBUG LEO]  !this.connected() : " + !this.connected());
-		
-				
-//				System.out.println("\n[DEBUG LEO]  otherPortURI : " + otherPortURI +
-//						"\nccname : " + ccname);
-				
 		assert	otherPortURI != null && ccname != null && !this.connected() ;
 
 		// FIXME: should use a proper state machine model to implement the
 		// connection and disconnection protocol
 
-//		System.out.println("[DEBUG LEO]  1");
 		Class<?> cc = Class.forName(ccname) ;
-//		System.out.println("[DEBUG LEO]  2");
 		Constructor<?> c = cc.getConstructor(new Class<?>[]{}) ;
-//		System.out.println("[DEBUG LEO]  3");
 		ConnectorI connector = (ConnectorI) c.newInstance() ;
-//		System.out.println("[DEBUG LEO]  4");
 		ConnectionBuilder.SINGLETON.connectWith(otherPortURI,
 												this.getPortURI(),
 												connector) ;
-//		System.out.println("[DEBUG LEO]  5");
 		assert	this.connected() ;
 	}
 

@@ -5,7 +5,6 @@ import java.util.UUID;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.connectors.AbstractConnector;
 import fr.upmc.components.connectors.ConnectionBuilder;
-import fr.upmc.components.extensions.synchronizers.connectors.SynchronizerManagerConnector;
 import fr.upmc.components.extensions.synchronizers.connectors.syncTools.arrayBlockingQueue.ArrayBlockingQueueConnectionConnector;
 import fr.upmc.components.extensions.synchronizers.connectors.syncTools.arrayBlockingQueue.ArrayBlockingQueuePutConnector;
 import fr.upmc.components.extensions.synchronizers.connectors.syncTools.arrayBlockingQueue.ArrayBlockingQueueTakeConnector;

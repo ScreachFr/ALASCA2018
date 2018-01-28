@@ -7,8 +7,6 @@ import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnection
 public class RequestGeneratorOutboundPort 
 	extends AbstractOutboundPort
 	implements RequestGeneratorConnectionI{
-
-	private static final long serialVersionUID = 2L;
 	
 	public RequestGeneratorOutboundPort(ComponentI owner) throws Exception {
 		super(RequestGeneratorConnectionI.class, owner);

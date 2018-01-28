@@ -3,8 +3,6 @@ package fr.upmc.gaspardleo.computer;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import fr.upmc.components.ports.AbstractPort;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;

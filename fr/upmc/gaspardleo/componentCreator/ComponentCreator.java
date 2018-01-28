@@ -70,8 +70,6 @@ public class ComponentCreator
 			Object[] constructorParams
 			) throws Exception{
 		
-//		System.out.println("[DEBUG LEO] CC 1");
-		
 		if(!this.isRequiredInterface(DynamicComponentCreationI.class)){
 			this.addRequiredInterface(DynamicComponentCreationI.class);
 		}
@@ -88,8 +86,6 @@ public class ComponentCreator
 				DynamicComponentCreationConnector.class.getCanonicalName());
 		
 		dccop.createComponent(clas.getCanonicalName(), constructorParams);
-		
-//		System.out.println("[DEBUG LEO] CC 2");
 		
 		dccop.doDisconnection();
 		dccop.destroyPort();

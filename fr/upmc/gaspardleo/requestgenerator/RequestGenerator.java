@@ -2,13 +2,11 @@ package fr.upmc.gaspardleo.requestgenerator;
 
 import java.util.HashMap;
 
-import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.components.ports.PortI;
 import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
 
@@ -81,9 +79,6 @@ public 	class RequestGenerator
 	@Override
 	public void doConnectionWithRD(String RD_Request_Submission_In) throws Exception {
 		
-		
-		System.out.println("[DEBUG LEO] doConnectionWithRD ...");
-		
 		RequestSubmissionOutboundPort rsop = 
 				(RequestSubmissionOutboundPort) super.findPortFromURI(super.requestSubmissionOutboundPortURI);
 		
@@ -104,8 +99,6 @@ public 	class RequestGenerator
 			e.printStackTrace();
 			throw e;
 		}
-		
-		System.out.println("[DEBUG LEO] doConnectionWithRD done");
 	}
 	
 //	public static HashMap<RGPortTypes, String> newInstance(

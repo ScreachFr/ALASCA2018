@@ -1,7 +1,5 @@
 package fr.upmc.gaspardleo.computer;
 
-import java.util.HashMap;
-
 import fr.upmc.components.ports.AbstractPort;
 
 public class ComputerMonitor 

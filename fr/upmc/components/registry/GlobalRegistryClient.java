@@ -115,7 +115,6 @@ public class			GlobalRegistryClient {
 		String result = null ;
 
 		if (this.registryHost == null) {
-//			System.out.println("[DEBUG LEO] sendCommand 1");
 			try {
 				this.registryHost =
 					InetAddress.getByName(GlobalRegistry.REGISTRY_HOSTNAME) ;
@@ -124,17 +123,14 @@ public class			GlobalRegistryClient {
 			}
 		}
 		if (this.s == null) {
-//			System.out.println("[DEBUG LEO] sendCommand 2");
 			this.s = new Socket(this.registryHost, GlobalRegistry.REGISTRY_PORT) ;
 			this.ps = new PrintStream(s.getOutputStream(), true) ;
 			this.br = new BufferedReader(
 								new InputStreamReader(s.getInputStream())) ;
 		}
-//		System.out.println("[DEBUG LEO] sendCommand 3");
 		ps.println(command) ;
 		result = this.br.readLine() ;
 		String[] tokens = result.split("\\s") ;
-//		System.out.println("[DEBUG LEO] ?ok " + tokens[0] + ": " + !tokens[0].equals("ok"));
 		if (!tokens[0].equals("ok")) {
 			throw new Exception(result) ;
 		}

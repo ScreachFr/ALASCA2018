@@ -4,7 +4,6 @@ package fr.upmc.gaspardleo.requestmonitor;
 import java.util.HashMap;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorInboundPort;
 
@@ -32,8 +31,6 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 			) throws Exception {
 		super(1, 1);
 		
-		System.out.println("[DEBUG LEO] RequestMonitor 1");
-		
 		if (alpha < 0.0 || alpha > 1.0)
 			throw new Error("RequestMonitor constructor : Wrong alpha value. This value must be between 0 and 1. It's current value is " + alpha + ".");
 		this.lock = new Object();
@@ -41,8 +38,6 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 		this.lastEntry = -1L;
 		this.alpha = alpha;
 		this.isFirstValue = true;
-		
-		System.out.println("[DEBUG LEO] RequestMonitor 2");
 
 		try{
 		this.addOfferedInterface(RequestMonitorI.class);
@@ -53,14 +48,10 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 			e.printStackTrace();
 			throw e;
 		}
-
 		
 		this.toggleLogging();
 		this.toggleTracing();		
 		this.logMessage("RequestMonitor made");
-		
-		System.out.println("[DEBUG LEO] RequestMonitor 3");
-		
 	}
 
 

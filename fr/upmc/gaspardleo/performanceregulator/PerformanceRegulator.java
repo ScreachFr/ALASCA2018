@@ -9,7 +9,6 @@ import fr.upmc.components.exceptions.ComponentStartException;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
@@ -74,7 +73,7 @@ public class PerformanceRegulator
 			) throws Exception {
 
 		super(1, 1);
-
+		
 		this.uri = component_uris.get(PerformanceRegulatorPorts.INTROSPECTION);
 		this.strategy = getStrategyFromEnum(strategy);
 		this.targetValue = targetValue;
@@ -89,13 +88,13 @@ public class PerformanceRegulator
 		this.rmop = new RequestMonitorOutboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(rmop);
 		this.rmop.publishPort();
-
+		
 //		this.rmop.doConnection(requestMonitor.get(RequestMonitorPorts.REQUEST_MONITOR_IN),
 //				ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
 
 		this.rmop.doConnection(requestMonitor.get(RequestMonitorPorts.REQUEST_MONITOR_IN),
 				RequestMonitorConnector.class.getCanonicalName());
-
+		
 		//Request dispatcher port creation and connection.
 		this.addRequiredInterface(RequestDispatcherI.class);
 		this.rdop = new RequestDispatcherOutboundPort(this);
@@ -181,15 +180,15 @@ public class PerformanceRegulator
 
 	@Override
 	public Boolean addAVMToRD() throws Exception {
+		
+		System.out.println("[DEBUG LEO] addAVMToRD ...");
+		
 		HashMap<ApplicationVMPortTypes, String> avm = this.cpop.createNewApplicationVM("avm-"+(newAVMID++), 1);
-
 		if (avm == null) {
 			this.logMessage(this.uri + " : addAVMToRD : No available ressource!");
-
 			return false;
 		}
 		this.logMessage(this.uri + " : Adding an avm : " + avm);
-		
 		try{
 			rdop.registerVM(avm, RequestSubmissionI.class);
 		} catch (Exception e){

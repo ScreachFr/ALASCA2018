@@ -762,10 +762,7 @@ implements	ComponentI
 		assert	states != null ;
 
 		boolean ret = false ;
-//		System.out.println("[DEBUG LEO] this.state : " + this.state);
 		for (int i = 0 ; !ret && i < states.length ; i++) {
-//			System.out.println("[DEBUG LEO] states[i] : " + states[i]);
-//			System.out.println("[DEBUG LEO] == : " + (this.state == states[i]));
 			ret = (this.state == states[i]) ;
 		}
 		return ret ;
@@ -1002,10 +999,6 @@ implements	ComponentI
 		assert	this.notInStateAmong(new ComponentStateI[]{
 							ComponentState.TERMINATED
 							}) ;
-
-//		System.out.println("[DEBUG LEO] isRequiredInterface : " + this.isRequiredInterface(inter));		
-//		System.out.println("[DEBUG LEO] isOfferedInterface : " + this.isOfferedInterface(inter));
-
 		return this.isRequiredInterface(inter) ||
 											this.isOfferedInterface(inter) ;
 	}
@@ -1214,30 +1207,16 @@ implements	ComponentI
 	 */
 	protected void		addPort(PortI p) throws Exception
 	{
-		
-//		System.out.println("[DEBUG LEO] p : " + p );
-//		
-//		System.out.println("[DEBUG LEO] notInStateAmong : " + (this.notInStateAmong(new ComponentStateI[]{
-//							ComponentState.TERMINATED
-//							})));
 		assert	this.notInStateAmong(new ComponentStateI[]{
 							ComponentState.TERMINATED
-							}) : "assertion 1";
-		
-//		System.out.println("[DEBUG LEO] equals : " + (this.equals(p.getOwner())));
-		assert	this.equals(p.getOwner()) : "assertion 2";
-		
-//		System.out.println("[DEBUG LEO] getImplementedInterface : " + p.getImplementedInterface());
-//		System.out.println("[DEBUG LEO] isInterface : " + (this.isInterface(p.getImplementedInterface())));
+							});
+		assert	this.equals(p.getOwner());
 		assert	this.isInterface(p.getImplementedInterface()) : 
 			"assertion 3"
 			+ "\n-> p = " + p
 			+ "\n-> ImplementedInterface = " + p.getImplementedInterface()
 			+ "\n-> isInterface : "	+ this.isInterface(p.getImplementedInterface());
-		
-//		System.out.println("[DEBUG LEO] get : " + (this.portURIs2ports.get(p.getPortURI()) == null));
-		assert	this.portURIs2ports.get(p.getPortURI()) == null : "assertion 4";
-
+		assert	this.portURIs2ports.get(p.getPortURI()) == null;
 		Vector<PortI> vps = null ;
 		synchronized (this.interfaces2ports) {
 			vps = this.interfaces2ports.get(p.getImplementedInterface()) ;
@@ -1254,8 +1233,8 @@ implements	ComponentI
 		synchronized (this.portURIs2ports) {
 			this.portURIs2ports.put(p.getPortURI(), p) ;
 		}
-		assert	this.interfaces2ports.containsKey(p.getImplementedInterface()) : "assertion 5";
-		assert	this.portURIs2ports.containsKey(p.getPortURI()) : "assertion 6";
+		assert	this.interfaces2ports.containsKey(p.getImplementedInterface());
+		assert	this.portURIs2ports.containsKey(p.getPortURI());
 	}
 
 	/**
@@ -1739,20 +1718,13 @@ implements	ComponentI
 		assert	task != null ;
 
 		if (this.isConcurrent()) {
-			
-//			System.out.println("[DEBUG LEO] 1");
 			if (this.isConcurrent) {
-//				System.out.println("[DEBUG LEO] 2");
 				return this.requestHandler.submit(task) ;
 			} else {
-//				System.out.println("[DEBUG LEO] 3");
-
 				assert	this.canScheduleTasks ;
 				return this.scheduledTasksHandler.submit(task) ;
 			}
 		} else {
-//			System.out.println("[DEBUG LEO] 4");
-
 			final ComponentService<T> t = task ;
 			return new Future<T>() {
 							@Override
@@ -1793,17 +1765,10 @@ implements	ComponentI
 	public <T> T		handleRequestSync(ComponentService<T> task)
 	throws Exception
 	{
-//		System.out.println("[DEBUG LEO] task : " + task);
-//		System.out.println("[DEBUG LEO] isInStateAmong : " + this.isInStateAmong(new ComponentStateI[]{
-//							ComponentState.STARTED
-//							}));
 		assert	this.isInStateAmong(new ComponentStateI[]{
 							ComponentState.STARTED
 							}) ;
-//		System.out.println("[DEBUG LEO] task != null : " + task != null);
 		assert	task != null ;
-
-//		System.out.println("[DEBUG LEO] isConcurrent : " + this.isConcurrent());
 		if (this.isConcurrent()) {			
 			return this.handleRequest(task).get() ;
 		} else {

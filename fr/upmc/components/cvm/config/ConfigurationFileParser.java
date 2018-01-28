@@ -39,13 +39,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
@@ -128,7 +123,6 @@ public class			ConfigurationFileParser
 	public boolean		validateConfigurationFile(File configFile)
 	throws	Exception
 	{
-		//DEBUG LEO 
 //		boolean result = false ;
 //		// Specify you want a factory for RELAX NG
 //		System.setProperty(
@@ -150,10 +144,7 @@ public class			ConfigurationFileParser
 //		validator.validate(new StreamSource(configFile));
 //		result = true ;
 //		return result ;
-		
 		return true;
-		
-		//FIN DEBUG LEO
 	}
 
 	/**

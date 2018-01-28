@@ -74,33 +74,16 @@
     	                <rmic classpath="${classpath}:../GaspardLeo/bin"
     	                    classname="fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort"
     	                    base="../GaspardLeo"/>
-    	<!-- DEBUG LEO -->
     	<echo message="Recompiling fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort" />
     	                        <rmic classpath="${classpath}:../GaspardLeo/bin"
     	                            classname="fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort"
     	                            base="../GaspardLeo"/>
-    	<!-- FIN DEBUG LEO -->
-    	
-        <!--<echo message="Recompiling fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionInboundPort" />
-                 <rmic classpath="${classpath}:../GaspardLeo/bin"
-                     classname="fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionInboundPort"
-                     base="../GaspardLeo"/> -->
-    	
-    	<!--<echo message="Recompiling fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort" />
-    	                                <rmic classpath="${classpath}:../GaspardLeo/bin"
-    	                                    classname="fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort"
-    	                                    base="../GaspardLeo"/> -->
-    	
-        <echo message="Recompiling fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort" />
+
+    	<echo message="Recompiling fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort" />
                                         <rmic classpath="${classpath}:../GaspardLeo/bin"
                                             classname="fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort"
                                             base="../GaspardLeo"/>
 
-    	<!--<echo message="Recompiling fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort" />
-    	                                        <rmic classpath="${classpath}:../GaspardLeo/bin"
-    	                                            classname="fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort"
-    	                                            base="../GaspardLeo"/> -->
-    	
         <echo message="Recompiling fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort" />
                                                 <rmic classpath="${classpath}:../GaspardLeo/bin"
                                                     classname="fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort"

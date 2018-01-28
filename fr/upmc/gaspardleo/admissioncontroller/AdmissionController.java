@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import fr.upmc.components.AbstractComponent;
-import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
@@ -18,6 +17,7 @@ import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.PerformanceR
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.RegulationStrategies;
 import fr.upmc.gaspardleo.performanceregulator.connectors.PerformanceRegulatorConnector;
 import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
+import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
@@ -44,7 +44,6 @@ public class AdmissionController
 	private HashMap<HashMap<RGPortTypes, String>, HashMap<RDPortTypes, String>> requestSources;
 	private HashMap<ComputerPoolPorts, String> computerPoolURIs;
 	private ComputerPoolOutboundPort cpop;
-	private ComponentCreator cc;
 	
 	public AdmissionController(
 			HashMap<ComputerPoolPorts, String> computerPoolUri,
@@ -64,12 +63,6 @@ public class AdmissionController
 		this.addPort(this.acip);
 		this.acip.publishPort();
 		
-		if(AbstractCVM.isDistributed){
-			assert this.acip.isDistributedlyPublished() : "ADMISSION_CONTROLLER_IN isn't distributedly published";
-			System.out.println("[DEBUG LEO] AdmissionControllerInboundPort uri : " + ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN));
-			System.out.println("[DEBUG LEO] AdmissionControllerInboundPort is distributedly published ? -> " + this.acip.isDistributedlyPublished());
-		}
-		
 		this.addRequiredInterface(ComputerPoolI.class);
 		this.cpop = new ComputerPoolOutboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(cpop);
@@ -82,9 +75,6 @@ public class AdmissionController
 		this.cpop.doConnection(
 			computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
 			ComputerPoolConnector.class.getCanonicalName());		
-
-		
-		this.cc = cc;
 		
 		this.toggleLogging();
 		this.toggleTracing();		
@@ -101,17 +91,11 @@ public class AdmissionController
 
 		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
 		
-		HashMap<RequestMonitorPorts, String> requestMonitorURIs;
-		
-		System.out.println("[DEBUG LEO] 1");
-		
 		HashMap<RequestMonitorPorts, String> rm_uris = new HashMap<>();
 		rm_uris.put(RequestMonitorPorts.REQUEST_MONITOR_IN, rg_monitor_in);		
 		rm_uris.put(RequestMonitorPorts.INTROSPECTION, "rm-" + rd_URI);
 		
-		RequestMonitor rm = new RequestMonitor(rm_uris, 0.5);
-		
-		System.out.println("[DEBUG LEO] 2");
+		new RequestMonitor(rm_uris, 0.5);
 		
 		//Request Generator port
 		this.addRequiredInterface(RequestGeneratorConnectionI.class);
@@ -122,8 +106,6 @@ public class AdmissionController
 //		rgop.doConnection(
 //				RG_uris.get(RGPortTypes.CONNECTION_IN), 
 //				ClassFactory.newConnector(RequestGeneratorConnectionI.class).getCanonicalName());
-		
-		System.out.println("[DEBUG LEO] 3");
 		
 		try{
 		rgop.doConnection(
@@ -137,30 +119,45 @@ public class AdmissionController
 			throw e;
 		}
 		// Performance regulator creation
-
+		
 		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = new HashMap<>();
 		performanceRegulator_uris.put(PerformanceRegulatorPorts.INTROSPECTION, rd_URI + "-pr");
 		performanceRegulator_uris.put(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN, AbstractPort.generatePortURI());
 		
-		PerformanceRegulator pr = new PerformanceRegulator(
+		new PerformanceRegulator(
 				performanceRegulator_uris, 
 				RD_uris, rm_uris, 
 				computerPoolURIs,
 				RegulationStrategies.SIMPLE_AVM,
 				new TargetValue(2000.0, 0.0));
 		
-		PerformanceRegulatorOutboundPort prop = new PerformanceRegulatorOutboundPort(AbstractPort.generatePortURI(), this);
+		if(!this.isRequiredInterface(PerformanceRegulatorI.class))
+			this.addRequiredInterface(PerformanceRegulatorI.class);
+		
+		PerformanceRegulatorOutboundPort prop = new PerformanceRegulatorOutboundPort(this);
 		this.addPort(prop);
 		prop.publishPort();
 		
 //		prop.doConnection(pr_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
 //				ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
 		
-		prop.doConnection(performanceRegulator_uris.get(
-				PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
+		try{
+			prop.doConnection(
+				performanceRegulator_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
 				PerformanceRegulatorConnector.class.getCanonicalName());
+		} catch (Exception e){
+			e.printStackTrace();
+			throw e;
+		}
 		
-		prop.addAVMToRD();
+		System.out.println("[DEBUG LEO] prop connected ? : " + prop.connected());
+		
+		try{
+			prop.addAVMToRD();
+		} catch (Exception e){
+			e.printStackTrace();
+			throw e;
+		}
 
 		this.logMessage("Admission controller : Request source successfully added!");
 	}

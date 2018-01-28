@@ -375,7 +375,8 @@ implements	ProcessorStateDataConsumerI,
 							  maxFrequencyGap,
 							  numberOfCores,
 							  psibpURI, piibpURI, pmibpURI,
-							  pssdibpURI, pdsdibpURI) ;
+							  pssdibpURI, pdsdibpURI,
+							  pssdibpURI+"_2", pdsdibpURI+"_2") ;
 			// add it to the deployed components in the CVM
 			AbstractCVM.theCVM.addDeployedComponent(this.processors[i]) ;
 
@@ -388,6 +389,8 @@ implements	ProcessorStateDataConsumerI,
 			map.put(Processor.ProcessorPortTypes.MANAGEMENT, pmibpURI) ;
 			map.put(Processor.ProcessorPortTypes.STATIC_STATE, pssdibpURI) ;
 			map.put(Processor.ProcessorPortTypes.DYNAMIC_STATE, pdsdibpURI) ;
+			map.put(Processor.ProcessorPortTypes.STATIC_STATE_2, pssdibpURI+"_2") ;
+			map.put(Processor.ProcessorPortTypes.DYNAMIC_STATE_2, pdsdibpURI+"_2") ;
 			// record this map for the processor in the computer data
 			this.processorsInboundPortURI.put(processorURI, map) ;
 
