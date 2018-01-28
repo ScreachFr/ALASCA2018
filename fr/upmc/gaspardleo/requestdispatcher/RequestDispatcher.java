@@ -20,9 +20,6 @@ import fr.upmc.datacenter.software.ports.RequestNotificationInboundPort;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionInboundPort;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
-import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
-import fr.upmc.datacenterclient.requestgenerator.interfaces.RequestGeneratorManagementI;
-import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.connectors.AdmissionControllerConnector;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
@@ -35,7 +32,6 @@ import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
-import fr.upmc.gaspardleo.test.DistributedTest;
 
 public 	class 		RequestDispatcher 
 		extends 	AbstractComponent 
@@ -68,7 +64,6 @@ public 	class 		RequestDispatcher
 	private RequestDispatcherInboundPort rdip;
 	private ShutdownableInboundPort sip;
 	private AdmissionControllerOutboundPort acop;
-	private RequestGeneratorManagementOutboundPort rgmop;
 	private Integer vmCursor;
 	private String rmop_uri;
 	
@@ -131,19 +126,6 @@ public 	class 		RequestDispatcher
 		this.rmop_uri = component_uris.get(RDPortTypes.RQUEST_MONITOR_IN);
 		 //Addition by AC the new RD for a specific RG
 		this.acop.addRequestDispatcher(component_uris, rg_uris, this.rmop_uri);
-		// Request Generator Management port
-		this.addRequiredInterface(RequestGeneratorManagementI.class);
-		rgmop = new RequestGeneratorManagementOutboundPort(
-			component_uris.get(RDPortTypes.REQUEST_GENERATOR_MANAGER_OUT),
-			this);
-		rgmop.publishPort();
-		this.addPort(rgmop);
-		rgmop.doConnection(
-			rg_uris.get(RGPortTypes.MANAGEMENT_IN),
-			RequestGeneratorManagementConnector.class.getCanonicalName());
-		// Execution of the main senario
-		DistributedTest.testScenario(rgmop);;	
-		
 		// Request Dispatcher debug
 		this.toggleLogging();
 		this.toggleTracing();

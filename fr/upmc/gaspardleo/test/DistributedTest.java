@@ -3,7 +3,10 @@ package fr.upmc.gaspardleo.test;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.cvm.AbstractDistributedCVM;
+import fr.upmc.components.ports.AbstractPort;
+import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
@@ -70,6 +73,15 @@ public class DistributedTest
 				RequestDispatcher rd = new RequestDispatcher(RequestDispatcher.makeUris(i), rg_uris, ac_uris);
 				this.addDeployedComponent(rd);
 				rd.start();
+				
+				RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
+					AbstractPort.generatePortURI(),
+					new AbstractComponent(0, 0) {});
+				rgmop.publishPort();
+				rgmop.doConnection(
+					rg_uris.get(RGPortTypes.MANAGEMENT_IN),
+					RequestGeneratorManagementConnector.class.getCanonicalName());
+				testScenario(rgmop);
 			}
 			
 			System.out.println("### DataCenter started !");
@@ -81,7 +93,7 @@ public class DistributedTest
 		}
 	}
 	
-	public static void testScenario(RequestGeneratorManagementOutboundPort rgmop) throws Exception {
+	public void testScenario(RequestGeneratorManagementOutboundPort rgmop) throws Exception {
 		
 		new Thread(new Runnable() {
 			@Override
@@ -100,11 +112,6 @@ public class DistributedTest
 	}
 	
 	public static void main(String[] args){
-		
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		
 		try {
 			DistributedTest dTest = new DistributedTest(args);
 			dTest.deploy();

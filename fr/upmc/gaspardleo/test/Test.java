@@ -3,6 +3,10 @@ package fr.upmc.gaspardleo.test;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import fr.upmc.components.AbstractComponent;
+import fr.upmc.components.ports.AbstractPort;
+import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorManagementConnector;
+import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
@@ -16,8 +20,8 @@ import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 public class Test {
 
-	private final static int 	NB_DATASOURCE 	= 1;	
-	private CVM 				cvm;
+	private final static int NB_DATASOURCE 	= 1;	
+	private CVM cvm;
 
 	public Test(){
 		initTest();
@@ -48,6 +52,15 @@ public class Test {
 				new RequestGenerator(rg_uris, new Double(500.0), new Long(6000000000L));
 				
 				new RequestDispatcher(RequestDispatcher.makeUris(i), rg_uris, ac_uris);
+				
+				RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
+					AbstractPort.generatePortURI(),
+					new AbstractComponent(0, 0) {});
+				rgmop.publishPort();
+				rgmop.doConnection(
+					rg_uris.get(RGPortTypes.MANAGEMENT_IN),
+					RequestGeneratorManagementConnector.class.getCanonicalName());
+				testScenario(rgmop);
 			}
 
 		} catch (Exception e) {
@@ -57,6 +70,24 @@ public class Test {
 	
 	public CVM getCvm() {
 		return cvm;
+	}
+	
+	public void testScenario(RequestGeneratorManagementOutboundPort rgmop) throws Exception {
+		
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(1000L);
+					rgmop.startGeneration();
+					Thread.sleep(20000L);
+					rgmop.stopGeneration();
+				} catch (Exception e) {
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+			}
+		}).start();
 	}
 
 	public static void main(String[] args){
