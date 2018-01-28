@@ -90,9 +90,7 @@ public class AdmissionController
 
 		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
 		
-		HashMap<RequestMonitorPorts, String> rm_uris = new HashMap<>();
-		rm_uris.put(RequestMonitorPorts.REQUEST_MONITOR_IN, rg_monitor_in);		
-		rm_uris.put(RequestMonitorPorts.INTROSPECTION, "rm-" + rd_URI);
+		HashMap<RequestMonitorPorts, String> rm_uris = RequestMonitor.makeUris(rg_monitor_in, rd_URI);
 		
 		new RequestMonitor(rm_uris, 0.5);
 		
@@ -119,10 +117,8 @@ public class AdmissionController
 		
 		// Performance regulator creation
 		
-		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = new HashMap<>();
-		performanceRegulator_uris.put(PerformanceRegulatorPorts.INTROSPECTION, rd_URI + "-pr");
-		performanceRegulator_uris.put(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN, AbstractPort.generatePortURI());
-		
+		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = PerformanceRegulator.makeUris(rd_URI);
+				
 		new PerformanceRegulator(
 				performanceRegulator_uris, 
 				RD_uris, rm_uris, 

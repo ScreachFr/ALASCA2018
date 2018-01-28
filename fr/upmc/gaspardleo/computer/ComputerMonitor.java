@@ -23,16 +23,4 @@ public class ComputerMonitor
 		this.toggleTracing();
 		this.logMessage("ComputerMonitor made");
 	}
-	
-//	public HashMap<ComputerMonitorPortTypes, String> getPortTypes() throws Exception {
-//		
-//		HashMap<ComputerMonitorPortTypes, String> result = new HashMap<>();
-//		
-//		result.put(ComputerMonitorPortTypes.STATIC_STATE_OUT, 
-//				this.cssPort.getPortURI());
-//		result.put(ComputerMonitorPortTypes.DYNAMIC_STATE_OUT, 
-//				this.cdsPort.getPortURI());
-//		
-//		return result;
-//	}
 }
