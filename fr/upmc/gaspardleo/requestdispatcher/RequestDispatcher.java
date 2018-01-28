@@ -24,7 +24,7 @@ import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
-import fr.upmc.gaspardleo.applicationvm.connectors.ApplicationVMConnector;
+import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
@@ -273,10 +273,16 @@ public 	class 		RequestDispatcher
 					= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
 			this.addPort(avmcop);
 			avmcop.publishPort();
-	// 		avmcop.doConnection(AVMConnectionPort_URI, 
-	//				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
-			avmcop.doConnection(AVMConnectionPort_URI, 
-					ApplicationVMConnector.class.getCanonicalName());
+			try{
+				avmcop.doConnection(AVMConnectionPort_URI, 
+					ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
+			}catch(Exception e){
+				e.printStackTrace();
+				throw e;
+			}
+			assert avmcop.connected() : "avmop not connected";
+//			avmcop.doConnection(AVMConnectionPort_URI, 
+//					ApplicationVMConnector.class.getCanonicalName());
 			avmcop.doRequestNotificationConnection(notificationPort_URI);
 			avmcop.doRequestMonitorConnection(requestMonitor_in);
 			this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
