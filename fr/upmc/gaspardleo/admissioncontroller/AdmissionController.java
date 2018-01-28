@@ -9,7 +9,6 @@ import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
-import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator;
@@ -30,6 +29,7 @@ import fr.upmc.gaspardleo.requestmonitor.RequestMonitor;
 import fr.upmc.gaspardleo.requestmonitor.RequestMonitor.RequestMonitorPorts;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 
 public class AdmissionController 
 		extends AbstractComponent
@@ -68,13 +68,9 @@ public class AdmissionController
 		this.addPort(cpop);
 		this.cpop.publishPort();
 
-//		this.cpop.doConnection(
-//				computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
-//				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());		
-		
 		this.cpop.doConnection(
 			computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
-			ComputerPoolConnector.class.getCanonicalName());		
+			ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());		
 		
 		this.toggleLogging();
 		this.toggleTracing();		

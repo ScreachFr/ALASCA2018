@@ -9,8 +9,8 @@ import fr.upmc.components.exceptions.ComponentStartException;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
-import fr.upmc.gaspardleo.computerpool.connectors.ComputerPoolConnector;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
@@ -110,17 +110,9 @@ public class PerformanceRegulator
 		this.addPort(this.cpop);
 		this.cpop.publishPort();
 
-//		this.cpop.doConnection(computerPool.get(ComputerPoolPorts.COMPUTER_POOL), 
-//				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
-
-		try{
 		this.cpop.doConnection(computerPool.get(ComputerPoolPorts.COMPUTER_POOL), 
-				ComputerPoolConnector.class.getCanonicalName());
-		} catch (Exception e){
-			e.printStackTrace();
-			throw e;
-		}
-		
+				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
+
 		//Debug
 		this.toggleTracing();
 		this.toggleLogging();
