@@ -15,10 +15,10 @@ import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
 import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionInboundPort;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
-import fr.upmc.gaspardleo.requestmonitor.connectors.RequestMonitorConnector;
 import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
@@ -108,12 +108,9 @@ public class ApplicationVM
 	public void doRequestMonitorConnection(String requestMonitor_in) throws Exception {
 
 		try{
-
-		//		this.rmop.doConnection(requestMonitor_in,
-		//				ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
-
-		this.rmop.doConnection(requestMonitor_in,
-				RequestMonitorConnector.class.getCanonicalName());
+			this.rmop.doConnection(
+				requestMonitor_in,
+				ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
 		}catch(Exception e){
 			e.printStackTrace();
 			throw e;

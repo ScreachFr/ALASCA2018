@@ -23,7 +23,6 @@ import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherOutboundPort;
 import fr.upmc.gaspardleo.requestmonitor.RequestMonitor.RequestMonitorPorts;
-import fr.upmc.gaspardleo.requestmonitor.connectors.RequestMonitorConnector;
 import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
@@ -87,12 +86,10 @@ public class PerformanceRegulator
 		this.rmop = new RequestMonitorOutboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(rmop);
 		this.rmop.publishPort();
-		
-//		this.rmop.doConnection(requestMonitor.get(RequestMonitorPorts.REQUEST_MONITOR_IN),
-//				ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
 
-		this.rmop.doConnection(requestMonitor.get(RequestMonitorPorts.REQUEST_MONITOR_IN),
-				RequestMonitorConnector.class.getCanonicalName());
+		this.rmop.doConnection(
+				requestMonitor.get(RequestMonitorPorts.REQUEST_MONITOR_IN),
+				ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
 		
 		//Request dispatcher port creation and connection.
 		this.addRequiredInterface(RequestDispatcherI.class);
