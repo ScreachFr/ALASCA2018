@@ -14,7 +14,6 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.PerformanceRegulatorPorts;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.RegulationStrategies;
-import fr.upmc.gaspardleo.performanceregulator.connectors.PerformanceRegulatorConnector;
 import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorOutboundPort;
@@ -130,17 +129,9 @@ public class AdmissionController
 		this.addPort(prop);
 		prop.publishPort();
 		
-//		prop.doConnection(pr_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
-//				ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
-		
-		try{
-			prop.doConnection(
+		prop.doConnection(
 				performanceRegulator_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
-				PerformanceRegulatorConnector.class.getCanonicalName());
-		} catch (Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+				ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
 		
 		System.out.println("[DEBUG LEO] prop connected ? : " + prop.connected());
 		
