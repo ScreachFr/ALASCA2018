@@ -9,8 +9,10 @@ import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 
 public class RequestDispatcherOutboundPort 
-	extends AbstractOutboundPort
-	implements RequestDispatcherI{
+		extends AbstractOutboundPort
+		implements RequestDispatcherI{
+
+	private static final long serialVersionUID = 1L;
 
 	public RequestDispatcherOutboundPort(ComponentI owner) throws Exception {
 		super(RequestDispatcherI.class, owner);

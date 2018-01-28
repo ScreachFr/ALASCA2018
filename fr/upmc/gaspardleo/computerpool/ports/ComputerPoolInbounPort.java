@@ -13,6 +13,8 @@ public class ComputerPoolInbounPort
 		extends AbstractOutboundPort
 		implements ComputerPoolI {
 
+	private static final long serialVersionUID = 1L;
+
 	public ComputerPoolInbounPort(String uri, ComponentI owner) throws Exception {
 		super(uri, ComputerPoolI.class, owner);
 	}

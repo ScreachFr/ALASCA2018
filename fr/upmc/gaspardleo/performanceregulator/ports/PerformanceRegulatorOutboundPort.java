@@ -6,8 +6,10 @@ import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
 
 public class PerformanceRegulatorOutboundPort 
-extends AbstractOutboundPort 
-implements PerformanceRegulatorI {
+		extends AbstractOutboundPort 
+		implements PerformanceRegulatorI {
+
+	private static final long serialVersionUID = 1L;
 
 	public PerformanceRegulatorOutboundPort(String uri, ComponentI owner)
 			throws Exception {

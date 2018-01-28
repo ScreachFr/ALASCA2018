@@ -5,9 +5,11 @@ import fr.upmc.components.ports.AbstractOutboundPort;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 
 public class RequestGeneratorOutboundPort 
-	extends AbstractOutboundPort
-	implements RequestGeneratorConnectionI{
-	
+		extends AbstractOutboundPort
+		implements RequestGeneratorConnectionI{
+
+	private static final long serialVersionUID = 1L;
+
 	public RequestGeneratorOutboundPort(ComponentI owner) throws Exception {
 		super(RequestGeneratorConnectionI.class, owner);
 	}

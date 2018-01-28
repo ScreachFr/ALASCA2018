@@ -6,6 +6,8 @@ import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 
 public class ShutdownableOutboundPort extends AbstractOutboundPort implements ShutdownableI{
 
+	private static final long serialVersionUID = 1L;
+
 	public ShutdownableOutboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, ShutdownableI.class, owner);
 	}
