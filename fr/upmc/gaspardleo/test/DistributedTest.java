@@ -10,6 +10,9 @@ import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorMana
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
+import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
+import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
+import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.computer.Computer;
 import fr.upmc.gaspardleo.computerpool.ComputerPool;
@@ -63,31 +66,42 @@ public class DistributedTest
 			this.addDeployedComponent(ac);
 			ac.start();
 			
-			for (int i = 0; i < NB_DATASOURCE; i++) {
-				
-				HashMap<RGPortTypes, String> rg_uris = RequestGenerator.makeUris(i);
-				RequestGenerator rg =new RequestGenerator(rg_uris, new Double(500.0), new Long(6000000000L));
-				this.addDeployedComponent(rg);
-				rg.start();
-				
-				RequestDispatcher rd = new RequestDispatcher(RequestDispatcher.makeUris(i), rg_uris, ac_uris);
-				this.addDeployedComponent(rd);
-				rd.start();
-				
-				RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
-					AbstractPort.generatePortURI(),
-					new AbstractComponent(0, 0) {});
-				rgmop.publishPort();
-				rgmop.doConnection(
-					rg_uris.get(RGPortTypes.MANAGEMENT_IN),
-					RequestGeneratorManagementConnector.class.getCanonicalName());
-				testScenario(rgmop);
-			}
+			this.cyclicBarrierClient.waitBarrier();
 			
 			System.out.println("### DataCenter started !");
 			
 		} else {
 			if (thisJVMURI.equals(DatacenterClient)){
+				
+				this.cyclicBarrierClient.waitBarrier();
+				
+				for (int i = 0; i < NB_DATASOURCE; i++) {
+					
+					HashMap<RGPortTypes, String> rg_uris = RequestGenerator.makeUris(i);
+					RequestGenerator rg =new RequestGenerator(rg_uris, new Double(500.0), new Long(6000000000L));
+					this.addDeployedComponent(rg);
+					rg.start();
+					
+					AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(
+						AbstractPort.generatePortURI(),
+						new AbstractComponent(0, 0) {});
+					acop.publishPort();
+					acop.doConnection(
+						ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
+						ClassFactory.newConnector(AdmissionControllerI.class).getCanonicalName());
+					assert acop.connected() : "acop not connected";
+					acop.createNewRequestDispatcher(i, rg_uris, ac_uris);
+					
+					RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
+						AbstractPort.generatePortURI(),
+						new AbstractComponent(0, 0) {});
+					rgmop.publishPort();
+					rgmop.doConnection(
+						rg_uris.get(RGPortTypes.MANAGEMENT_IN),
+						RequestGeneratorManagementConnector.class.getCanonicalName());
+					testScenario(rgmop);
+				}
+				
 				System.out.println("### DataCenterClient started !");
 			}
 		}

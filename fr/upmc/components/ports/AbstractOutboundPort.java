@@ -1,5 +1,6 @@
 package fr.upmc.components.ports;
 
+
 // Copyright Jacques Malenfant, Univ. Pierre et Marie Curie.
 // 
 // Jacques.Malenfant@lip6.fr
@@ -68,6 +69,10 @@ public abstract class	AbstractOutboundPort
 extends		AbstractPort
 implements	OutboundPortI
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/** URI of the server port to which this port is connected.			*/
 	protected String	serverPortURI ;
 	/** connector used to link with the provider component.				*/

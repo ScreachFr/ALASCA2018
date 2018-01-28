@@ -1,5 +1,7 @@
 package fr.upmc.components.ports;
 
+import java.rmi.server.UnicastRemoteObject;
+
 // Copyright Jacques Malenfant, Univ. Pierre et Marie Curie.
 // 
 // Jacques.Malenfant@lip6.fr
@@ -63,11 +65,17 @@ import fr.upmc.components.interfaces.OfferedI;
  * @version	$Name$ -- $Revision$ -- $Date$
  */
 public abstract class	AbstractPort
+extends UnicastRemoteObject
 implements	PortI
 {
 	// ------------------------------------------------------------------------
 	// Port unique identifier management
 	// ------------------------------------------------------------------------
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * generate a unique identifier for the port which has the interface

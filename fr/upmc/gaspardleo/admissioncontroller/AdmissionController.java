@@ -20,6 +20,7 @@ import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorOutboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
+import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.connectors.RequestGeneraterConnector;
@@ -191,5 +192,12 @@ public class AdmissionController
 		HashMap<ACPortTypes, String> ac_uris = new HashMap<ACPortTypes, String>();		
 		ac_uris.put(ACPortTypes.ADMISSION_CONTROLLER_IN, introspection_uri);
 		return ac_uris;
+	}
+
+	@Override
+	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,
+			HashMap<ACPortTypes, String> ac_uris) throws Exception {
+		RequestDispatcher rd = new RequestDispatcher(RequestDispatcher.makeUris(num_rd), rg_uris, ac_uris);
+		rd.start();
 	}
 }

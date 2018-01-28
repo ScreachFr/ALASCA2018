@@ -7,6 +7,7 @@ import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractInboundPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
+import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
@@ -25,9 +26,7 @@ implements AdmissionControllerI {
 			HashMap<RDPortTypes, String> RD_uris,
 			HashMap<RGPortTypes, String> RG_uris,
 			String rg_monitor_in) throws Exception {
-		
 		AdmissionController ac = (AdmissionController) this.owner;
-
 		ac.handleRequestAsync(
 				new ComponentI.ComponentService<AdmissionController>(){
 					@Override
@@ -44,7 +43,6 @@ implements AdmissionControllerI {
 	@Override
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
 		AdmissionController ac = (AdmissionController) this.owner;
-
 		ac.handleRequestAsync(
 				new ComponentI.ComponentService<AdmissionController>(){
 					@Override
@@ -53,13 +51,11 @@ implements AdmissionControllerI {
 						return ac;
 					}
 				});
-
 	}
 
 	@Override
 	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() throws Exception {
 		AdmissionController ac = (AdmissionController) this.owner;
-
 		return ac.handleRequestSync(
 				new ComponentI.ComponentService<ArrayList<ApplicationVMManagementOutboundPort>>(){
 					@Override
@@ -69,4 +65,17 @@ implements AdmissionControllerI {
 				});
 	}
 
+	@Override
+	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,
+			HashMap<ACPortTypes, String> ac_uris) throws Exception {
+		AdmissionController ac = (AdmissionController) this.owner;
+		ac.handleRequestAsync(
+				new ComponentI.ComponentService<AdmissionController>(){
+					@Override
+					public AdmissionController call() throws Exception {
+						ac.createNewRequestDispatcher(num_rd, rg_uris, ac_uris);
+						return ac;
+					}
+				});
+	}
 }
