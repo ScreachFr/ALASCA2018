@@ -35,7 +35,7 @@ public class AdmissionController
 		implements AdmissionControllerI{
 
 	public static enum	ACPortTypes {
-		ADMISSION_CONTROLLER_IN;
+		ADMISSION_CONTROLLER_IN
 	}
 	
 	private AdmissionControllerInboundPort acip;
@@ -46,10 +46,9 @@ public class AdmissionController
 	private ComputerPoolOutboundPort cpop;
 	
 	public AdmissionController(
-			HashMap<ComputerPoolPorts, String> computerPoolUri,
-			HashMap<ACPortTypes, String> ac_uris,
-			ComponentCreator cc
-			) throws Exception{		
+		HashMap<ComputerPoolPorts, String> computerPoolUri,
+		HashMap<ACPortTypes, String> ac_uris,
+		ComponentCreator cc) throws Exception{		
 		
 		super(1, 1);
 
@@ -108,16 +107,16 @@ public class AdmissionController
 //				ClassFactory.newConnector(RequestGeneratorConnectionI.class).getCanonicalName());
 		
 		try{
-		rgop.doConnection(
+			rgop.doConnection(
 				RG_uris.get(RGPortTypes.CONNECTION_IN), 
 				RequestGeneraterConnector.class.getCanonicalName());
-
-		rgop.doConnectionWithRD(
+			rgop.doConnectionWithRD(
 				RD_uris.get(RDPortTypes.REQUEST_SUBMISSION_IN));	
 		} catch (Exception e){
 			e.printStackTrace();
 			throw e;
 		}
+		
 		// Performance regulator creation
 		
 		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = new HashMap<>();
@@ -166,9 +165,9 @@ public class AdmissionController
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
 
 		Optional<HashMap<RGPortTypes,String>> optRD = 
-				requestSources.keySet().stream()
-				.filter((e) -> e.get(RGPortTypes.INTROSPECTION).equals(requestGeneratorURI))
-				.findFirst();
+			requestSources.keySet().stream()
+			.filter((e) -> e.get(RGPortTypes.INTROSPECTION).equals(requestGeneratorURI))
+			.findFirst();
 
 		if (!optRD.isPresent()) {
 			this.logMessage("Remove request source : Can't find the request generator you're looking for!");
@@ -189,35 +188,12 @@ public class AdmissionController
 
 	@Override
 	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() {
-
 		return this.avmPorts;
 	}
 	
-//	public static HashMap<ACPortTypes, String> newInstance(
-//			HashMap<ComputerPoolPorts, String> computerPoolUri,
-//			HashMap<ACPortTypes, String> ac_uris,
-//			ComponentCreator cc) throws Exception{
-//		
-//		/*Constructeur :
-//		 
-//		  	HashMap<ComputerPoolPorts, String> computerPoolUri,
-//			HashMap<ACPortTypes, String> ac_uris,
-//			ComponentCreator cc
-//		 */
-//		
-//		Object[] constructorParams = new Object[] {
-//				computerPoolUri,
-//				ac_uris,
-//				cc
-//		};
-//
-//		try {
-//			cc.createComponent(AdmissionController.class, constructorParams);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//			throw e;
-//		}
-//
-//		return ac_uris;		
-//	}
+	public static HashMap<ACPortTypes, String> makeUris(String introspection_uri){
+		HashMap<ACPortTypes, String> ac_uris = new HashMap<ACPortTypes, String>();		
+		ac_uris.put(ACPortTypes.ADMISSION_CONTROLLER_IN, introspection_uri);
+		return ac_uris;
+	}
 }

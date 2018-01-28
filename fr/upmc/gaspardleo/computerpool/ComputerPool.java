@@ -9,6 +9,7 @@ import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.connectors.DataConnector;
+import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.ComputerStaticState;
 import fr.upmc.datacenter.hardware.computers.connectors.ComputerServicesConnector;
@@ -327,32 +328,10 @@ public class ComputerPool
 		}
 	}
 	
-//	public static HashMap<ComputerPoolPorts, String> newInstance(
-//			ComponentCreator cc) throws Exception {
-//			
-//		HashMap<ComputerPoolPorts, String> component_uris = new HashMap<>();
-//		component_uris.put(ComputerPoolPorts.COMPUTER_POOL, AbstractPort.generatePortURI());
-//		component_uris.put(ComputerPoolPorts.INTROSPECTION, AbstractPort.generatePortURI());
-//		
-//		/* Constructeur :
-//		 
-//			HashMap<ComputerPoolPorts, String> component_uris,
-//			ComponentCreator cc
-//		 */
-//		
-//		Object[] constructorParams = new Object[]{
-//				component_uris,
-//				cc
-//		};
-//		
-//		try{
-//			cc.createComponent(ComputerPool.class, constructorParams);
-//		}catch (Exception e){
-//			e.printStackTrace();
-//			throw e;
-//		}
-//		
-//		
-//		return component_uris;
-//	}
+	public static HashMap<ComputerPoolPorts, String> makeUris(){
+		HashMap<ComputerPoolPorts, String> computerPool_uris = new HashMap<>();
+		computerPool_uris.put(ComputerPoolPorts.COMPUTER_POOL, AbstractPort.generatePortURI());
+		computerPool_uris.put(ComputerPoolPorts.INTROSPECTION, AbstractPort.generatePortURI());
+		return computerPool_uris;
+	}
 }
