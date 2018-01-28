@@ -10,4 +10,5 @@ grant {
   permission java.lang.RuntimePermission "stopThread";
   permission java.lang.RuntimePermission "modifyThread";
   permission java.lang.RuntimePermission "modifyThreadGroup";
+  permission java.security.AllPermission "./jars/javassist-3.9.0.GA.ja";
 };
