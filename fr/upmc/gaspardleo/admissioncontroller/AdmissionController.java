@@ -21,7 +21,6 @@ import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOu
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
-import fr.upmc.gaspardleo.requestgenerator.connectors.RequestGeneraterConnector;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
 import fr.upmc.gaspardleo.requestmonitor.RequestMonitor;
@@ -96,14 +95,10 @@ public class AdmissionController
 		this.addPort(rgop);
 		rgop.publishPort();
 		
-//		rgop.doConnection(
-//				RG_uris.get(RGPortTypes.CONNECTION_IN), 
-//				ClassFactory.newConnector(RequestGeneratorConnectionI.class).getCanonicalName());
-		
 		try{
 			rgop.doConnection(
 				RG_uris.get(RGPortTypes.CONNECTION_IN), 
-				RequestGeneraterConnector.class.getCanonicalName());
+				ClassFactory.newConnector(RequestGeneratorConnectionI.class).getCanonicalName());
 			rgop.doConnectionWithRD(
 				RD_uris.get(RDPortTypes.REQUEST_SUBMISSION_IN));	
 		} catch (Exception e){
