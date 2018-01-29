@@ -94,17 +94,13 @@ public class AdmissionController
 		RequestGeneratorOutboundPort rgop = new RequestGeneratorOutboundPort(this);
 		this.addPort(rgop);
 		rgop.publishPort();
+	
+		rgop.doConnection(
+			RG_uris.get(RGPortTypes.CONNECTION_IN), 
+			ClassFactory.newConnector(RequestGeneratorConnectionI.class).getCanonicalName());
 		
-		try{
-			rgop.doConnection(
-				RG_uris.get(RGPortTypes.CONNECTION_IN), 
-				ClassFactory.newConnector(RequestGeneratorConnectionI.class).getCanonicalName());
-			rgop.doConnectionWithRD(
-				RD_uris.get(RDPortTypes.REQUEST_SUBMISSION_IN));	
-		} catch (Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		rgop.doConnectionWithRD(
+			RD_uris.get(RDPortTypes.REQUEST_SUBMISSION_IN));	
 		
 		// Performance regulator creation
 		

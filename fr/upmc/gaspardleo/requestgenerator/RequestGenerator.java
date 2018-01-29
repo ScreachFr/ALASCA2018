@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.components.ports.PortI;
-import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
 import fr.upmc.datacenter.software.ports.RequestSubmissionOutboundPort;
@@ -74,22 +73,20 @@ public 	class RequestGenerator
 
 	@Override
 	public void doConnectionWithRD(String RD_Request_Submission_In) throws Exception {
+		
 		RequestSubmissionOutboundPort rsop = 
-				(RequestSubmissionOutboundPort) super.findPortFromURI(super.requestSubmissionOutboundPortURI);
+			(RequestSubmissionOutboundPort) super.findPortFromURI(super.requestSubmissionOutboundPortURI);
+		
 		if (rsop == null){
 			super.addRequiredInterface(RequestSubmissionI.class) ;
 			rsop = new RequestSubmissionOutboundPort(requestSubmissionOutboundPortURI, this) ;
 			super.addPort(rsop) ;
 			rsop.publishPort() ;
 		}
-		try {
-			rsop.doConnection(
-				RD_Request_Submission_In, 
-				ClassFactory.newConnector(RequestSubmissionI.class).getCanonicalName());
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		
+		rsop.doConnection(
+			RD_Request_Submission_In, 
+			ClassFactory.newConnector(RequestSubmissionI.class).getCanonicalName());
 	}
 
 	public static HashMap<RGPortTypes, String> makeUris(int num_rg){

@@ -77,7 +77,8 @@ public class PerformanceRegulator
 		this.targetValue = targetValue;
 
 		this.addOfferedInterface(PerformanceRegulatorI.class);
-		this.prip = new PerformanceRegulatorInboundPort(component_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN), this);
+		this.prip = new PerformanceRegulatorInboundPort(
+			component_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN), this);
 		this.addPort(this.prip);
 		this.prip.publishPort();
 
@@ -88,8 +89,8 @@ public class PerformanceRegulator
 		this.rmop.publishPort();
 
 		this.rmop.doConnection(
-				requestMonitor.get(RequestMonitorPorts.REQUEST_MONITOR_IN),
-				ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
+			requestMonitor.get(RequestMonitorPorts.REQUEST_MONITOR_IN),
+			ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
 		
 		//Request dispatcher port creation and connection.
 		this.addRequiredInterface(RequestDispatcherI.class);
@@ -98,8 +99,8 @@ public class PerformanceRegulator
 		this.rdop.publishPort();
 
 		this.rdop.doConnection(
-				requestDispatcher.get(RDPortTypes.REQUEST_DISPATCHER_IN),
-				ClassFactory.newConnector(RequestDispatcherI.class).getCanonicalName());
+			requestDispatcher.get(RDPortTypes.REQUEST_DISPATCHER_IN),
+			ClassFactory.newConnector(RequestDispatcherI.class).getCanonicalName());
 
 		//Computer pool port creation and connection.
 		this.addRequiredInterface(ComputerPoolI.class);
@@ -133,20 +134,16 @@ public class PerformanceRegulator
 
 	@Override
 	public Boolean increaseCPUFrequency() throws Exception {
+
 		Boolean hasChangedFreq = false;
-		
 		List<String> avms;
-		try{
+		
 		avms = rdop.getRegisteredAVMUris();
-		} catch (Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+
 		for (String avm : avms) {
 			if (cpop.increaseCoreFrequency(avm))
 				hasChangedFreq = true;
 		}
-		
 		
 		return hasChangedFreq;
 	}
@@ -173,17 +170,16 @@ public class PerformanceRegulator
 		System.out.println("[DEBUG LEO] addAVMToRD ...");
 		
 		HashMap<ApplicationVMPortTypes, String> avm = this.cpop.createNewApplicationVM("avm-"+(newAVMID++), 1);
+		
 		if (avm == null) {
 			this.logMessage(this.uri + " : addAVMToRD : No available ressource!");
 			return false;
 		}
+		
 		this.logMessage(this.uri + " : Adding an avm : " + avm);
-		try{
-			rdop.registerVM(avm, RequestSubmissionI.class);
-		} catch (Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+
+		rdop.registerVM(avm, RequestSubmissionI.class);
+
 		return true;
 	}
 

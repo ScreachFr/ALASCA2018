@@ -82,40 +82,26 @@ public class ApplicationVM
 	}
 
 	@Override
-	public void doRequestNotificationConnection(
-			String RD_RequestNotificationInboundPortURI) throws Exception {
-		try{
-			this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
-			this.addPort(requestNotificationOutboundPort);
-			this.requestNotificationOutboundPort.publishPort();
-			this.addRequiredInterface(RequestNotificationI.class);
-	
-			this.requestNotificationOutboundPort.doConnection(
-				RD_RequestNotificationInboundPortURI,
-				ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
-			
-			assert this.requestNotificationOutboundPort.connected() : "rnop is not connect";
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+	public void doRequestNotificationConnection(String RD_RequestNotificationInboundPortURI) throws Exception {
 		
+		this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
+		this.addPort(requestNotificationOutboundPort);
+		this.requestNotificationOutboundPort.publishPort();
+		this.addRequiredInterface(RequestNotificationI.class);
+
+		this.requestNotificationOutboundPort.doConnection(
+			RD_RequestNotificationInboundPortURI,
+			ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
+			
 		this.logMessage("AVM : rnop connection status : " + this.requestNotificationOutboundPort.connected());
 	}
 	
 	@Override
 	public void doRequestMonitorConnection(String requestMonitor_in) throws Exception {
 
-		try{
-			this.rmop.doConnection(
-				requestMonitor_in,
-				ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
-		System.out.println("rmop connected : " + rmop.connected());
-
+		this.rmop.doConnection(
+			requestMonitor_in,
+			ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
 	}
 
 	public RequestNotificationOutboundPort getRequestNotificationOutboundPort() throws Exception {
@@ -141,16 +127,11 @@ public class ApplicationVM
 
 			TaskI t = this.taskQueue.remove() ;
 			
-			
 			this.logMessage(this.vmURI + " : Request " + t.getRequest().getRequestURI() + " has been in queue for " 
 					+ (execTimestamp -this.requestStartTimeStamps.get(t.getRequest())) + "ms.");
 			
-			try{
-				rmop.addEntry(this.requestStartTimeStamps.get(t.getRequest()), execTimestamp);
-			} catch (Exception e){
-				e.printStackTrace();
-				throw e;
-			}
+			rmop.addEntry(this.requestStartTimeStamps.get(t.getRequest()), execTimestamp);
+				
 			this.logMessage(this.vmURI + " starts request " +
 					t.getRequest().getRequestURI()) ;
 			this.runningTasks.put(t.getTaskURI(), ac) ;
@@ -194,21 +175,11 @@ public class ApplicationVM
 		component_uris.put(ApplicationVMPortTypes.SHUTDOWNABLE, AbstractPort.generatePortURI());
 		component_uris.put(ApplicationVMPortTypes.CONNECTION_REQUEST, AbstractPort.generatePortURI());
 		
-		/* Constructeur :
-		 
-				HashMap<ApplicationVMPortTypes, String> component_uris
-		 */
-		
 		Object[] constructorParams = new Object[] {
 				component_uris
 		};
 		
-		try {
-			cc.createComponent(ApplicationVM.class, constructorParams);
-		} catch(Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
+		cc.createComponent(ApplicationVM.class, constructorParams);
 
 		return component_uris;
 	}

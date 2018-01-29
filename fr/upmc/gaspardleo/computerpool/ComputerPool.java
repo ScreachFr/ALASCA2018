@@ -93,47 +93,35 @@ public class ComputerPool
 		
 		if(!this.isRequiredInterface(ComputerServicesI.class))
 			this.addRequiredInterface(ComputerServicesI.class);
+		
 		ComputerServicesOutboundPort csop = new ComputerServicesOutboundPort(this);
 		this.addPort(csop);
 		csop.publishPort();
 		
-		try{
-			csop.doConnection(
-				computerUris.get(ComputerPortsTypes.SERVICE_IN), 
-				ClassFactory.newConnector(ComputerServicesI.class).getCanonicalName());
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		csop.doConnection(
+			computerUris.get(ComputerPortsTypes.SERVICE_IN), 
+			ClassFactory.newConnector(ComputerServicesI.class).getCanonicalName());
+
 		for (int i = 0; i < (numberOfProcessors * numberOfCores)/2; i++) {
 			availableCores.add(csop.allocateCores(DEFAULT_CORE_ALLOC_NUMBER));
 		}
 		
 		this.computers.add(computerUris);
 		
-		try{
-			csop.doConnection(computerUris.get(
-				ComputerPortsTypes.SERVICE_IN),
-				ClassFactory.newConnector(ComputerServicesI.class).getCanonicalName());
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		csop.doConnection(computerUris.get(
+			ComputerPortsTypes.SERVICE_IN),
+			ClassFactory.newConnector(ComputerServicesI.class).getCanonicalName());
 		
 		if(!this.isRequiredInterface(ComputerStaticStateDataI.class))
 			this.addRequiredInterface(ComputerStaticStateDataI.class);
+		
 		ComputerStaticStateDataOutboundPort cssdop = new ComputerStaticStateDataOutboundPort(this, computerUris.get(ComputerPortsTypes.INTROSPECTION));
 		this.addPort(cssdop);
 		cssdop.publishPort();
 
-		try{
-			cssdop.doConnection(
-				computerUris.get(ComputerPortsTypes.STATIC_STATE_IN),
-				DataConnector.class.getCanonicalName());
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		cssdop.doConnection(
+			computerUris.get(ComputerPortsTypes.STATIC_STATE_IN),
+			DataConnector.class.getCanonicalName());
 		
 		ComputerStaticState css = (ComputerStaticState) cssdop.request();
 
@@ -146,57 +134,50 @@ public class ComputerPool
 
 			if(!this.isRequiredInterface(ControlledDataRequiredI.ControlledPullI.class))
 				this.addRequiredInterface(ControlledDataRequiredI.ControlledPullI.class);
+			
 			ProcessorDynamicStateDataOutboundPort pdsdop = new ProcessorDynamicStateDataOutboundPort(this, cpuUri);
 			this.addPort(pdsdop);
 			pdsdop.publishPort();
-			try{
-				pdsdop.doConnection(
-					cpuPortMap.get(cpuUri).get(ProcessorPortTypes.DYNAMIC_STATE_2),
-					DataConnector.class.getCanonicalName());
-			}catch(Exception e){
-				e.printStackTrace();
-				throw e;
-			}
+			
+			pdsdop.doConnection(
+				cpuPortMap.get(cpuUri).get(ProcessorPortTypes.DYNAMIC_STATE_2),
+				DataConnector.class.getCanonicalName());
+			
 			processorDynamicStatePort.put(cpuUri, pdsdop);
 
 			if(!this.isRequiredInterface(ProcessorStaticStateDataI.class))
 				this.addRequiredInterface(ProcessorStaticStateDataI.class);
-			ProcessorStaticStateDataOutboundPort pssdop 
-			= new ProcessorStaticStateDataOutboundPort(this, cpuUri);
+			
+			ProcessorStaticStateDataOutboundPort pssdop = new ProcessorStaticStateDataOutboundPort(this, cpuUri);
 			this.addPort(pssdop);
 			pssdop.publishPort();
-			try{
-				pssdop.doConnection(
-					cpuPortMap.get(cpuUri).get(ProcessorPortTypes.STATIC_STATE_2),
-					DataConnector.class.getCanonicalName());
-			}catch(Exception e){
-				e.printStackTrace();
-				throw e;
-			}
+			
+			pssdop.doConnection(
+				cpuPortMap.get(cpuUri).get(ProcessorPortTypes.STATIC_STATE_2),
+				DataConnector.class.getCanonicalName());
+
 			processorStaticStatePort.put(cpuUri, pssdop);
 
 			if (processorManagmentPorts.get(cpuUri) == null) {
+
 				if(!this.isRequiredInterface(ProcessorManagementI.class))
 					this.addRequiredInterface(ProcessorManagementI.class);
+				
 				ProcessorManagementOutboundPort pmob = new ProcessorManagementOutboundPort(this);
 				this.addPort(pmob);
 				pmob.publishPort();
-				try{
-					pmob.doConnection(
-						cpuPortMap.get(cpuUri).get(ProcessorPortTypes.MANAGEMENT),
-						ClassFactory.newConnector(ProcessorManagementI.class).getCanonicalName());
-				}catch(Exception e){
-					e.printStackTrace();
-					throw e;
-				}
+				
+				pmob.doConnection(
+					cpuPortMap.get(cpuUri).get(ProcessorPortTypes.MANAGEMENT),
+					ClassFactory.newConnector(ProcessorManagementI.class).getCanonicalName());
+			
 				this.processorManagmentPorts.put(cpuUri, pmob);
 			}
 		}
 
 		for (int i = 0; i < (nbProcessor * nbCorePerProcessor)/2; i++) {
+			
 			AllocatedCore[] cores = csop.allocateCores(DEFAULT_CORE_ALLOC_NUMBER);
-
-
 
 			for (AllocatedCore allocatedCore : cores) {
 				allocatedCore.processorInboundPortURI.get(ProcessorPortTypes.MANAGEMENT);

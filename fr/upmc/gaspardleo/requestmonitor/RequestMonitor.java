@@ -29,25 +29,22 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 		  	HashMap<RequestMonitorPorts, String> component_uris,
 			Double alpha
 			) throws Exception {
+		
 		super(1, 1);
 		
 		if (alpha < 0.0 || alpha > 1.0)
 			throw new Error("RequestMonitor constructor : Wrong alpha value. This value must be between 0 and 1. It's current value is " + alpha + ".");
+		
 		this.lock = new Object();
 		this.meanRequestExecutionTime = 0.0;
 		this.lastEntry = -1L;
 		this.alpha = alpha;
 		this.isFirstValue = true;
 
-		try{
 		this.addOfferedInterface(RequestMonitorI.class);
 		this.rmip = new RequestMonitorInboundPort(component_uris.get(RequestMonitorPorts.REQUEST_MONITOR_IN), this);
 		this.addPort(this.rmip);
 		this.rmip.publishPort();
-		} catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
 		
 		this.toggleLogging();
 		this.toggleTracing();		

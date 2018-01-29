@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.exceptions.ComponentShutdownException;
 import fr.upmc.components.ports.AbstractPort;
-import fr.upmc.datacenter.software.connectors.RequestNotificationConnector;
-import fr.upmc.datacenter.software.connectors.RequestSubmissionConnector;
 import fr.upmc.datacenter.software.interfaces.RequestI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI;
 import fr.upmc.datacenter.software.interfaces.RequestNotificationI;
@@ -82,47 +80,47 @@ public 	class 		RequestDispatcher
 
 		// Request submission inbound port connection.
 		this.addOfferedInterface(RequestSubmissionI.class);
-		this.rsip = new RequestSubmissionInboundPort(
-			component_uris.get(RDPortTypes.REQUEST_SUBMISSION_IN), 
-			this);
+		this.rsip = new RequestSubmissionInboundPort(component_uris.get(RDPortTypes.REQUEST_SUBMISSION_IN), this);
 		this.addPort(this.rsip);
 		this.rsip.publishPort();
+		
 		// Request notification submission inbound port connection.
 		this.addOfferedInterface(RequestNotificationI.class);
-		this.rnip = new RequestNotificationInboundPort(
-			component_uris.get(RDPortTypes.REQUEST_NOTIFICATION_IN), 
-			this);
+		this.rnip = new RequestNotificationInboundPort(component_uris.get(RDPortTypes.REQUEST_NOTIFICATION_IN), this);
 		this.addPort(this.rnip);
 		this.rnip.publishPort();
+		
 		this.rnop_uri = component_uris.get(RDPortTypes.REQUEST_NOTIFICATION_OUT);
+		
 		this.rg_uris = rg_uris;
-		assert component_uris.get(RDPortTypes.REQUEST_DISPATCHER_IN) != null : "assertion : rg_uris.get(RDPortTypes.REQUEST_DISPATCHER_IN) null";
+		
 		//RequestDispatcher
 		this.addOfferedInterface(RequestDispatcherI.class);
-		this.rdip = new RequestDispatcherInboundPort(
-				component_uris.get(RDPortTypes.REQUEST_DISPATCHER_IN), 
-				this);	
-		assert this.rdip != null : "assertion : this.rdip null";
+		this.rdip = new RequestDispatcherInboundPort(component_uris.get(RDPortTypes.REQUEST_DISPATCHER_IN), this);	
 		this.addPort(rdip);
 		this.rdip.publishPort();
+		
 		// Shutdown port
 		this.addOfferedInterface(ShutdownableI.class);
-		this.sip = new ShutdownableInboundPort(
-			component_uris.get(RDPortTypes.SHUTDOWNABLE_IN), 
-			this);
+		this.sip = new ShutdownableInboundPort(component_uris.get(RDPortTypes.SHUTDOWNABLE_IN), this);
 		this.addPort(this.sip);
 		this.sip.publishPort();
+		
 		//Admission Crontroler port
 		this.addRequiredInterface(AdmissionControllerI.class);
 		this.acop = new AdmissionControllerOutboundPort(this);
 		this.acop.publishPort();
 		this.addPort(acop);
+		
 		this.acop.doConnection(
 				ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
 				ClassFactory.newConnector(AdmissionControllerI.class).getCanonicalName());
+		
 		this.rmop_uri = component_uris.get(RDPortTypes.RQUEST_MONITOR_IN);
+		
 		 //Addition by AC the new RD for a specific RG
 		this.acop.addRequestDispatcher(component_uris, rg_uris, this.rmop_uri);
+		
 		// Request Dispatcher debug
 		this.toggleLogging();
 		this.toggleTracing();
@@ -219,24 +217,19 @@ public 	class 		RequestDispatcher
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		System.out.println("acceptRequestTerminationNotification function");
-		try {
-			RequestNotificationOutboundPort rnop = 
-					(RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
-			if (rnop == null){
-				this.addRequiredInterface(RequestSubmissionI.class) ;
-				rnop = new RequestNotificationOutboundPort(this.rnop_uri, this) ;
-				this.addPort(rnop) ;
-				rnop.publishPort() ;
-				rnop.doConnection(
-						rg_uris.get(RGPortTypes.REQUEST_NOTIFICATION_IN), 
-						ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
-			}
-			this.logMessage(this.Component_URI + " : incoming request termination notification.");
-			rnop.notifyRequestTermination(r);
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
+		RequestNotificationOutboundPort rnop = 
+				(RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
+		if (rnop == null){
+			this.addRequiredInterface(RequestSubmissionI.class) ;
+			rnop = new RequestNotificationOutboundPort(this.rnop_uri, this) ;
+			this.addPort(rnop) ;
+			rnop.publishPort() ;
+			rnop.doConnection(
+					rg_uris.get(RGPortTypes.REQUEST_NOTIFICATION_IN), 
+					ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
 		}
+		this.logMessage(this.Component_URI + " : incoming request termination notification.");
+		rnop.notifyRequestTermination(r);
 	}
 	
 	@Override
@@ -265,23 +258,18 @@ public 	class 		RequestDispatcher
 	}	
 	
 	private void doAVMRequestNotificationAndMonitoringConnection(String AVMConnectionPort_URI,
-			String notificationPort_URI, String requestMonitor_in) throws Exception {
-		try {
-			this.logMessage("Admission controller : connection on notification port.");
-			ApplicationVMConnectionOutboundPort avmcop 
-					= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
-			this.addPort(avmcop);
-			avmcop.publishPort();
-			avmcop.doConnection(
-					AVMConnectionPort_URI, 
-					ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
-			avmcop.doRequestNotificationConnection(notificationPort_URI);
-			avmcop.doRequestMonitorConnection(requestMonitor_in);
-			this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		String notificationPort_URI, String requestMonitor_in) throws Exception {
+		this.logMessage("Admission controller : connection on notification port.");
+		ApplicationVMConnectionOutboundPort avmcop 
+				= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
+		this.addPort(avmcop);
+		avmcop.publishPort();
+		avmcop.doConnection(
+				AVMConnectionPort_URI, 
+				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
+		avmcop.doRequestNotificationConnection(notificationPort_URI);
+		avmcop.doRequestMonitorConnection(requestMonitor_in);
+		this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
 	}
 
 	@Override
