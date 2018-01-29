@@ -31,7 +31,7 @@ import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOu
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
+import fr.upmc.gaspardleo.componentcreator.ComponentCreator;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort;
@@ -76,6 +76,7 @@ public class ComputerPool
 		this.processorStaticStatePort = new HashMap<>();
 
 		this.cc = new ComponentCreator(AbstractCVM.theCVM);
+		
 		this.toggleLogging();
 		this.toggleTracing();
 		
@@ -193,31 +194,36 @@ public class ComputerPool
 			String avmURI, 
 			Integer numberOfCoreToAllocate)  throws Exception{
 		
-		System.out.println("[DEBUG LEO] createNewApplicationVM ...");
-		
 		// Pas de core sous la main.
 		if (availableCores.size() == 0)
 			return null;
-		
-		HashMap<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(avmURI, cc);
-		// Create a mock up port to manage the AVM component (allocate cores).
-		
-		if(!this.isRequiredInterface(ApplicationVMManagementI.class))
-			this.addRequiredInterface(ApplicationVMManagementI.class);
-		
-		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(new AbstractComponent(0, 0) {});
-		this.addPort(avmPort);
-		avmPort.publishPort();
 
-		avmPort.doConnection(
-			result.get(ApplicationVMPortTypes.MANAGEMENT),
-			ClassFactory.newConnector(ApplicationVMManagementI.class).getCanonicalName());
-		
-		AllocatedCore[] cores = availableCores.remove(0);
-		avmPort.allocateCores(cores);
+		try{
+			HashMap<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(avmURI, cc);
+			// Create a mock up port to manage the AVM component (allocate cores).					
+			
+			if(!this.isRequiredInterface(ApplicationVMManagementI.class))
+				this.addRequiredInterface(ApplicationVMManagementI.class);
 
-		avmInUse.put(result, cores);
-		return result;
+			ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(this);
+			this.addPort(avmPort);
+			avmPort.publishPort();
+	
+			avmPort.doConnection(
+				result.get(ApplicationVMPortTypes.MANAGEMENT),
+				ClassFactory.newConnector(ApplicationVMManagementI.class).getCanonicalName());
+			
+			AllocatedCore[] cores = availableCores.remove(0);
+			avmPort.allocateCores(cores);
+	
+			avmInUse.put(result, cores);
+		
+			return result;
+			
+		}catch (Exception e){
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 	@Override

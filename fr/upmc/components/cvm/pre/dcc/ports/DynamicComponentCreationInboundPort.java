@@ -90,7 +90,7 @@ implements	DynamicComponentCreationI
 										(DynamicComponentCreator) this.owner ;
 		final String fClassname = classname ;
 		final Object[] fConstructorParams = constructorParams ;
-		dcc.handleRequestAsync(
+		dcc.handleRequestSync(
 				new ComponentI.ComponentService<Void>() {
 					@Override
 					public Void call() throws Exception {

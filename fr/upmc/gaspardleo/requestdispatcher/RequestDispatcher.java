@@ -245,7 +245,7 @@ public 	class 		RequestDispatcher
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		
-		System.out.println("acceptRequestTerminationNotification function");
+		this.logMessage("acceptRequestTerminationNotification function");
 		
 		RequestNotificationOutboundPort rnop = (RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
 		

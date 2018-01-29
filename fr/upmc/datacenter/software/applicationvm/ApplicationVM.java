@@ -388,7 +388,6 @@ implements	ProcessorServicesNotificationConsumerI,
 	public void			endTask(TaskI t) throws Exception
 	{
 		assert	t != null && this.isRunningTask(t) ;
-
 		this.logMessage(this.vmURI + " terminates request " +
 											t.getRequest().getRequestURI()) ;
 		AllocatedCore ac = this.runningTasks.remove(t.getTaskURI()) ;
@@ -396,8 +395,13 @@ implements	ProcessorServicesNotificationConsumerI,
 		this.allocatedCoresIdleStatus.put(ac, true) ;
 		if (this.tasksToNotify.contains(t.getTaskURI())) {
 			this.tasksToNotify.remove(t.getTaskURI()) ;
-			this.requestNotificationOutboundPort.
-									notifyRequestTermination(t.getRequest()) ;
+			try{
+				this.requestNotificationOutboundPort.
+										notifyRequestTermination(t.getRequest()) ;
+			}catch(Exception e){
+				e.printStackTrace();
+				throw e;
+			}
 		}
 		if (!this.taskQueue.isEmpty()) {
 			this.startTask() ;

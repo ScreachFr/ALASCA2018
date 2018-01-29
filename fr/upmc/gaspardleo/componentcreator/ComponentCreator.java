@@ -1,4 +1,4 @@
-package fr.upmc.gaspardleo.componentCreator;
+package fr.upmc.gaspardleo.componentcreator;
 
 import java.lang.reflect.Constructor;
 
@@ -76,8 +76,13 @@ public class ComponentCreator
 				AbstractDistributedCVM.thisJVMURI +	AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX,
 				ClassFactory.newConnector(DynamicComponentCreationI.class).getCanonicalName());
 		
-		dccop.createComponent(clas.getCanonicalName(), constructorParams);
-		
+		try{
+			dccop.createComponent(clas.getCanonicalName(), constructorParams);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+
 		dccop.doDisconnection();
 		dccop.destroyPort();
 	}	

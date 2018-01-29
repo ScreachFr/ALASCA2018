@@ -143,12 +143,12 @@ extends		AbstractComponent
 			e.printStackTrace();
 			throw e;
 		}
-		assert	cons != null ;
+		assert	cons != null : "cons != null";
 		AbstractComponent component;
 		try{
-		component =	(AbstractComponent) cons.newInstance(constructorParams) ;
+			component =	(AbstractComponent) cons.newInstance(constructorParams) ;
 		}catch(Exception e){
-			e.printStackTrace();
+			System.out.println(e.getCause().getMessage());
 			throw e;
 		}
 		assert component != null;

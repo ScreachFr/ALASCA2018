@@ -116,8 +116,6 @@ public class PerformanceRegulator
 			throw e;
 		}
 		
-		System.out.println("[DEBUG LEO] cpop connected ? : " + cpop.connected());
-		
 		//Debug
 		this.toggleTracing();
 		this.toggleLogging();
@@ -176,15 +174,13 @@ public class PerformanceRegulator
 	@Override
 	public Boolean addAVMToRD() throws Exception {
 		
-		System.out.println("[DEBUG LEO] addAVMToRD ...");
-		
 		HashMap<ApplicationVMPortTypes, String> avm = this.cpop.createNewApplicationVM("avm-"+(newAVMID++), 1);
-		
+
 		if (avm == null) {
 			this.logMessage(this.uri + " : addAVMToRD : No available ressource!");
 			return false;
 		}
-		
+
 		this.logMessage(this.uri + " : Adding an avm : " + avm);
 
 		rdop.registerVM(avm, RequestSubmissionI.class);

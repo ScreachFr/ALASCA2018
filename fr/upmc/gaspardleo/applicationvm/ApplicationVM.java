@@ -15,7 +15,7 @@ import fr.upmc.datacenter.software.ports.RequestNotificationOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 import fr.upmc.gaspardleo.applicationvm.ports.ApplicationVMConnectionInboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
+import fr.upmc.gaspardleo.componentcreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
@@ -62,7 +62,7 @@ public class ApplicationVM
 		this.avmcip = new ApplicationVMConnectionInboundPort(component_uris.get(ApplicationVMPortTypes.CONNECTION_REQUEST), this);
 		this.addPort(avmcip);
 		this.avmcip.publishPort();
-
+		
 		this.addOfferedInterface(ShutdownableI.class);
 		this.sip = new ShutdownableInboundPort(component_uris.get(ApplicationVMPortTypes.SHUTDOWNABLE), this);
 		this.addPort(this.sip);
@@ -72,7 +72,7 @@ public class ApplicationVM
 		this.rmop = new RequestMonitorOutboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(this.rmop);
 		this.rmop.publishPort();
-				
+		
 		// VM debug
 		this.toggleLogging();
 		this.toggleTracing();
@@ -83,15 +83,22 @@ public class ApplicationVM
 	@Override
 	public void doRequestNotificationConnection(String RD_RequestNotificationInboundPortURI) throws Exception {
 		
-		this.addRequiredInterface(RequestNotificationI.class);
+		if(!this.isRequiredInterface(RequestNotificationI.class))
+			this.addRequiredInterface(RequestNotificationI.class);
+		
 		this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
 		this.addPort(requestNotificationOutboundPort);
 		this.requestNotificationOutboundPort.publishPort();
 
-		this.requestNotificationOutboundPort.doConnection(
-			RD_RequestNotificationInboundPortURI,
-			ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
-			
+		try{
+			this.requestNotificationOutboundPort.doConnection(
+				RD_RequestNotificationInboundPortURI,
+				ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		
 		this.logMessage("AVM : rnop connection status : " + this.requestNotificationOutboundPort.connected());
 	}
 	
@@ -181,8 +188,13 @@ public class ApplicationVM
 				component_uris
 		};
 		
-		cc.createComponent(ApplicationVM.class, constructorParams);
-
+		try{
+			cc.createComponent(ApplicationVM.class, constructorParams);
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		
 		return component_uris;
 	}
 }

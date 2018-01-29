@@ -46,14 +46,18 @@ public class PerformanceRegulatorInboundPort
 	@Override
 	public Boolean addAVMToRD() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
-
-		return pr.handleRequestSync(
-				new ComponentI.ComponentService<Boolean>(){
-					@Override
-					public Boolean call() throws Exception {
-						return pr.addAVMToRD();
-					}
-				});
+		try{
+			return pr.handleRequestSync(
+					new ComponentI.ComponentService<Boolean>(){
+						@Override
+						public Boolean call() throws Exception {
+							return pr.addAVMToRD();
+						}
+					});
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 	@Override

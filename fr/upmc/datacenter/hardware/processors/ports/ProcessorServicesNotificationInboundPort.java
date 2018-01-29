@@ -101,12 +101,8 @@ implements	ProcessorServicesNotificationI
 				"ProcessorServicesNotificationInboundPort>>notifyEndOfTask(" +
 				t.getTaskURI() + ")") ;
 		}
-		
-		
 		final ProcessorServicesNotificationConsumerI psnc =
 						(ProcessorServicesNotificationConsumerI) this.owner ;
-		
-		
 		this.owner.handleRequestAsync(
 						new ComponentI.ComponentService<Void>() {
 							@Override

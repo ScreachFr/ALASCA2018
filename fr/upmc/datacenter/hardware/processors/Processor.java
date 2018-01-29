@@ -790,7 +790,6 @@ implements	PushModeControllingI
 	throws Exception
 	{
 		assert	t != null ;
-
 		String notificationInboundPortURI =
 									this.notificationInboundPortURIs.remove(t) ;
 		if (notificationInboundPortURI != null) {

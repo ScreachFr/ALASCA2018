@@ -78,7 +78,9 @@ public 	class RequestGenerator
 			(RequestSubmissionOutboundPort) super.findPortFromURI(super.requestSubmissionOutboundPortURI);
 		
 		if (rsop == null){
-			super.addRequiredInterface(RequestSubmissionI.class) ;
+			if(!this.isRequiredInterface(RequestSubmissionI.class))
+				super.addRequiredInterface(RequestSubmissionI.class) ;
+			
 			rsop = new RequestSubmissionOutboundPort(requestSubmissionOutboundPortURI, this) ;
 			super.addPort(rsop) ;
 			rsop.publishPort() ;

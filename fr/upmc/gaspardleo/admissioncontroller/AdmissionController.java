@@ -86,7 +86,8 @@ public class AdmissionController
 		
 		HashMap<RequestMonitorPorts, String> rm_uris = RequestMonitor.makeUris(rg_monitor_in, rd_URI);
 		
-		new RequestMonitor(rm_uris, 0.5);
+		RequestMonitor rm = new RequestMonitor(rm_uris, 0.5);
+		rm.start();
 		
 		//Request Generator port
 		this.addRequiredInterface(RequestGeneratorConnectionI.class);
@@ -105,12 +106,14 @@ public class AdmissionController
 		
 		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = PerformanceRegulator.makeUris(rd_URI);
 				
-		new PerformanceRegulator(
+		PerformanceRegulator pr = new PerformanceRegulator(
 			performanceRegulator_uris, 
 			RD_uris, rm_uris, 
 			computerPoolURIs,
 			RegulationStrategies.SIMPLE_AVM,
-			new TargetValue(2000.0, 0.0));
+			new TargetValue(2000.0, 0.0));	
+		
+		pr.start();
 		
 		if(!this.isRequiredInterface(PerformanceRegulatorI.class))
 			this.addRequiredInterface(PerformanceRegulatorI.class);
@@ -123,15 +126,8 @@ public class AdmissionController
 			performanceRegulator_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
 			ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
 		
-		System.out.println("[DEBUG LEO] prop connected ? : " + prop.connected());
-		
-		try{
-			prop.addAVMToRD();
-		} catch (Exception e){
-			e.printStackTrace();
-			throw e;
-		}
-
+		prop.addAVMToRD();
+			
 		this.logMessage("Admission controller : Request source successfully added!");
 	}
 	

@@ -379,7 +379,7 @@ implements	ProcessorStateDataConsumerI,
 							  pssdibpURI+"_2", pdsdibpURI+"_2") ;
 			// add it to the deployed components in the CVM
 			AbstractCVM.theCVM.addDeployedComponent(this.processors[i]) ;
-
+			
 			// create a map between the port types and the ports URI
 			EnumMap<Processor.ProcessorPortTypes, String> map =
 				new EnumMap<Processor.ProcessorPortTypes,String>(

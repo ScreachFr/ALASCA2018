@@ -36,7 +36,7 @@ public class DistributedTest
 	@Override
 	public void start() throws Exception {
 
-		super.start();
+		//super.start();
 				
 		if(thisJVMURI.equals(Datacenter)){
 			
@@ -63,6 +63,8 @@ public class DistributedTest
 			AdmissionController ac = new AdmissionController(computerPool_uris, ac_uris);
 			this.addDeployedComponent(ac);
 			ac.start();
+			
+			super.start();
 			
 			this.cyclicBarrierClient.waitBarrier();
 			
@@ -102,6 +104,8 @@ public class DistributedTest
 						rg_uris.get(RGPortTypes.MANAGEMENT_IN),
 						RequestGeneratorManagementConnector.class.getCanonicalName());
 					
+					super.start();
+					
 					testScenario(rgmop);
 				}
 				
@@ -116,7 +120,7 @@ public class DistributedTest
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(1000L);
+					Thread.sleep(5000L);
 					rgmop.startGeneration();
 					Thread.sleep(20000L);
 					rgmop.stopGeneration();
