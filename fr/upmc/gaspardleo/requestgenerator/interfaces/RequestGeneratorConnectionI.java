@@ -6,5 +6,14 @@ import fr.upmc.components.interfaces.RequiredI;
 public interface RequestGeneratorConnectionI 
 	extends	OfferedI, RequiredI{
 
-	public void doConnectionWithRD(String RD_Request_Submission_In) throws Exception;
+	/**
+	 * Connecte un RequestGenerator avec une interface de traitement de requête.
+	 * Le port utilisé ici est celui de RequestSubmission. Il permet au 
+	 * RequestGenerator d'avoir une réponse à ses requêtes.
+	 * ie : RequestDispatcher/ApplicationVM in -> RequestGenerator_out.
+	 * @param Request_Submission_In
+	 * 		Uri du RequestSubmissionInboundPort, donc server, avec lequel se connecter.
+	 * @throws Exception
+	 */
+	public void doConnectionWithRD(String Request_Submission_In) throws Exception;
 }

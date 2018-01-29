@@ -128,7 +128,7 @@ public class ApplicationVM
 		assert	!this.taskQueue.isEmpty() ;
 
 		AllocatedCore ac = this.findIdleCore();
-		this.logMessage("Starting task execution on core " + ac + ".");
+		this.logMessage("Starting task execution on core " + ((ac == null) ? "'no available core'": ac) + ".");
 
 		if (ac != null) {
 			long execTimestamp = System.currentTimeMillis();
@@ -150,7 +150,7 @@ public class ApplicationVM
 			p.executeTaskOnCoreAndNotify(t, ac.coreNo, np.getPortURI()) ;
 		
 		} else {
-			this.logMessage("Task cancelled, couldn't find an idling core.");
+			this.logMessage("Task cancelled, couldn't find an idling core, the request is being transfered in queue.");
 		}
 	}
 	
