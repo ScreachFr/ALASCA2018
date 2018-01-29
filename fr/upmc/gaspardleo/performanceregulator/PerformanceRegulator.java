@@ -77,8 +77,7 @@ public class PerformanceRegulator
 		this.targetValue = targetValue;
 
 		this.addOfferedInterface(PerformanceRegulatorI.class);
-		this.prip = new PerformanceRegulatorInboundPort(
-			component_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN), this);
+		this.prip = new PerformanceRegulatorInboundPort(component_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN), this);
 		this.addPort(this.prip);
 		this.prip.publishPort();
 

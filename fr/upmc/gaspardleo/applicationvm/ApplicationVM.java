@@ -84,10 +84,10 @@ public class ApplicationVM
 	@Override
 	public void doRequestNotificationConnection(String RD_RequestNotificationInboundPortURI) throws Exception {
 		
+		this.addRequiredInterface(RequestNotificationI.class);
 		this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
 		this.addPort(requestNotificationOutboundPort);
 		this.requestNotificationOutboundPort.publishPort();
-		this.addRequiredInterface(RequestNotificationI.class);
 
 		this.requestNotificationOutboundPort.doConnection(
 			RD_RequestNotificationInboundPortURI,
@@ -106,9 +106,13 @@ public class ApplicationVM
 
 	public RequestNotificationOutboundPort getRequestNotificationOutboundPort() throws Exception {
 		
-		if (this.requestNotificationOutboundPort == null)
+		if (this.requestNotificationOutboundPort == null){
+			
+			if(!this.isRequiredInterface(RequestNotificationI.class))
+				this.addRequiredInterface(RequestNotificationI.class);
+			
 			this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
-
+		}
 		return this.requestNotificationOutboundPort;
 	}
 
@@ -132,13 +136,11 @@ public class ApplicationVM
 			
 			rmop.addEntry(this.requestStartTimeStamps.get(t.getRequest()), execTimestamp);
 				
-			this.logMessage(this.vmURI + " starts request " +
-					t.getRequest().getRequestURI()) ;
-			this.runningTasks.put(t.getTaskURI(), ac) ;
-			ProcessorServicesOutboundPort p =
-					this.processorServicesPorts.get(ac.processorURI) ;
-			ProcessorServicesNotificationInboundPort np =
-					this.processorNotificationInboundPorts.get(ac.processorURI) ;
+			this.logMessage(this.vmURI + " starts request " + t.getRequest().getRequestURI()) ;
+			this.runningTasks.put(t.getTaskURI(), ac);
+			
+			ProcessorServicesOutboundPort p = this.processorServicesPorts.get(ac.processorURI) ;
+			ProcessorServicesNotificationInboundPort np = this.processorNotificationInboundPorts.get(ac.processorURI) ;
 			p.executeTaskOnCoreAndNotify(t, ac.coreNo, np.getPortURI()) ;
 		
 		} else {

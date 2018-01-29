@@ -57,8 +57,8 @@ public class ComputerPool
 
 	public ComputerPool(
 			HashMap<ComputerPoolPorts, String> component_uris,
-			ComponentCreator cc
-			) throws Exception {
+			ComponentCreator cc) throws Exception {
+		
 		super(1, 1);
 
 		this.uri = component_uris.get(ComputerPoolPorts.INTROSPECTION);
@@ -193,18 +193,25 @@ public class ComputerPool
 	public synchronized  HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(
 			String avmURI, 
 			Integer numberOfCoreToAllocate)  throws Exception{
+		
 		// Pas de core sous la main.
 		if (availableCores.size() == 0)
 			return null;
+		
 		HashMap<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(avmURI, cc);
 		// Create a mock up port to manage the AVM component (allocate cores).
-		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(
-				new AbstractComponent(0, 0) {});
+		
+		if(!this.isRequiredInterface(ApplicationVMManagementI.class))
+			this.addRequiredInterface(ApplicationVMManagementI.class);
+		
+		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(new AbstractComponent(0, 0) {});
+		this.addPort(avmPort);
 		avmPort.publishPort();
 
 		avmPort.doConnection(
 				result.get(ApplicationVMPortTypes.MANAGEMENT),
 				ClassFactory.newConnector(ApplicationVMManagementI.class).getCanonicalName());
+		
 		AllocatedCore[] cores = availableCores.remove(0);
 		avmPort.allocateCores(cores);
 
@@ -214,12 +221,13 @@ public class ComputerPool
 
 	@Override
 	public Boolean increaseCoreFrequency(String avmUri) throws Exception {
+		
 		Boolean hasChangedFrequency = false;
-
 
 		for (HashMap<ApplicationVMPortTypes, String> avm : avmInUse.keySet()) {
 			if (avm.get(ApplicationVMPortTypes.INTROSPECTION).equals(avmUri)) {
 				for (AllocatedCore core : avmInUse.get(avm)) {
+					
 					ProcessorDynamicStateDataOutboundPort pdsdop = processorDynamicStatePort.get(core.processorURI);
 					ProcessorStaticStateDataOutboundPort pssdop = processorStaticStatePort.get(core.processorURI);
 

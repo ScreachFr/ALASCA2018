@@ -7,7 +7,8 @@ import fr.upmc.components.interfaces.RequiredI;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 
-public interface ComputerPoolI extends OfferedI, RequiredI {
+public interface ComputerPoolI 
+		extends	OfferedI, RequiredI{
 
 	/**
 	 * Créé une nouvelle ApplicationVM.

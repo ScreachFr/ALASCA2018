@@ -7,6 +7,7 @@ import java.util.Optional;
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
+import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
@@ -148,7 +149,10 @@ public class AdmissionController
 			this.logMessage("Remove request source : Can't find the request generator you're looking for!");
 			return;
 		}
-
+		
+		if(!this.isRequiredInterface(ShutdownableI.class));
+			this.addRequiredInterface(ShutdownableI.class);
+			
 		ShutdownableOutboundPort sop = new ShutdownableOutboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(sop);
 		sop.publishPort();

@@ -51,7 +51,6 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 		this.logMessage("RequestMonitor made");
 	}
 
-
 	@Override
 	public void addEntry(Long submissionTimestamp, Long notificationTimestamp) {
 		long executionTime = notificationTimestamp - submissionTimestamp;

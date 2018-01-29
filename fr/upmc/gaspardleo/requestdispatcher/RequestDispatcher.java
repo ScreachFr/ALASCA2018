@@ -128,49 +128,69 @@ public 	class 		RequestDispatcher
 	}
 	
 	private synchronized String getNextVmUriFromCursor() {
-		return registeredVmsUri.get(vmCursor++%registeredVmsUri.size())
-				.get(ApplicationVMPortTypes.INTROSPECTION);
+		return registeredVmsUri.get(vmCursor++%registeredVmsUri.size()).get(ApplicationVMPortTypes.INTROSPECTION);
 	}
 
 	@Override
 	public String registerVM(
 			HashMap<ApplicationVMPortTypes, String> avmURIs, 
 			Class<?> vmInterface) throws Exception {
+		
 		this.logMessage("Register avm : " + avmURIs + "...");
+		
 		String avmUri = avmURIs.get(ApplicationVMPortTypes.INTROSPECTION);
+		
 		// Verifi si l'AVM est déjà registered.
 		if (this.registeredVmsUri.stream().anyMatch((e) -> e.get(ApplicationVMPortTypes.INTROSPECTION).equals(avmUri))) { 
 			this.logMessage("Register AVM : You just tried to register an AVM that already was registered it this RequestDispatcher.");
 			return null;
 		}
+	
+		if(!this.isRequiredInterface(RequestSubmissionI.class))
+			this.addRequiredInterface(RequestSubmissionI.class);
+		
 		RequestSubmissionOutboundPort rsop = new RequestSubmissionOutboundPort(this);
 		this.addPort(rsop);
 		rsop.publishPort();
+		
 		rsop.doConnection(avmURIs.get(
-				ApplicationVMPortTypes.REQUEST_SUBMISSION), 
-				ClassFactory.newConnector(RequestSubmissionI.class).getCanonicalName());
+			ApplicationVMPortTypes.REQUEST_SUBMISSION), 
+			ClassFactory.newConnector(RequestSubmissionI.class).getCanonicalName());
+		
+		if(!this.isRequiredInterface(RequestNotificationI.class))
+			this.addRequiredInterface(RequestNotificationI.class);
+		
 		RequestNotificationInboundPort rnip = new RequestNotificationInboundPort(this);
 		this.addPort(rnip);
 		rnip.publishPort();
+		
 		this.registeredVmsRnip.put(avmUri, rnip);
-		doAVMRequestNotificationAndMonitoringConnection(avmURIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
-				this.rnip.getPortURI(), this.rmop_uri);
+		
+		doAVMRequestNotificationAndMonitoringConnection(
+			avmURIs.get(ApplicationVMPortTypes.CONNECTION_REQUEST),
+			this.rnip.getPortURI(), this.rmop_uri);
+		
 		this.registeredVmsRsop.put(avmUri, rsop);
 		this.registeredVmsUri.add(avmURIs);
+		
 		this.logMessage(this.Component_URI + " : " + avmURIs + " has been added.");
+		
 		return rnip.getPortURI();
 	}
 
 	@Override
 	public void unregisterVM(String vmUri) throws Exception {
+		
 		Optional<HashMap<ApplicationVMPortTypes,String>> URIs = 
 				registeredVmsUri.stream()
 				.filter(e -> e.get(ApplicationVMPortTypes.INTROSPECTION).equals(vmUri))
 				.findFirst();
+		
 		if (!URIs.isPresent()) {
 			this.logMessage("Unregister AVM : This AVM is not registered!");
 			return;
 		}
+		
 		registeredVmsUri.remove(URIs.get());
 		registeredVmsRsop.get(vmUri).doDisconnection();
 	}
@@ -182,13 +202,16 @@ public 	class 		RequestDispatcher
 
 	@Override
 	public void acceptRequestSubmission(RequestI r) throws Exception {
+		
 		this.logMessage(this.Component_URI + " : incoming request submission");
+		
 		if (this.registeredVmsUri.size() == 0) {
 			this.logMessage(this.Component_URI + " : no registered vm.");
+		
 		} else {
 			String avmURI = getNextVmUriFromCursor();
-			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(
-					avmURI); 
+			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(avmURI); 
+			
 			if (!rsop.connected()) {
 				throw new Exception(this.Component_URI + " can't conect to vm.");
 			}
@@ -198,15 +221,20 @@ public 	class 		RequestDispatcher
 
 	@Override
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
+		
 		this.logMessage(this.Component_URI + " : incoming request submission and notification.");
 		System.out.println("There's " + registeredVmsUri.size() + " registered AVMs.");
+		
 		if (this.registeredVmsUri.size() == 0) {
 			this.logMessage(this.Component_URI + " : no registered vm.");
+		
 		} else {
 			vmCursor = (vmCursor+1) % this.registeredVmsUri.size();
 			String avmURI = getNextVmUriFromCursor();
 			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(avmURI);
+			
 			this.logMessage(this.Component_URI + " is using " + avmURI);
+			
 			if (!rsop.connected()) {
 				throw new Exception(this.Component_URI + " can't conect to vm.");
 			}
@@ -216,26 +244,30 @@ public 	class 		RequestDispatcher
 	
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
+		
 		System.out.println("acceptRequestTerminationNotification function");
-		RequestNotificationOutboundPort rnop = 
-				(RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
+		
+		RequestNotificationOutboundPort rnop = (RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
+		
 		if (rnop == null){
 			this.addRequiredInterface(RequestSubmissionI.class) ;
 			rnop = new RequestNotificationOutboundPort(this.rnop_uri, this) ;
 			this.addPort(rnop) ;
 			rnop.publishPort() ;
+			
 			rnop.doConnection(
-					rg_uris.get(RGPortTypes.REQUEST_NOTIFICATION_IN), 
-					ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
+				rg_uris.get(RGPortTypes.REQUEST_NOTIFICATION_IN), 
+				ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
 		}
+		
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
 		rnop.notifyRequestTermination(r);
 	}
 	
 	@Override
 	public void notifyRequestTermination(RequestI r) throws Exception {
-		RequestNotificationOutboundPort rnop = 
-				(RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
+		
+		RequestNotificationOutboundPort rnop = (RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
 		// XXX Pas utilisé.
 		rnop.notifyRequestTermination(r);
@@ -257,18 +289,28 @@ public 	class 		RequestDispatcher
 		super.shutdown();
 	}	
 	
-	private void doAVMRequestNotificationAndMonitoringConnection(String AVMConnectionPort_URI,
-		String notificationPort_URI, String requestMonitor_in) throws Exception {
+	private void doAVMRequestNotificationAndMonitoringConnection(
+		String AVMConnectionPort_URI,
+		String notificationPort_URI,
+		String requestMonitor_in) throws Exception {
+		
 		this.logMessage("Admission controller : connection on notification port.");
-		ApplicationVMConnectionOutboundPort avmcop 
-				= new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
+		
+		if(!this.isRequiredInterface(ApplicationVMConnectionsI.class))
+			this.addRequiredInterface(ApplicationVMConnectionsI.class);
+		
+		ApplicationVMConnectionOutboundPort avmcop = new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
 		this.addPort(avmcop);
 		avmcop.publishPort();
+		
 		avmcop.doConnection(
-				AVMConnectionPort_URI, 
-				ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
+			AVMConnectionPort_URI, 
+			ClassFactory.newConnector(ApplicationVMConnectionsI.class).getCanonicalName());
+		
 		avmcop.doRequestNotificationConnection(notificationPort_URI);
+		
 		avmcop.doRequestMonitorConnection(requestMonitor_in);
+		
 		this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
 	}
 

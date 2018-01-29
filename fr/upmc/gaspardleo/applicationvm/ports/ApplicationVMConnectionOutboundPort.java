@@ -5,7 +5,8 @@ import fr.upmc.components.ports.AbstractOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 
 public class ApplicationVMConnectionOutboundPort 
-	extends AbstractOutboundPort implements ApplicationVMConnectionsI {
+	extends AbstractOutboundPort 
+	implements ApplicationVMConnectionsI {
 
 	private static final long serialVersionUID = 1L;
 
