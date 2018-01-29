@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ports.AbstractPort;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
@@ -47,8 +46,7 @@ public class AdmissionController
 	
 	public AdmissionController(
 		HashMap<ComputerPoolPorts, String> computerPoolUri,
-		HashMap<ACPortTypes, String> ac_uris,
-		ComponentCreator cc) throws Exception{		
+		HashMap<ACPortTypes, String> ac_uris) throws Exception{		
 		
 		super(1, 1);
 
@@ -108,11 +106,11 @@ public class AdmissionController
 		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = PerformanceRegulator.makeUris(rd_URI);
 				
 		new PerformanceRegulator(
-				performanceRegulator_uris, 
-				RD_uris, rm_uris, 
-				computerPoolURIs,
-				RegulationStrategies.SIMPLE_AVM,
-				new TargetValue(2000.0, 0.0));
+			performanceRegulator_uris, 
+			RD_uris, rm_uris, 
+			computerPoolURIs,
+			RegulationStrategies.SIMPLE_AVM,
+			new TargetValue(2000.0, 0.0));
 		
 		if(!this.isRequiredInterface(PerformanceRegulatorI.class))
 			this.addRequiredInterface(PerformanceRegulatorI.class);
@@ -122,8 +120,8 @@ public class AdmissionController
 		prop.publishPort();
 		
 		prop.doConnection(
-				performanceRegulator_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
-				ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
+			performanceRegulator_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
+			ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
 		
 		System.out.println("[DEBUG LEO] prop connected ? : " + prop.connected());
 		

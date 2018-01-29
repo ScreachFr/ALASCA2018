@@ -29,25 +29,20 @@ public class ComponentCreator
 		
 	public void createComponent(
 			Class<?> clas,
-			Object[] constructorParams
-			) throws Exception{
+			Object[] constructorParams) throws Exception{
 		
 		assert clas != null;
 		assert constructorParams != null;
 		
 		if(AbstractCVM.isDistributed){
-						
 			this.distributedComponetCreation(clas, constructorParams);
-			
 		} else {
-			
 			this.componentCreation(clas, constructorParams);
 		}
 	}
 	
 	public void componentCreation(Class<?> clas,
-			Object[] constructorParams
-			) throws Exception{
+			Object[] constructorParams) throws Exception{
 				
 		Class<?>[] parameterTypes = new Class[constructorParams.length] ;
 		for(int i = 0 ; i < constructorParams.length ; i++) {			
@@ -59,20 +54,17 @@ public class ComponentCreator
 		
 		assert cons != null : "assertion : cons null";
 		
-		AbstractComponent component = 
-				(AbstractComponent) cons.newInstance(constructorParams);
+		AbstractComponent component = (AbstractComponent) cons.newInstance(constructorParams);
 		
 		component.start();
 		this.cvm.addDeployedComponent(component);
 	}
 	
 	public void distributedComponetCreation(Class<?> clas,
-			Object[] constructorParams
-			) throws Exception{
+			Object[] constructorParams) throws Exception{
 		
-		if(!this.isRequiredInterface(DynamicComponentCreationI.class)){
+		if(!this.isRequiredInterface(DynamicComponentCreationI.class))
 			this.addRequiredInterface(DynamicComponentCreationI.class);
-		}
 		
 		DynamicComponentCreationOutboundPort dccop = new DynamicComponentCreationOutboundPort(this);
 		dccop.localPublishPort();;

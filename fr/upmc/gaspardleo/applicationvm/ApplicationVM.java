@@ -47,8 +47,7 @@ public class ApplicationVM
 	private RequestMonitorOutboundPort rmop;
 	
 	public ApplicationVM(
-			HashMap<ApplicationVMPortTypes, String> component_uris
-		) throws Exception {
+			HashMap<ApplicationVMPortTypes, String> component_uris) throws Exception {
 
 		super(
 			component_uris.get(ApplicationVMPortTypes.INTROSPECTION), 
@@ -150,6 +149,7 @@ public class ApplicationVM
 	
 	@Override
 	public void acceptRequestSubmissionAndNotify(final RequestI r) throws Exception {
+		
 		if (AbstractCVM.DEBUG) 
 			System.out.println("ApplicationVM>>acceptRequestSubmissionAndNotify");
 		

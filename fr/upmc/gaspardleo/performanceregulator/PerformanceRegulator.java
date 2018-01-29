@@ -32,13 +32,13 @@ public class PerformanceRegulator
 
 	public enum PerformanceRegulatorPorts {
 		INTROSPECTION, 
-		PERFORMANCE_REGULATOR_IN;
+		PERFORMANCE_REGULATOR_IN
 	}
 
 	public enum RegulationStrategies {
 		SIMPLE_AVM, 
 		SIMPLE_FREQ, 
-		STRATEGY_TO_SURPASS_METAL_GEAR;
+		STRATEGY_TO_SURPASS_METAL_GEAR
 	}
 	
 	private static int DEBUG_LEVEL = 2;
@@ -107,9 +107,17 @@ public class PerformanceRegulator
 		this.addPort(this.cpop);
 		this.cpop.publishPort();
 
-		this.cpop.doConnection(computerPool.get(ComputerPoolPorts.COMPUTER_POOL), 
+		try{
+			this.cpop.doConnection(
+				computerPool.get(ComputerPoolPorts.COMPUTER_POOL), 
 				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
-
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		
+		System.out.println("[DEBUG LEO] cpop connected ? : " + cpop.connected());
+		
 		//Debug
 		this.toggleTracing();
 		this.toggleLogging();
@@ -135,6 +143,7 @@ public class PerformanceRegulator
 	public Boolean increaseCPUFrequency() throws Exception {
 
 		Boolean hasChangedFreq = false;
+		
 		List<String> avms;
 		
 		avms = rdop.getRegisteredAVMUris();
@@ -150,6 +159,7 @@ public class PerformanceRegulator
 
 	@Override
 	public Boolean decreaseCPUFrequency() throws Exception {
+		
 		Boolean hasChangedFreq = false;
 		
 		List<String> avms = rdop.getRegisteredAVMUris();
@@ -185,6 +195,7 @@ public class PerformanceRegulator
 
 	@Override
 	public Boolean removeAVMFromRD() throws Exception {
+		
 		List<String> avms = rdop.getRegisteredAVMUris();
 		
 		if (avms.size() <= 1) {

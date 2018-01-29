@@ -13,7 +13,6 @@ import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.computer.Computer;
 import fr.upmc.gaspardleo.computerpool.ComputerPool;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
@@ -28,7 +27,6 @@ public class DistributedTest
 	private static final int NB_DATASOURCE = 1;
 	private static final String AC_URI = "AC_URI";
 	private HashMap<ACPortTypes, String> ac_uris;
-	private ComponentCreator cc;
 	
 	public DistributedTest(String[] args) throws Exception {
 		super(args);
@@ -39,29 +37,30 @@ public class DistributedTest
 	public void start() throws Exception {
 
 		super.start();
-		
-		cc = new ComponentCreator(this);
 				
 		if(thisJVMURI.equals(Datacenter)){
 			
 			HashMap<ComputerPoolPorts, String> computerPool_uris = ComputerPool.makeUris();
-			ComputerPool cp = new ComputerPool(computerPool_uris, cc);
+			ComputerPool cp = new ComputerPool(computerPool_uris);
 			this.addDeployedComponent(cp);
 			cp.start();
 			
 			HashSet<Integer> admissibleFrequencies = Computer.makeFrequencies();
 			HashMap<Integer,Integer> processingPower = Computer.makeProcessingPower();
+			
 			Computer c0 = new Computer(Computer.makeUris(0), computerPool_uris, admissibleFrequencies, processingPower);
 			Computer c1 = new Computer(Computer.makeUris(1), computerPool_uris, admissibleFrequencies, processingPower);
 			Computer c2 = new Computer(Computer.makeUris(2), computerPool_uris, admissibleFrequencies, processingPower);
+			
 			this.addDeployedComponent(c0);
 			this.addDeployedComponent(c1);
 			this.addDeployedComponent(c2);
+			
 			c0.start();
 			c1.start();
 			c2.start();
 			
-			AdmissionController ac = new AdmissionController(computerPool_uris, ac_uris, cc);
+			AdmissionController ac = new AdmissionController(computerPool_uris, ac_uris);
 			this.addDeployedComponent(ac);
 			ac.start();
 			
@@ -84,20 +83,25 @@ public class DistributedTest
 					AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(
 						AbstractPort.generatePortURI(),
 						new AbstractComponent(0, 0) {});
+					
 					acop.publishPort();
+					
 					acop.doConnection(
 						ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
 						ClassFactory.newConnector(AdmissionControllerI.class).getCanonicalName());
-					assert acop.connected() : "acop not connected";
+					
 					acop.createNewRequestDispatcher(i, rg_uris, ac_uris);
 					
 					RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
 						AbstractPort.generatePortURI(),
 						new AbstractComponent(0, 0) {});
+					
 					rgmop.publishPort();
+					
 					rgmop.doConnection(
 						rg_uris.get(RGPortTypes.MANAGEMENT_IN),
 						RequestGeneratorManagementConnector.class.getCanonicalName());
+					
 					testScenario(rgmop);
 				}
 				

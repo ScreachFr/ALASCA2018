@@ -9,7 +9,6 @@ import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorMana
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
-import fr.upmc.gaspardleo.componentCreator.ComponentCreator;
 import fr.upmc.gaspardleo.computer.Computer;
 import fr.upmc.gaspardleo.computerpool.ComputerPool;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
@@ -32,10 +31,8 @@ public class Test {
 		try {
 			this.cvm = new CVM();
 			
-			ComponentCreator cc = new ComponentCreator(cvm);
-			
 			HashMap<ComputerPoolPorts, String> computerPool_uris = ComputerPool.makeUris();
-			new ComputerPool(computerPool_uris, cc);
+			new ComputerPool(computerPool_uris);
 			
 			HashSet<Integer> admissibleFrequencies = Computer.makeFrequencies();
 			HashMap<Integer,Integer> processingPower = Computer.makeProcessingPower();
@@ -44,7 +41,7 @@ public class Test {
 			new Computer(Computer.makeUris(2), computerPool_uris, admissibleFrequencies, processingPower);
 
 			HashMap<ACPortTypes, String> ac_uris = AdmissionController.makeUris("AC_URI");
-			new AdmissionController(computerPool_uris, ac_uris, cc);
+			new AdmissionController(computerPool_uris, ac_uris);
 			
 			for (int i = 0; i < NB_DATASOURCE; i++) {
 				
@@ -56,10 +53,13 @@ public class Test {
 				RequestGeneratorManagementOutboundPort rgmop = new RequestGeneratorManagementOutboundPort(
 					AbstractPort.generatePortURI(),
 					new AbstractComponent(0, 0) {});
+				
 				rgmop.publishPort();
+				
 				rgmop.doConnection(
 					rg_uris.get(RGPortTypes.MANAGEMENT_IN),
 					RequestGeneratorManagementConnector.class.getCanonicalName());
+				
 				testScenario(rgmop);
 			}
 

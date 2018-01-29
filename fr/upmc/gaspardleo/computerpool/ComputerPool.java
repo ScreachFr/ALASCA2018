@@ -9,6 +9,7 @@ import java.util.Set;
 
 import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.connectors.DataConnector;
+import fr.upmc.components.cvm.AbstractCVM;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.hardware.computers.Computer.AllocatedCore;
 import fr.upmc.datacenter.hardware.computers.ComputerStaticState;
@@ -56,8 +57,7 @@ public class ComputerPool
 	private ComponentCreator cc;
 
 	public ComputerPool(
-			HashMap<ComputerPoolPorts, String> component_uris,
-			ComponentCreator cc) throws Exception {
+			HashMap<ComputerPoolPorts, String> component_uris) throws Exception {
 		
 		super(1, 1);
 
@@ -75,7 +75,7 @@ public class ComputerPool
 		this.processorDynamicStatePort = new HashMap<>();
 		this.processorStaticStatePort = new HashMap<>();
 
-		this.cc = cc;
+		this.cc = new ComponentCreator(AbstractCVM.theCVM);
 		this.toggleLogging();
 		this.toggleTracing();
 		
@@ -86,8 +86,7 @@ public class ComputerPool
 	public void addComputer(
 			HashMap<ComputerPortsTypes, String> computerUris,
 			Integer numberOfProcessors,
-			Integer numberOfCores
-			) throws Exception {
+			Integer numberOfCores) throws Exception {
 		
 		this.logMessage("Computer Pool : Computer creation and core allocation.");
 		
@@ -102,9 +101,9 @@ public class ComputerPool
 			computerUris.get(ComputerPortsTypes.SERVICE_IN), 
 			ClassFactory.newConnector(ComputerServicesI.class).getCanonicalName());
 
-		for (int i = 0; i < (numberOfProcessors * numberOfCores)/2; i++) {
+		for (int i = 0; i < (numberOfProcessors * numberOfCores)/2; i++) 
 			availableCores.add(csop.allocateCores(DEFAULT_CORE_ALLOC_NUMBER));
-		}
+		
 		
 		this.computers.add(computerUris);
 		
@@ -194,6 +193,8 @@ public class ComputerPool
 			String avmURI, 
 			Integer numberOfCoreToAllocate)  throws Exception{
 		
+		System.out.println("[DEBUG LEO] createNewApplicationVM ...");
+		
 		// Pas de core sous la main.
 		if (availableCores.size() == 0)
 			return null;
@@ -209,8 +210,8 @@ public class ComputerPool
 		avmPort.publishPort();
 
 		avmPort.doConnection(
-				result.get(ApplicationVMPortTypes.MANAGEMENT),
-				ClassFactory.newConnector(ApplicationVMManagementI.class).getCanonicalName());
+			result.get(ApplicationVMPortTypes.MANAGEMENT),
+			ClassFactory.newConnector(ApplicationVMManagementI.class).getCanonicalName());
 		
 		AllocatedCore[] cores = availableCores.remove(0);
 		avmPort.allocateCores(cores);
@@ -252,7 +253,9 @@ public class ComputerPool
 		return hasChangedFrequency;
 	}
 
-	private Optional<Integer> getNextAdmissibleFrequency(ProcessorStaticState pss, ProcessorDynamicState pds, Integer coreNo) {
+	private Optional<Integer> getNextAdmissibleFrequency(
+			ProcessorStaticState pss, ProcessorDynamicState pds, Integer coreNo) {
+		
 		int currentFreq = pds.getCurrentCoreFrequency(coreNo);
 
 		Set<Integer> admissibleFreqs = pss.getAdmissibleFrequencies();
@@ -262,7 +265,9 @@ public class ComputerPool
 				.min((x, y) -> Integer.compare(x, y));
 	}
 
-	private Optional<Integer> getPreviousAdmissibleFequency(ProcessorStaticState pss, ProcessorDynamicState pds, Integer coreNo) {
+	private Optional<Integer> getPreviousAdmissibleFequency(
+			ProcessorStaticState pss, ProcessorDynamicState pds, Integer coreNo) {
+		
 		int currentFreq = pds.getCurrentCoreFrequency(coreNo);
 
 		Set<Integer> admissibleFreqs = pss.getAdmissibleFrequencies();
@@ -274,12 +279,13 @@ public class ComputerPool
 
 	@Override
 	public Boolean decreaseCoreFrequency(String avmUri) throws Exception {
+		
 		Boolean hasChangedFrequency = false;
-
 
 		for (HashMap<ApplicationVMPortTypes, String> avm : avmInUse.keySet()) {
 			if (avm.get(ApplicationVMPortTypes.INTROSPECTION).equals(avmUri)) {
 				for (AllocatedCore core : avmInUse.get(avm)) {
+					
 					ProcessorDynamicStateDataOutboundPort pdsdop = processorDynamicStatePort.get(core.processorURI);
 					ProcessorStaticStateDataOutboundPort pssdop = processorStaticStatePort.get(core.processorURI);
 

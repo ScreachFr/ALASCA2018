@@ -14,7 +14,8 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 	
 	
 	public enum RequestMonitorPorts {
-		INTROSPECTION, REQUEST_MONITOR_IN;
+		INTROSPECTION,
+		REQUEST_MONITOR_IN
 	}
 	
 	private Double meanRequestExecutionTime;
@@ -27,8 +28,7 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 	
 	public RequestMonitor(
 		  	HashMap<RequestMonitorPorts, String> component_uris,
-			Double alpha
-			) throws Exception {
+			Double alpha) throws Exception {
 		
 		super(1, 1);
 		
@@ -53,6 +53,7 @@ public class RequestMonitor extends AbstractComponent implements RequestMonitorI
 
 	@Override
 	public void addEntry(Long submissionTimestamp, Long notificationTimestamp) {
+		
 		long executionTime = notificationTimestamp - submissionTimestamp;
 
 		refreshMeanRequestExecutionTime(executionTime);
