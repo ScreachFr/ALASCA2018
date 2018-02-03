@@ -8,10 +8,10 @@ import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
-import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.PerformanceRegulatorPorts;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.RegulationStrategies;
+import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulatorPoolNetwork;
 import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorOutboundPort;
@@ -23,26 +23,24 @@ import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnection
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
 import fr.upmc.gaspardleo.requestmonitor.RequestMonitor;
 import fr.upmc.gaspardleo.requestmonitor.RequestMonitor.RequestMonitorPorts;
+import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 
-public class AdmissionController 
+public class AdmissionControllerPoolNetwork 
 		extends AbstractComponent
-		implements AdmissionControllerI{
+		implements AdmissionControllerI {
 
-	public static enum	ACPortTypes {
-		ADMISSION_CONTROLLER_IN
-	}
 	
 	private AdmissionControllerInboundPort acip;
 	private ArrayList<ApplicationVMManagementOutboundPort> avmPorts;
 	// Map<RequestGenerator, RequestDispatcher>
 	private HashMap<HashMap<RGPortTypes, String>, HashMap<RDPortTypes, String>> requestSources;
-	private HashMap<ComputerPoolPorts, String> computerPoolURIs;
+	private String computerPoolNetWorkInboundPortUri;
 	
-	public AdmissionController(
-		HashMap<ComputerPoolPorts, String> computerPoolUri,
+	public AdmissionControllerPoolNetwork(
+			String computerPoolNetWorkInboundPortUri,
 		HashMap<ACPortTypes, String> ac_uris) throws Exception{		
 		
 		super(1, 1);
@@ -50,12 +48,13 @@ public class AdmissionController
 		this.requestSources = new HashMap<>();
 
 		this.avmPorts 	= new ArrayList<ApplicationVMManagementOutboundPort>();
-		this.computerPoolURIs = computerPoolUri;
-
+		this.computerPoolNetWorkInboundPortUri = computerPoolNetWorkInboundPortUri;
+		
 		this.addOfferedInterface(AdmissionControllerI.class);
 		this.acip = new AdmissionControllerInboundPort(ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), this);
 		this.addPort(this.acip);
 		this.acip.publishPort();
+		
 		
 		this.toggleLogging();
 		this.toggleTracing();		
@@ -94,10 +93,13 @@ public class AdmissionController
 		
 		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = PerformanceRegulator.makeUris(rd_URI);
 				
-		PerformanceRegulator pr = new PerformanceRegulator(
+		
+		
+		PerformanceRegulatorPoolNetwork pr = new PerformanceRegulatorPoolNetwork(
+			"prpn",
 			performanceRegulator_uris, 
 			RD_uris, rm_uris, 
-			computerPoolURIs,
+			computerPoolNetWorkInboundPortUri,
 			RegulationStrategies.SIMPLE_AVM,
 			new TargetValue(2000.0, 0.0));	
 		
@@ -160,8 +162,10 @@ public class AdmissionController
 
 	@Override
 	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,
-			HashMap<ACPortTypes, String> ac_uris) throws Exception {
+			HashMap<ACPortTypes, String> ac_uris)
+			throws Exception {
 		RequestDispatcher rd = new RequestDispatcher(RequestDispatcher.makeUris(num_rd), rg_uris, ac_uris);
 		rd.start();
 	}
+	
 }

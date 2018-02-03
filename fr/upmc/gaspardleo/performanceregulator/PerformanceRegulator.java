@@ -59,7 +59,6 @@ public class PerformanceRegulator
 	// Regulation
 	private RegulationStrategyI strategy;
 	private TargetValue targetValue;
-//	private Boolean isUsingUpperBound;
 
 	public PerformanceRegulator(
 		    HashMap<PerformanceRegulatorPorts, String> component_uris,

@@ -9,20 +9,22 @@ import fr.upmc.datacenterclient.requestgenerator.connectors.RequestGeneratorMana
 import fr.upmc.datacenterclient.requestgenerator.ports.RequestGeneratorManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
+import fr.upmc.gaspardleo.admissioncontroller.AdmissionControllerPoolNetwork;
 import fr.upmc.gaspardleo.computer.Computer;
 import fr.upmc.gaspardleo.computerpool.ComputerPool;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
+import fr.upmc.gaspardleo.computerpool.ComputerPoolNetworkMaster;
 import fr.upmc.gaspardleo.cvm.CVM;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
-public class Test {
+public class CPNetworkTest {
 
 	private final static int NB_DATASOURCE 	= 1;	
 	private CVM cvm;
 
-	public Test(){
+	public CPNetworkTest(){
 		initTest();
 	}
 
@@ -31,17 +33,31 @@ public class Test {
 		try {
 			this.cvm = new CVM();
 			
-			HashMap<ComputerPoolPorts, String> computerPool_uris = ComputerPool.makeUris();
-			new ComputerPool(computerPool_uris);
+			HashMap<ComputerPoolPorts, String> cp_uris_1 = ComputerPool.makeUris();
+			new ComputerPool(cp_uris_1);
+			HashMap<ComputerPoolPorts, String> cp_uris_2 = ComputerPool.makeUris();
+			new ComputerPool(cp_uris_2);
+			HashMap<ComputerPoolPorts, String> cp_uris_3 = ComputerPool.makeUris();
+			new ComputerPool(cp_uris_3);
+			
+			
+			
 			
 			HashSet<Integer> admissibleFrequencies = Computer.makeFrequencies();
 			HashMap<Integer,Integer> processingPower = Computer.makeProcessingPower();
-			new Computer(Computer.makeUris(0), computerPool_uris, admissibleFrequencies, processingPower);
-			new Computer(Computer.makeUris(1), computerPool_uris, admissibleFrequencies, processingPower);
-			new Computer(Computer.makeUris(2), computerPool_uris, admissibleFrequencies, processingPower);
+			new Computer(Computer.makeUris(0), cp_uris_1, admissibleFrequencies, processingPower);
+			new Computer(Computer.makeUris(1), cp_uris_2, admissibleFrequencies, processingPower);
+			new Computer(Computer.makeUris(2), cp_uris_3, admissibleFrequencies, processingPower);
 
+			String cpnm_in = AbstractPort.generatePortURI();
+			ComputerPoolNetworkMaster cpnm = new ComputerPoolNetworkMaster("cpnm", cpnm_in);
+
+			cpnm.registerComputerPool(cp_uris_1.get(ComputerPoolPorts.INTROSPECTION), cp_uris_1.get(ComputerPoolPorts.COMPUTER_POOL));
+			cpnm.registerComputerPool(cp_uris_2.get(ComputerPoolPorts.INTROSPECTION), cp_uris_2.get(ComputerPoolPorts.COMPUTER_POOL));
+			cpnm.registerComputerPool(cp_uris_3.get(ComputerPoolPorts.INTROSPECTION), cp_uris_3.get(ComputerPoolPorts.COMPUTER_POOL));
+			
 			HashMap<ACPortTypes, String> ac_uris = AdmissionController.makeUris("AC_URI");
-			new AdmissionController(computerPool_uris, ac_uris);
+			new AdmissionControllerPoolNetwork(cpnm_in, ac_uris);
 			
 			for (int i = 0; i < NB_DATASOURCE; i++) {
 				
@@ -93,7 +109,7 @@ public class Test {
 	public static void main(String[] args){
 
 		try {
-			final Test tvmc = new Test() ;
+			final CPNetworkTest tvmc = new CPNetworkTest() ;
 			System.out.println("starting...") ;
 			tvmc.getCvm().start() ;
 			Thread.sleep(90000L) ;

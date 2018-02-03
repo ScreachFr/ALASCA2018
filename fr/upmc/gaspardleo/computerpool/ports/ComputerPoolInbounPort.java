@@ -3,14 +3,14 @@ package fr.upmc.gaspardleo.computerpool.ports;
 import java.util.HashMap;
 
 import fr.upmc.components.ComponentI;
-import fr.upmc.components.ports.AbstractOutboundPort;
+import fr.upmc.components.ports.AbstractInboundPort;
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computerpool.ComputerPool;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 
 public class ComputerPoolInbounPort 
-		extends AbstractOutboundPort
+		extends AbstractInboundPort
 		implements ComputerPoolI {
 
 	private static final long serialVersionUID = 1L;
