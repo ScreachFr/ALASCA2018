@@ -2,6 +2,11 @@ package fr.upmc.gaspardleo.computer;
 
 import fr.upmc.components.ports.AbstractPort;
 
+/**
+ * La classe <code> ComputerMonitor </ code> implémente le composant représentant 
+ * le contrôlleur d'un ordinateur dans le centre de données.
+ * @author Leonor & Alexandre
+ */
 public class ComputerMonitor 
 	extends fr.upmc.datacenter.hardware.tests.ComputerMonitor {
 
@@ -9,6 +14,11 @@ public class ComputerMonitor
 		STATIC_STATE_OUT, DYNAMIC_STATE_OUT;
 	}
 	
+	/**
+	 * @param computerURI	URI de l'ordinateur à contrôller
+	 * @param active		État d'activité
+	 * @throws Exception
+	 */
 	public ComputerMonitor(
 		String computerURI, 
 		boolean active

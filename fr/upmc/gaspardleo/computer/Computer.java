@@ -9,7 +9,13 @@ import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 
-public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
+/**
+ * La classe <code> ApplicationVM </ code> implémente le composant représentant 
+ * un ordinateur dans le centre de données.
+ * @author Leonor & Alexandre
+ */
+public class Computer 
+	extends fr.upmc.datacenter.hardware.computers.Computer {
 
 	public static enum ComputerPortsTypes {
 		INTROSPECTION,
@@ -18,11 +24,22 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 		DYNAMIC_STATE_IN
 	}
 	
+	/** Fréquence de la CPU */
 	private static final int CPU_FREQUENCY = 3000;
+	/** Gap de la fréquence maximum de la CPU */
 	private static final int CPU_MAX_FREQUENCY_GAP = 1500;
+	/** Nombre de CPU */
 	private static final int NB_CPU = 2;
+	/** Nombre de coeurs */
 	private static final int NB_CORES = 4;
 	
+	/**
+	 * @param computer_uris				URIS du composant et de ses ports
+	 * @param cp_uris					URI du ComputerPool auquel il est associé
+	 * @param admissibleFrequencies		Fréquences admissibles
+	 * @param processingPower			Puissance de calcul
+	 * @throws Exception
+	 */
 	public Computer(
 			HashMap<ComputerPortsTypes, String> computer_uris,
 			HashMap<ComputerPoolPorts, String> cp_uris,
@@ -57,6 +74,10 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 		this.logMessage("Computer made");
 	}
 
+	/**
+	 * Crée les valeurs de fréquences admissibles
+	 * @return	Les valeurs de fréquences admissibles
+	 */
 	public static HashSet<Integer> makeFrequencies(){
 		HashSet<Integer> admissibleFrequencies = new HashSet<Integer>() ;
 		admissibleFrequencies.add(1500);
@@ -64,6 +85,10 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 		return admissibleFrequencies;
 	}
 	
+	/**
+	 * Crée les valeurs de puissance de calcul
+	 * @return	Les valeurs de puissance de calcul
+	 */
 	public static HashMap<Integer,Integer> makeProcessingPower(){
 		HashMap<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
 		processingPower.put(1500, 1500000);
@@ -71,6 +96,11 @@ public class Computer extends fr.upmc.datacenter.hardware.computers.Computer {
 		return processingPower;
 	}
 	
+	/**
+	 * Crée les URIs du composant et de ses ports
+	 * @param num_computer	URI du composant en lui même
+	 * @return
+	 */
 	public static HashMap<ComputerPortsTypes, String> makeUris(int num_computer){
 		HashMap<ComputerPortsTypes, String> computer_uris = new HashMap<>();
 		computer_uris.put(ComputerPortsTypes.INTROSPECTION, "computer-"+num_computer);
