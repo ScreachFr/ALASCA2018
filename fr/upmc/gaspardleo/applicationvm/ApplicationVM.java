@@ -21,6 +21,14 @@ import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableInboundPort;
 import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
+/**
+ * La classe <code> ApplicationVM </ code> implémente le composant représentant 
+ * une application VM dans le centre de données.
+ * 
+ * <p><strong>Description</strong></p>
+ * Ce composant simule l'exécution d'applications web en recevant des requêtes
+ * @author Leonor & Alexandre
+ */
 public class ApplicationVM 
 		extends fr.upmc.datacenter.software.applicationvm.ApplicationVM
 		implements ApplicationVMConnectionsI, ShutdownableI {
@@ -36,16 +44,21 @@ public class ApplicationVM
 		SHUTDOWNABLE;
 	}
 
+	/** map contenant le timestamp d'arrivé de chaque reqête */
 	private HashMap<RequestI, Long> requestStartTimeStamps;
-	
-	// Misc
+	/** URI de l'application VM */
 	private String vmURI;
-
-	// Ports
+	/** Inbound port offrant les services d'arrêt de l'application VM */
 	private ShutdownableInboundPort sip;
+	/** Inbound port offrent les services de connexion à l'application VM */
 	private ApplicationVMConnectionInboundPort avmcip;
+	/** Outbound port pôur utiliser les services du RequestMonitor */
 	private RequestMonitorOutboundPort rmop;
-	
+
+	/**
+	 * @param component_uris	URIS du composant et des ses ports
+	 * @throws Exception
+	 */
 	public ApplicationVM(
 			HashMap<ApplicationVMPortTypes, String> component_uris) throws Exception {
 
@@ -80,6 +93,9 @@ public class ApplicationVM
 		this.logMessage("ApplicationVM made");
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.applicationvm.interfaces#doRequestNotificationConnection(String)
+	 */
 	@Override
 	public void doRequestNotificationConnection(String RD_RequestNotificationInboundPortURI) throws Exception {
 		
@@ -102,6 +118,9 @@ public class ApplicationVM
 		this.logMessage("AVM : rnop connection status : " + this.requestNotificationOutboundPort.connected());
 	}
 	
+	/**
+	 * @see fr.upmc.gaspardleo.applicationvm.interfaces#doRequestMonitorConnection(String)
+	 */
 	@Override
 	public void doRequestMonitorConnection(String requestMonitor_in) throws Exception {
 
@@ -110,6 +129,11 @@ public class ApplicationVM
 			ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
 	}
 
+	/**
+	 * Cée un RequestNotificationOutboundPort si il n'éxiste pas déjà et le retourne
+	 * @return RequestNotificationOutboundPort
+	 * @throws Exception
+	 */
 	public RequestNotificationOutboundPort getRequestNotificationOutboundPort() throws Exception {
 		
 		if (this.requestNotificationOutboundPort == null){
@@ -121,7 +145,10 @@ public class ApplicationVM
 		}
 		return this.requestNotificationOutboundPort;
 	}
-
+	
+	/**
+	 * @see fr.upmc.gaspardleo.componentmanagement#startTask()
+	 */
 	@Override
 	public void startTask() throws Exception {
 		
@@ -153,7 +180,10 @@ public class ApplicationVM
 			this.logMessage("Task cancelled, couldn't find an idling core, the request is being transfered in queue.");
 		}
 	}
-	
+
+	/**
+	 * @see fr.upmc.datacenter.software.interfaces.RequestSubmissionHandlerI#acceptRequestSubmissionAndNotify(fr.upmc.datacenter.software.interfaces.RequestI)
+	 */
 	@Override
 	public void acceptRequestSubmissionAndNotify(final RequestI r) throws Exception {
 		
@@ -172,6 +202,13 @@ public class ApplicationVM
 		this.startTask();
 	}
 
+	/**
+	 * Création d'une application VM via le ComponentCreator qui gère la création dynamique
+	 * @param component_URI		URI de l'application VM
+	 * @param cc				ComponentCreator
+	 * @return					Les URIs de l'application VM et des ses ports
+	 * @throws Exception
+	 */
 	public static HashMap<ApplicationVMPortTypes, String> newInstance(
 			String component_URI,
 			ComponentCreator cc) throws Exception {

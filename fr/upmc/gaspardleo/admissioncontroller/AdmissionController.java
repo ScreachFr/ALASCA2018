@@ -34,7 +34,7 @@ import fr.upmc.gaspardleo.classfactory.ClassFactory;
  * un contrôlleur d'admission dans le centre de données.
  * 
  * <p><strong>Description</strong></p>
- * 
+ * Ce composant gère la création et la suppression de ressources pour le traitement des requêtes.
  * @author Leonor & Alexandre
  */
 public class AdmissionController 
