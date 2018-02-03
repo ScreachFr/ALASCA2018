@@ -26,9 +26,17 @@ import fr.upmc.gaspardleo.requestmonitor.RequestMonitor.RequestMonitorPorts;
 import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
-public class PerformanceRegulator 
-		extends AbstractComponent 
-		implements PerformanceRegulatorI {
+/**
+ * La classe <code> PerformanceRegulator </ code> implémente le composant représentant 
+ * le régulateur de performance du traitement des requêts dans le centre de données.
+ * 
+ * <p><strong>Description</strong></p>
+ * Ce composant gère l'adaptation du des ressources du centre de calcul
+ * @author Leonor & Alexandre
+ */
+public 	class 		PerformanceRegulator 
+		extends 	AbstractComponent 
+		implements 	PerformanceRegulatorI {
 
 	public enum PerformanceRegulatorPorts {
 		INTROSPECTION, 
@@ -41,26 +49,40 @@ public class PerformanceRegulator
 		STRATEGY_TO_SURPASS_METAL_GEAR
 	}
 	
+	/** Varibale pour l'activation du mode débug */
 	private static int DEBUG_LEVEL = 2;
+	/** Varibale d'incrémentation le nomage des applications VM */
 	private static int newAVMID = 0;
-
+	/** Variable pour calucler la fréquence du contrôle de prerformance */
 	public final static double CONTROL_FEQUENCY = 30; // Based on a minute.
+	/** Variable corrspond au temps d'attente entre deux régulation */
 	public final static long REGULATION_TRUCE = 30000; // 30 sec.
+	/** Variable correspondant au début de la première régulation */
 	public final static long FIRST_PERF_CHECK = 1000;
-
+	/** URI du composant */
 	private String uri;
-
-	// Ports
+	/** Inbound port offrant les service du PerformanceRegulator */
 	private PerformanceRegulatorInboundPort prip;
+	/** Outbound port pour utiliser les services du RequestMonitor */
 	private RequestMonitorOutboundPort rmop;
+	/** Outbound port pour utiliser les services du RequestDispatcher */
 	private RequestDispatcherOutboundPort rdop;
+	/** Outbound port pour utiliser les services du ComputerPool */
 	private ComputerPoolOutboundPort cpop;
-
-	// Regulation
+	/** Correspond à la stratégie de régulation en cours */
 	private RegulationStrategyI strategy;
+	/** Correspond à la valeur cible du temps d'attente entre des requêtes */
 	private TargetValue targetValue;
-//	private Boolean isUsingUpperBound;
 
+	/**
+	 * @param 	component_uris		URIs du composant
+	 * @param 	requestDispatcher	URIs du RequestDispatcher
+	 * @param 	requestMonitor		URIs du RequestMonitor
+	 * @param 	computerPool		URIs du ComputerPool
+	 * @param 	strategy			Stratégie à appliquer
+	 * @param 	targetValue			Cible de temps d'attente des réquêtes
+	 * @throws 	Exception
+	 */
 	public PerformanceRegulator(
 		    HashMap<PerformanceRegulatorPorts, String> component_uris,
 			HashMap<RDPortTypes, String> requestDispatcher,
@@ -136,7 +158,9 @@ public class PerformanceRegulator
 		}
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#increaseCPUFrequency()
+	 */
 	@Override
 	public Boolean increaseCPUFrequency() throws Exception {
 
@@ -154,7 +178,9 @@ public class PerformanceRegulator
 		return hasChangedFreq;
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#decreaseCPUFrequency()
+	 */
 	@Override
 	public Boolean decreaseCPUFrequency() throws Exception {
 		
@@ -170,7 +196,9 @@ public class PerformanceRegulator
 		return hasChangedFreq;
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#addAVMToRD()
+	 */
 	@Override
 	public Boolean addAVMToRD() throws Exception {
 		
@@ -188,7 +216,9 @@ public class PerformanceRegulator
 		return true;
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#removeAVMFromRD()
+	 */
 	@Override
 	public Boolean removeAVMFromRD() throws Exception {
 		
@@ -207,18 +237,25 @@ public class PerformanceRegulator
 		return true;
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#setRegulationStrategie(RegulationStrategyI)
+	 */
 	@Override
 	public void setRegulationStrategie(RegulationStrategyI strat) throws Exception {
 		this.strategy = strat;
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#getRegulationStrategie()
+	 */
 	@Override
 	public RegulationStrategyI getRegulationStrategie() throws Exception {
 		return strategy;
 	}
-
+	
+	/**
+	 * @see fr.upmc.components#start()
+	 */
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
@@ -229,7 +266,9 @@ public class PerformanceRegulator
 		}
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#startRegulationControlLoop()
+	 */
 	@Override
 	public void startRegulationControlLoop() throws Exception {
 		if (DEBUG_LEVEL > 0)
@@ -273,6 +312,11 @@ public class PerformanceRegulator
 
 	}
 	
+	/**
+	 * Construie les URIs du composant et de ses ports
+	 * @param 	rd_URI	URI RequestDispatcher
+	 * @return			Les URIs du composant et de ses ports
+	 */
 	public static HashMap<PerformanceRegulatorPorts, String> makeUris(String rd_URI){
 		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = new HashMap<>();
 		performanceRegulator_uris.put(PerformanceRegulatorPorts.INTROSPECTION, rd_URI + "-pr");

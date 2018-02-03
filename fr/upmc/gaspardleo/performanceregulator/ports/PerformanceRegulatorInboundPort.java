@@ -6,17 +6,29 @@ import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
 
-public class PerformanceRegulatorInboundPort 
-		extends AbstractInboundPort 
-		implements PerformanceRegulatorI{
+/**
+ * La classe <code> PerformanceRegulatorInboundPort </ code> implémente le port entrant 
+ * offrant l'interface <code> PerformanceRegulatorI </ code>.
+ * @author Leonor & Alexandre
+ */
+public class 		PerformanceRegulatorInboundPort 
+		extends 	AbstractInboundPort 
+		implements 	PerformanceRegulatorI{
 
 	private static final long serialVersionUID = -8603941140083696346L;
 
+	/**
+	 * @param 	uri			URI de l'inbound port
+	 * @param 	owner		Composant propriétaire du port
+	 * @throws 	Exception
+	 */
 	public PerformanceRegulatorInboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, PerformanceRegulatorI.class, owner);
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#increaseCPUFrequency()
+	 */
 	@Override
 	public Boolean increaseCPUFrequency() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
@@ -30,6 +42,9 @@ public class PerformanceRegulatorInboundPort
 				});
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#decreaseCPUFrequency()
+	 */
 	@Override
 	public Boolean decreaseCPUFrequency() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
@@ -43,6 +58,9 @@ public class PerformanceRegulatorInboundPort
 				});
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#addAVMToRD()
+	 */
 	@Override
 	public Boolean addAVMToRD() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
@@ -60,6 +78,9 @@ public class PerformanceRegulatorInboundPort
 		}
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#removeAVMFromRD()
+	 */
 	@Override
 	public Boolean removeAVMFromRD() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
@@ -73,6 +94,9 @@ public class PerformanceRegulatorInboundPort
 				});
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#setRegulationStrategie(RegulationStrategyI)
+	 */
 	@Override
 	public void setRegulationStrategie(RegulationStrategyI strat) throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
@@ -88,6 +112,9 @@ public class PerformanceRegulatorInboundPort
 				});
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#getRegulationStrategie()
+	 */
 	@Override
 	public RegulationStrategyI getRegulationStrategie() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
@@ -101,6 +128,9 @@ public class PerformanceRegulatorInboundPort
 				});
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#startRegulationControlLoop()
+	 */
 	@Override
 	public void startRegulationControlLoop() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
@@ -115,5 +145,4 @@ public class PerformanceRegulatorInboundPort
 					}
 				});
 	}
-
 }
