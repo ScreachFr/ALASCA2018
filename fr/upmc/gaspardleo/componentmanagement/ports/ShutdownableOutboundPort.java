@@ -5,7 +5,7 @@ import fr.upmc.components.ports.AbstractOutboundPort;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 
 /**
- * La classe <code> ShutdownableInboundPort </ code> implémente le port sortant 
+ * La classe <code> ShutdownableOutboundPort </ code> implémente le port sortant 
  * offrant l'interface <code> ShutdownableI </ code>.
  * @author Leonor & Alexandre
  */

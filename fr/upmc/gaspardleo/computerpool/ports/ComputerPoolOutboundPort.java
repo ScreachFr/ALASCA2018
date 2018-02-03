@@ -9,20 +9,37 @@ import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 
+/**
+ * La classe <code> ComputerPoolOutboundPort </ code> implémente le port sortrant 
+ * offrant l'interface <code> ComputerPoolI </ code>.
+ * @author Leonor & Alexandre
+ */
 public class ComputerPoolOutboundPort 
 		extends AbstractOutboundPort 
 		implements ComputerPoolI {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * @param 	uri			URI du port
+	 * @param 	owner		Composant propriétaire du port
+	 * @throws 	Exception
+	 */
 	public ComputerPoolOutboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, ComputerPoolI.class, owner);
 	}
 
+	/**
+	 * @param 	owner		Composant propriétaire du port
+	 * @throws 	Exception
+	 */
 	public ComputerPoolOutboundPort(ComponentI owner) throws Exception {
 		super(AbstractPort.generatePortURI(), ComputerPoolI.class, owner);
 	}
 	
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#addComputer(HashMap<ComputerPortsTypes, String>, Integer, Integer)
+	 */
 	@Override
 	public void addComputer(
 			HashMap<ComputerPortsTypes, String> computerUris,
@@ -35,6 +52,9 @@ public class ComputerPoolOutboundPort
 				numberOfCores);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#createNewApplicationVM(String, Integer)
+	 */
 	@Override
 	public HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(
 			String avmURI, 
@@ -45,21 +65,33 @@ public class ComputerPoolOutboundPort
 				numberOfCoreToAllocate);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#hasAvailableCore()
+	 */
 	@Override
 	public Boolean hasAvailableCore() throws Exception {
 		return ((ComputerPoolI)(this.connector)).hasAvailableCore();
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#increaseCoreFrequency(String)
+	 */
 	@Override
 	public Boolean increaseCoreFrequency(String avmUri) throws Exception {
 		return ((ComputerPoolI)(this.connector)).increaseCoreFrequency(avmUri);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#decreaseCoreFrequency(String)
+	 */
 	@Override
 	public Boolean decreaseCoreFrequency(String avmUri) throws Exception {
 		return ((ComputerPoolI)(this.connector)).decreaseCoreFrequency(avmUri);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#eleaseCores(String)
+	 */
 	@Override
 	public void releaseCores(String avmUri) throws Exception {
 		((ComputerPoolI)(this.connector)).releaseCores(avmUri);

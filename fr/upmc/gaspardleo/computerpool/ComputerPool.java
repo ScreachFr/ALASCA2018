@@ -37,6 +37,14 @@ import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort;
 
+/**
+ * La classe <code> ComputerPool </ code> implémente le composant représentant 
+ * une pool d'ordinateur dans le centre de données.
+ * 
+ * <p><strong>Description</strong></p>
+ * Ce composant est pour la gestion des ordinateur et des application VM
+ * @author Leonor & Alexandre
+ */
 public class ComputerPool 
 		extends AbstractComponent 
 		implements ComputerPoolI{
@@ -46,17 +54,31 @@ public class ComputerPool
 		COMPUTER_POOL
 	}
 	
+	/** Nombre de coeurs alloués par défaut pour une ordinateur */
 	public final static int DEFAULT_CORE_ALLOC_NUMBER = 2;
+	/** Inboud port offrant les services de la pool d'ordinateur */
 	private ComputerPoolInbounPort cpi;
+	/** Liste de URIs des ports des ordinateurs de la pool */
 	private List<HashMap<ComputerPortsTypes, String>> computers;
+	/** Liste des cœurs disponibles */
 	private List<AllocatedCore[]> availableCores;
+	/**  Liste de URIs des ports des applications VM en cours d'utilistation dans la pool */
 	private HashMap<HashMap<ApplicationVMPortTypes, String>, AllocatedCore[]> avmInUse;
+	/** URI du composant en lui même */
 	private String uri;
+	/** Liste des URIs des ports de management du processeur */
 	private HashMap<String, ProcessorManagementOutboundPort> processorManagmentPorts;
+	/** URIs et Outbound port du processeur pour les données dynamiques*/
 	private HashMap<String, ProcessorDynamicStateDataOutboundPort> processorDynamicStatePort;
+	/** URIs et Outbound port du processeur pour les données statiques*/
 	private HashMap<String, ProcessorStaticStateDataOutboundPort> processorStaticStatePort;
+	/** Composant servant à la création dynamique des applications VM */
 	private ComponentCreator cc;
 
+	/**
+	 * @param 	component_uris	URIs du composant et de ses ports
+	 * @throws 	Exception
+	 */
 	public ComputerPool(
 			HashMap<ComputerPoolPorts, String> component_uris) throws Exception {
 		
@@ -84,6 +106,9 @@ public class ComputerPool
 		this.logMessage("ComputerPool made");
 	}
 	
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#addComputer(HashMap<ComputerPortsTypes, String>, Integer, Integer)
+	 */
 	@Override
 	public void addComputer(
 			HashMap<ComputerPortsTypes, String> computerUris,
@@ -190,6 +215,9 @@ public class ComputerPool
 		this.computers.add(computerUris);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#createNewApplicationVM(String, Integer)
+	 */
 	@Override
 	public synchronized  HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(
 			String avmURI, 
@@ -227,6 +255,9 @@ public class ComputerPool
 		}
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#increaseCoreFrequency(String)
+	 */
 	@Override
 	public Boolean increaseCoreFrequency(String avmUri) throws Exception {
 		
@@ -260,6 +291,13 @@ public class ComputerPool
 		return hasChangedFrequency;
 	}
 
+	/**
+	 * Détermine une la fréquence suivante
+	 * @param pss		État static du processeur
+	 * @param pds		État dynamique du processor
+	 * @param coreNo	Numéro du coeur
+	 * @return			La fréquence suivante
+	 */
 	private Optional<Integer> getNextAdmissibleFrequency(
 			ProcessorStaticState pss, ProcessorDynamicState pds, Integer coreNo) {
 		
@@ -276,6 +314,13 @@ public class ComputerPool
 				.min((x, y) -> Integer.compare(x, y));
 	}
 
+	/**
+	 * Détermine une la fréquence précedente
+	 * @param 	pss		État static du processeur
+	 * @param 	pds		État dynamique du processor
+	 * @param 	coreNo	Numéro du coeur
+	 * @return			La fréquence précedente
+	 */
 	private Optional<Integer> getPreviousAdmissibleFequency(
 			ProcessorStaticState pss, ProcessorDynamicState pds, Integer coreNo) {
 		
@@ -292,10 +337,22 @@ public class ComputerPool
 				.max((x, y) -> Integer.compare(x, y));
 	}
 	
+	/**
+	 * Détermine si une fréquence est admissible en fonction d'une valeur min, une valeur max et de l'écart maximum
+	 * @param 	min			valeur de la fréquence minimale
+	 * @param 	max			valeur de la fréquence maximum
+	 * @param 	candidate	valeur de la fréquence candidate
+	 * @param 	maxGap		valeur de l'écart maximum entre deux fréquence
+	 * @return				true : si la fréquence est admissible
+	 * 						faux : si la fréquence n'est pas admissible
+	 */
 	private boolean isFrequencyGapAdmissible(int min, int max, int candidate, int maxGap) {
 		return Math.max(Math.abs(candidate - min), Math.abs(max - candidate)) <= maxGap;
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#decreaseCoreFrequency(String)
+	 */
 	@Override
 	public Boolean decreaseCoreFrequency(String avmUri) throws Exception {
 		
@@ -326,16 +383,25 @@ public class ComputerPool
 		return hasChangedFrequency;
 	}
 
-
+	/**
+	 * Permet de récupérer l'URI du comosant
+	 * @return L'URI du composant
+	 */
 	public String getUri() {
 		return uri;
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#hasAvailableCore()
+	 */
 	@Override
 	public synchronized Boolean hasAvailableCore() throws Exception {
 		return !availableCores.isEmpty();
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces#eleaseCores(String)
+	 */
 	@Override
 	public synchronized void releaseCores(String avmUri) throws Exception {
 		for (HashMap<ApplicationVMPortTypes, String> uris : avmInUse.keySet()) {
@@ -345,6 +411,10 @@ public class ComputerPool
 		}
 	}
 	
+	/**
+	 * Construie les URIs du composant et des ses ports
+	 * @return Les URIs du composant et des ses ports
+	 */
 	public static HashMap<ComputerPoolPorts, String> makeUris(){
 		HashMap<ComputerPoolPorts, String> computerPool_uris = new HashMap<>();
 		computerPool_uris.put(ComputerPoolPorts.COMPUTER_POOL, AbstractPort.generatePortURI());

@@ -5,7 +5,7 @@ import fr.upmc.components.ports.AbstractOutboundPort;
 import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 
 /**
- * La classe <code> ApplicationVMConnectionInboundPort </ code> implémente le port sortant 
+ * La classe <code> ApplicationVMConnectionOutboundPort </ code> implémente le port sortant 
  * offrant l'interface <code> ApplicationVMConnectionsI </ code>.
  * @author Leonor & Alexandre
  */
