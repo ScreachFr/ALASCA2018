@@ -29,6 +29,14 @@ import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 
+/**
+ * La classe <code> AdmissionController </ code> implémente le composant représentant 
+ * un contrôlleur d'admission dans le centre de données.
+ * 
+ * <p><strong>Description</strong></p>
+ * 
+ * @author Leonor & Alexandre
+ */
 public class AdmissionController 
 		extends AbstractComponent
 		implements AdmissionControllerI{
@@ -37,13 +45,23 @@ public class AdmissionController
 		ADMISSION_CONTROLLER_IN
 	}
 	
+	/** Inbound port offrant les services de l'admission contrôlleur */
 	private AdmissionControllerInboundPort acip;
+	/**	Liste d'outbound port utilisé pour manager les applications VM */
 	private ArrayList<ApplicationVMManagementOutboundPort> avmPorts;
-	// Map<RequestGenerator, RequestDispatcher>
+	/** Liste d'URIs pour gérer les duos RequestGenerator - RequestDispatcher */
 	private HashMap<HashMap<RGPortTypes, String>, HashMap<RDPortTypes, String>> requestSources;
+	/** Liste d'URIs pour gérer le ComputerPool */
 	private HashMap<ComputerPoolPorts, String> computerPoolURIs;
+	/** Outbound port pour utiliser les services du CompuerPool */
 	private ComputerPoolOutboundPort cpop;
 	
+	/**
+	 * 
+	 * @param 	computerPoolUri		URI du composant ComputerPool
+	 * @param 	ac_uris				URI du composant en lui même
+	 * @throws 	Exception
+	 */
 	public AdmissionController(
 		HashMap<ComputerPoolPorts, String> computerPoolUri,
 		HashMap<ACPortTypes, String> ac_uris) throws Exception{		
@@ -74,8 +92,11 @@ public class AdmissionController
 		this.logMessage("AdmissionController made");
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#addRequestSource(HashMap<RDPortTypes, String>, HashMap<RGPortTypes, String>, String)
+	 */
 	@Override
-	public void addRequestDispatcher(
+	public void addRequestSource(
 			HashMap<RDPortTypes, String> RD_uris,
 			HashMap<RGPortTypes, String> RG_uris,
 			String rg_monitor_in) throws Exception {
@@ -131,6 +152,9 @@ public class AdmissionController
 		this.logMessage("Admission controller : Request source successfully added!");
 	}
 	
+	/**
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#removeRequestSource(String)
+	 */
 	@Override
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
 
@@ -159,17 +183,28 @@ public class AdmissionController
 		//sop.doDisconnection();
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#getApplicationVMManagementOutboundPorts()
+	 */
 	@Override
 	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() {
 		return this.avmPorts;
 	}
 	
+	/**
+	 * Crée les URIs pour le composant et ses ports
+	 * @param introspection_uri		URI du composant en lui même
+	 * @return
+	 */
 	public static HashMap<ACPortTypes, String> makeUris(String introspection_uri){
 		HashMap<ACPortTypes, String> ac_uris = new HashMap<ACPortTypes, String>();		
 		ac_uris.put(ACPortTypes.ADMISSION_CONTROLLER_IN, introspection_uri);
 		return ac_uris;
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#createNewRequestDispatcher(int, HashMap<RGPortTypes, String>, HashMap<ACPortTypes, String>)
+	 */
 	@Override
 	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,
 			HashMap<ACPortTypes, String> ac_uris) throws Exception {

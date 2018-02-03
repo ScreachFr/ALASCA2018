@@ -119,7 +119,7 @@ public 	class 		RequestDispatcher
 		this.rmop_uri = component_uris.get(RDPortTypes.RQUEST_MONITOR_IN);
 		
 		 //Addition by AC the new RD for a specific RG
-		this.acop.addRequestDispatcher(component_uris, rg_uris, this.rmop_uri);
+		this.acop.addRequestSource(component_uris, rg_uris, this.rmop_uri);
 		
 		// Request Dispatcher debug
 		this.toggleLogging();

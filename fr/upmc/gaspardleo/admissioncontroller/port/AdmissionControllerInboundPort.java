@@ -12,17 +12,31 @@ import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
-public class AdmissionControllerInboundPort extends AbstractInboundPort
-implements AdmissionControllerI {
+/**
+ * La classe <code> AdmissionControllerInboundPort </ code> implémente le port entrant 
+ * offrant l'interface <code> AdmissionControllerI </ code>.
+ * @author Leonor & Alexandre
+ */
+public class AdmissionControllerInboundPort 
+		extends AbstractInboundPort
+		implements AdmissionControllerI {
 
 	private static final long serialVersionUID = -476427438292215937L;
 
+	/**
+	 * @param 	uri			URI de l'inbound port
+	 * @param 	owner		Composant propriétaire du port
+	 * @throws 	Exception
+	 */
 	public AdmissionControllerInboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, AdmissionControllerI.class, owner);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#addRequestSource(HashMap<RDPortTypes, String>, HashMap<RGPortTypes, String>, String)
+	 */
 	@Override
-	public void addRequestDispatcher(
+	public void addRequestSource(
 			HashMap<RDPortTypes, String> RD_uris,
 			HashMap<RGPortTypes, String> RG_uris,
 			String rg_monitor_in) throws Exception {
@@ -31,7 +45,7 @@ implements AdmissionControllerI {
 				new ComponentI.ComponentService<AdmissionController>(){
 					@Override
 					public AdmissionController call() throws Exception {
-						ac.addRequestDispatcher(
+						ac.addRequestSource(
 								RD_uris, 
 								RG_uris,
 								rg_monitor_in);
@@ -39,7 +53,10 @@ implements AdmissionControllerI {
 					}
 				});
 	}
-
+	
+	/**
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#removeRequestSource(String)
+	 */
 	@Override
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
 		AdmissionController ac = (AdmissionController) this.owner;
@@ -53,6 +70,9 @@ implements AdmissionControllerI {
 				});
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#getApplicationVMManagementOutboundPorts()
+	 */
 	@Override
 	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() throws Exception {
 		AdmissionController ac = (AdmissionController) this.owner;
@@ -65,6 +85,9 @@ implements AdmissionControllerI {
 				});
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#createNewRequestDispatcher(int, HashMap<RGPortTypes, String>, HashMap<ACPortTypes, String>)
+	 */
 	@Override
 	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,
 			HashMap<ACPortTypes, String> ac_uris) throws Exception {

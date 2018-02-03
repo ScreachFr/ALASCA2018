@@ -35,8 +35,6 @@ public class DistributedTest
 		
 	@Override
 	public void start() throws Exception {
-
-		//super.start();
 				
 		if(thisJVMURI.equals(Datacenter)){
 			
@@ -82,9 +80,7 @@ public class DistributedTest
 					this.addDeployedComponent(rg);
 					rg.start();
 					
-					AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(
-						AbstractPort.generatePortURI(),
-						new AbstractComponent(0, 0) {});
+					AdmissionControllerOutboundPort acop = new AdmissionControllerOutboundPort(new AbstractComponent(0, 0) {});
 					
 					acop.publishPort();
 					

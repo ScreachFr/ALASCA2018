@@ -10,10 +10,22 @@ import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
+/**
+ * L'interface <code> AdmissionControllerI </ code> définit le comportement de l'objet AdmissionControler
+ * pour la création et la suppression de ressources pour le traitement des requêtes.
+ * @author Leonor & Alexandre
+ */
 public interface AdmissionControllerI 
 	extends	OfferedI, RequiredI{
 
-	public void addRequestDispatcher(
+	/**
+	 * Créé les composants RequestMonitor et PerformanceRegulator nécessaire ua traitement des requêtes.
+	 * Connecte ces nouveaux commposant au RequestDispatcher et au RequestGenerator gâce aux Uris données en paramètre.
+	 * @param 	RD_uris 	URIs du RequestDispatcher
+	 * @param 	RG_uris 	URIs du RequestGenerator
+	 * @throws 	Exception
+	 */
+	public void addRequestSource(
 		HashMap<RDPortTypes, String> RD_uris,
 		HashMap<RGPortTypes, String> RG_uris,
 		String rg_monitor_in) throws Exception;
@@ -26,8 +38,22 @@ public interface AdmissionControllerI
 	 */
 	public void removeRequestSource(String requestGeneratorURI) throws Exception;
 	
-	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() throws Exception;
+	/**
+	 * Retourne les outbound ports de management des machines virtuelles d'application.
+	 * @throws Exception
+	 * @retunr la liste des outbound ports de management des machines virtuelles d'application
+	 */
+	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() 
+			throws Exception;
 	
+	/**
+	 * Crée un composant RequestDispatcher avec les URIs données en paramètre. 
+	 * @param 	num_rd		Numéro du RequestDispatcher
+	 * @param	rg_uris		URIs du RequestDispatcher
+	 * @param 	ac_uris		Uris du Composant AdmissionControler 
+	 * @throws 	Exception
+	 * @retunr 	la liste des outbound ports de management des machines virtuelles d'application
+	 */
 	public void createNewRequestDispatcher(
 			int num_rd, 
 			HashMap<RGPortTypes, String> rg_uris, 
