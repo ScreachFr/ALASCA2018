@@ -9,11 +9,21 @@ import fr.upmc.components.cvm.pre.dcc.interfaces.DynamicComponentCreationI;
 import fr.upmc.components.cvm.pre.dcc.ports.DynamicComponentCreationOutboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 
+/**
+ * La classe <code> ComponentCreator </ code>  implément un composant permettant 
+ * la création dynamique d'autres composants
+ * @author Leonor & Alexandre
+ */
 public class ComponentCreator 
 	extends AbstractComponent {
 	
+	/** CVM pour le déploiment des composant */
 	AbstractCVM cvm;
 		
+	/**
+	 * @param cvm		CVM pour le déploiment des composant
+	 * @throws Exception
+	 */
 	public ComponentCreator(AbstractCVM cvm) throws Exception{
 
 		super(1,1);
@@ -26,7 +36,13 @@ public class ComponentCreator
 		this.logMessage("ComponentCreator made");
 		
 	}
-		
+	
+	/**
+	 * Crétaion d'un composant en fonctionde si la CVM est distribuée
+	 * @param clas					Classe du composant à instancier
+	 * @param constructorParams		Valeurs des parmètres du constructeur du composant à instancier
+	 * @throws Exception
+	 */
 	public void createComponent(
 			Class<?> clas,
 			Object[] constructorParams) throws Exception{
@@ -41,6 +57,12 @@ public class ComponentCreator
 		}
 	}
 	
+	/**
+	 * Création non dynamique d'un composant
+	 * @param clas					Classe du composant à instancier
+	 * @param constructorParams		Valeurs des parmètres du constructeur du composant à instancier
+	 * @throws Exception
+	 */
 	public void componentCreation(Class<?> clas,
 			Object[] constructorParams) throws Exception{
 				
@@ -60,6 +82,12 @@ public class ComponentCreator
 		this.cvm.addDeployedComponent(component);
 	}
 	
+	/**
+	 * Création dynamique d'un composant
+	 * @param clas					Classe du composant à instancier
+	 * @param constructorParams		Valeurs des parmètres du constructeur du composant à instancier
+	 * @throws Exception
+	 */
 	public void distributedComponetCreation(Class<?> clas,
 			Object[] constructorParams) throws Exception{
 		
