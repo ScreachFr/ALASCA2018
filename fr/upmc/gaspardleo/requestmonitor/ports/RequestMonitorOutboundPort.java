@@ -4,26 +4,45 @@ import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
 import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 
-public class RequestMonitorOutboundPort 
-		extends AbstractOutboundPort 
-		implements RequestMonitorI{
+/**
+ * La classe <code> RequestMonitorOutboundPort </ code> implémente le port sortrant 
+ * offrant l'interface <code> RequestMonitorI </ code>.
+ * @author Leonor & Alexandre
+ */
+public 	class 		RequestMonitorOutboundPort 
+		extends 	AbstractOutboundPort 
+		implements 	RequestMonitorI{
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * @param 	uri			URI de l'inbound port
+	 * @param 	owner		Composant propriétaire du port
+	 * @throws 	Exception
+	 */
 	public RequestMonitorOutboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, RequestMonitorI.class, owner);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI#addEntry(Long, Long)
+	 */
 	@Override
 	public void addEntry(Long submissionTimestamp, Long notificationTimestamp) throws Exception {
 		((RequestMonitorI)(this.connector)).addEntry(submissionTimestamp, notificationTimestamp);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI#getMeanRequestExecutionTime()
+	 */
 	@Override
 	public Double getMeanRequestExecutionTime() throws Exception {
 		return ((RequestMonitorI)(this.connector)).getMeanRequestExecutionTime();
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI#isDataRelevant()
+	 */
 	@Override
 	public Boolean isDataRelevant() throws Exception {
 		return ((RequestMonitorI)(this.connector)).isDataRelevant();

@@ -384,7 +384,7 @@ public 	class 		RequestDispatcher
 	}
 	
 	/**
-	 * Construie les URIs du composant et de ses ports
+	 * Construit les URIs du composant et de ses ports
 	 * @param num_rd	Numéro du RequestDispatcher pour la création unique d'URI
 	 * @return	Les URIs du composant et de ses ports
 	 */

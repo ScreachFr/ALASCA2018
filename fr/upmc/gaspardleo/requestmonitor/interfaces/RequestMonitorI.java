@@ -3,31 +3,32 @@ package fr.upmc.gaspardleo.requestmonitor.interfaces;
 import fr.upmc.components.interfaces.OfferedI;
 import fr.upmc.components.interfaces.RequiredI;
 
-public interface RequestMonitorI 
-		extends	OfferedI, RequiredI{
+/**
+ * L'interface <code> RequestMonitorI </ code> dÃ©finit le comportement de l'objet RequestMonitor
+ * pour le contrÃ´lle des requÃªtes
+ * @author Leonor & Alexandre
+ */
+public 	interface 	RequestMonitorI 
+		extends		OfferedI, RequiredI{
 	
 	/**
-	 * Ajoute une entrée au moniteur.
-	 * @param submissionTimestamp
-	 * 		Heure d'arrivée de l'entrée.
-	 * @param queueExitTimestamp
-	 * 		Heure de sortie de l'entrée de la file d'attente.
-	 * @throws Exception
+	 * Ajoute une entrÃ©e au moniteur.
+	 * @param 	submissionTimestamp 	Heure d'arrivÃ©e de l'entrÃ©e.
+	 * @param 	queueExitTimestamp 		Heure de sortie de l'entrÃ©e de la file d'attente.
+	 * @throws 	Exception
 	 */
 	public void addEntry(Long submissionTimestamp, Long queueExitTimestamp) throws Exception;
 	
 	/**
-	 * Donne la durée moyenne d'attente avant le traitement d'une requête.
-	 * @return
-	 * 		Durée moyenne.
+	 * Donne la durÃ©e moyenne d'attente avant le traitement d'une requÃªte.
+	 * @return DurÃ©e moyenne.
 	 * @throws Exception
 	 */
 	public Double getMeanRequestExecutionTime() throws Exception;
 	
 	/**
-	 * Indique si les mesures sont encore pertinentes. Cela peut permettre d'indiquer des données périmées.
-	 * @return
-	 * 	Les données sont-elle pertinentes ?
+	 * Indique si les mesures sont encore pertinentes. Cela peut permettre d'indiquer que des donnÃ©es sont pÃ©rimÃ©es.
+	 * @return Les donnÃ©es sont-elle pertinentes ?
 	 * @throws Exception
 	 */
 	public Boolean isDataRelevant() throws Exception;

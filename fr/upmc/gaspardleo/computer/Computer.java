@@ -97,7 +97,7 @@ public 	class Computer
 	}
 	
 	/**
-	 * Crée les URIs du composant et de ses ports
+	 * Construit les URIs du composant et de ses ports
 	 * @param num_computer	URI du composant en lui même
 	 * @return
 	 */

@@ -116,7 +116,7 @@ public 	class 		RequestGenerator
 	}
 
 	/**
-	 * Construie les URIs du composant et de ses ports
+	 * Construit les URIs du composant et de ses ports
 	 * @param 	num_rg	Numéro du composant permettant la création unique d'URI
 	 * @return	Les URIs du composant et de ses ports
 	 */

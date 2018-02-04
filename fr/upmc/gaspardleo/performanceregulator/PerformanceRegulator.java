@@ -313,7 +313,7 @@ public 	class 		PerformanceRegulator
 	}
 	
 	/**
-	 * Construie les URIs du composant et de ses ports
+	 * Construit les URIs du composant et de ses ports
 	 * @param 	rd_URI	URI RequestDispatcher
 	 * @return			Les URIs du composant et de ses ports
 	 */

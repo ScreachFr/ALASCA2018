@@ -192,7 +192,7 @@ public class AdmissionController
 	}
 	
 	/**
-	 * Crée les URIs pour le composant et ses ports
+	 * Construit les URIs pour le composant et ses ports
 	 * @param introspection_uri		URI du composant en lui même
 	 * @return
 	 */
