@@ -11,9 +11,9 @@ import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
  * offrant l'interface <code> ShutdownableI </ code>.
  * @author Leonor & Alexandre
  */
-public class ShutdownableInboundPort 
-		extends AbstractInboundPort 
-		implements ShutdownableI {
+public 	class 		ShutdownableInboundPort 
+		extends 	AbstractInboundPort 
+		implements 	ShutdownableI {
 
 	private static final long serialVersionUID = 3417493372016237408L;
 
@@ -27,7 +27,7 @@ public class ShutdownableInboundPort
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.componentmanagement#shutdown()
+	 * @see fr.upmc.gaspardleo.componentmanagement.ShutdownableI#shutdown()
 	 */
 	@Override
 	public void shutdown() throws Exception {

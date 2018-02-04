@@ -93,7 +93,7 @@ public class AdmissionController
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#addRequestSource(HashMap<RDPortTypes, String>, HashMap<RGPortTypes, String>, String)
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI#addRequestSource(HashMap<RDPortTypes, String>, HashMap<RGPortTypes, String>, String)
 	 */
 	@Override
 	public void addRequestSource(
@@ -153,7 +153,7 @@ public class AdmissionController
 	}
 	
 	/**
-	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#removeRequestSource(String)
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interface.AdmissionControllerI#removeRequestSource(String)
 	 */
 	@Override
 	public void removeRequestSource(String requestGeneratorURI) throws Exception {
@@ -184,7 +184,7 @@ public class AdmissionController
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#getApplicationVMManagementOutboundPorts()
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI#getApplicationVMManagementOutboundPorts()
 	 */
 	@Override
 	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() {
@@ -203,7 +203,7 @@ public class AdmissionController
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces#createNewRequestDispatcher(int, HashMap<RGPortTypes, String>, HashMap<ACPortTypes, String>)
+	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI#createNewRequestDispatcher(int, HashMap<RGPortTypes, String>, HashMap<ACPortTypes, String>)
 	 */
 	@Override
 	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,

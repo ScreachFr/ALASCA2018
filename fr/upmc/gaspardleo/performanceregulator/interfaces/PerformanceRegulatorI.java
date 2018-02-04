@@ -8,8 +8,8 @@ import fr.upmc.components.interfaces.RequiredI;
  * pour l'adaptation du centre de calcul
  * @author Leonor & Alexandre
  */
-public interface PerformanceRegulatorI 
-	extends OfferedI, RequiredI{
+public 	interface PerformanceRegulatorI 
+		extends OfferedI, RequiredI{
 	
 	/**
 	 * Demande au ComputerPool connecté d'augmenter la fréquence des coeurs

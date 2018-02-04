@@ -14,8 +14,8 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
  * un ordinateur dans le centre de données.
  * @author Leonor & Alexandre
  */
-public class Computer 
-	extends fr.upmc.datacenter.hardware.computers.Computer {
+public 	class Computer 
+		extends fr.upmc.datacenter.hardware.computers.Computer {
 
 	public static enum ComputerPortsTypes {
 		INTROSPECTION,

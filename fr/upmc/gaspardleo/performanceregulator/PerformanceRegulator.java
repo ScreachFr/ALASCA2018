@@ -159,7 +159,7 @@ public 	class 		PerformanceRegulator
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#increaseCPUFrequency()
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#increaseCPUFrequency()
 	 */
 	@Override
 	public Boolean increaseCPUFrequency() throws Exception {
@@ -179,7 +179,7 @@ public 	class 		PerformanceRegulator
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#decreaseCPUFrequency()
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#decreaseCPUFrequency()
 	 */
 	@Override
 	public Boolean decreaseCPUFrequency() throws Exception {
@@ -197,7 +197,7 @@ public 	class 		PerformanceRegulator
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#addAVMToRD()
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#addAVMToRD()
 	 */
 	@Override
 	public Boolean addAVMToRD() throws Exception {
@@ -217,7 +217,7 @@ public 	class 		PerformanceRegulator
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#removeAVMFromRD()
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#removeAVMFromRD()
 	 */
 	@Override
 	public Boolean removeAVMFromRD() throws Exception {
@@ -238,7 +238,7 @@ public 	class 		PerformanceRegulator
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#setRegulationStrategie(RegulationStrategyI)
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#setRegulationStrategie(RegulationStrategyI)
 	 */
 	@Override
 	public void setRegulationStrategie(RegulationStrategyI strat) throws Exception {
@@ -246,7 +246,7 @@ public 	class 		PerformanceRegulator
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#getRegulationStrategie()
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#getRegulationStrategie()
 	 */
 	@Override
 	public RegulationStrategyI getRegulationStrategie() throws Exception {
@@ -267,7 +267,7 @@ public 	class 		PerformanceRegulator
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#startRegulationControlLoop()
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#startRegulationControlLoop()
 	 */
 	@Override
 	public void startRegulationControlLoop() throws Exception {

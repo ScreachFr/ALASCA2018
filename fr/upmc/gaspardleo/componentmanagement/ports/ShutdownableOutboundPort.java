@@ -9,9 +9,9 @@ import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
  * offrant l'interface <code> ShutdownableI </ code>.
  * @author Leonor & Alexandre
  */
-public class ShutdownableOutboundPort 
-		extends AbstractOutboundPort
-		implements ShutdownableI{
+public 	class 		ShutdownableOutboundPort 
+		extends 	AbstractOutboundPort
+		implements 	ShutdownableI{
 
 	private static final long serialVersionUID = 1L;
 
@@ -25,7 +25,7 @@ public class ShutdownableOutboundPort
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.componentmanagement#shutdown()
+	 * @see fr.upmc.gaspardleo.componentmanagement.ShutdownableI#shutdown()
 	 */
 	@Override
 	public void shutdown() throws Exception {

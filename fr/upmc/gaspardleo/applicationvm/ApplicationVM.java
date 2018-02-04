@@ -29,9 +29,10 @@ import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
  * Ce composant simule l'exécution d'applications web en recevant des requêtes
  * @author Leonor & Alexandre
  */
-public class ApplicationVM 
-		extends fr.upmc.datacenter.software.applicationvm.ApplicationVM
-		implements ApplicationVMConnectionsI, ShutdownableI {
+public class 		ApplicationVM 
+		extends 	fr.upmc.datacenter.software.applicationvm.ApplicationVM
+		implements 	ApplicationVMConnectionsI, 
+					ShutdownableI {
 
 	public static enum	ApplicationVMPortTypes {
 		REQUEST_SUBMISSION,
@@ -94,7 +95,7 @@ public class ApplicationVM
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.applicationvm.interfaces#doRequestNotificationConnection(String)
+	 * @see fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI#doRequestNotificationConnection(String)
 	 */
 	@Override
 	public void doRequestNotificationConnection(String RD_RequestNotificationInboundPortURI) throws Exception {
@@ -119,7 +120,7 @@ public class ApplicationVM
 	}
 	
 	/**
-	 * @see fr.upmc.gaspardleo.applicationvm.interfaces#doRequestMonitorConnection(String)
+	 * @see fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI#doRequestMonitorConnection(String)
 	 */
 	@Override
 	public void doRequestMonitorConnection(String requestMonitor_in) throws Exception {
@@ -147,7 +148,7 @@ public class ApplicationVM
 	}
 	
 	/**
-	 * @see fr.upmc.gaspardleo.componentmanagement#startTask()
+	 * @see fr.upmc.gaspardleo.componentmanagement.ShutdownableI#startTask()
 	 */
 	@Override
 	public void startTask() throws Exception {

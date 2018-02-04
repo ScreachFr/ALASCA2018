@@ -20,7 +20,7 @@ public class 	SimpleAVMStrategie
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#increasePerformances(PerformanceRegulatorI)
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI#increasePerformances(PerformanceRegulatorI)
 	 */
 	@Override
 	public void increasePerformances(PerformanceRegulatorI regulator) throws Exception {
@@ -31,7 +31,7 @@ public class 	SimpleAVMStrategie
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#decreasePerformances(PerformanceRegulatorI)
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI#decreasePerformances(PerformanceRegulatorI)
 	 */
 	@Override
 	public void decreasePerformances(PerformanceRegulatorI regulator) throws Exception {
@@ -40,7 +40,7 @@ public class 	SimpleAVMStrategie
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces#canRegulate(PerformanceRegulatorI)
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI#canRegulate(PerformanceRegulatorI)
 	 */
 	@Override
 	public Boolean canRegulate(PerformanceRegulatorI regulator) throws Exception {

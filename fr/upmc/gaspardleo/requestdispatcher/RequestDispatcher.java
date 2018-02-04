@@ -160,7 +160,7 @@ public 	class 		RequestDispatcher
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#registerVM(final HashMap<ApplicationVMPortTypes, String>, Class<?>)
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI#registerVM(final HashMap<ApplicationVMPortTypes, String>, Class<?>)
 	 */
 	@Override
 	public String registerVM(
@@ -210,7 +210,7 @@ public 	class 		RequestDispatcher
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#unregisterVM(final String)
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI#unregisterVM(final String)
 	 */
 	@Override
 	public void unregisterVM(String vmUri) throws Exception {
@@ -230,7 +230,7 @@ public 	class 		RequestDispatcher
 	}
 	
 	/**
-	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#unregisterVM()
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI#unregisterVM()
 	 */
 	@Override
 	public void unregisterVM() throws Exception {
@@ -238,7 +238,7 @@ public 	class 		RequestDispatcher
 	}
 
 	/**
-	 * @see fr.upmc.datacenter.software.interfaces#acceptRequestSubmission(RequestI)
+	 * @see fr.upmc.datacenter.software.interfaces.RequestSubmissionHandlerI#acceptRequestSubmission(RequestI)
 	 */
 	@Override
 	public void acceptRequestSubmission(RequestI r) throws Exception {
@@ -260,7 +260,7 @@ public 	class 		RequestDispatcher
 	}
 
 	/**
-	 * @see fr.upmc.datacenter.software.interfaces#acceptRequestSubmissionAndNotify(RequestI)
+	 * @see fr.upmc.datacenter.software.interfaces.RequestSubmissionHandlerI#acceptRequestSubmissionAndNotify(RequestI)
 	 */
 	@Override
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
@@ -374,7 +374,7 @@ public 	class 		RequestDispatcher
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#getRegisteredAVMUris()
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI#getRegisteredAVMUris()
 	 */
 	@Override
 	public List<String> getRegisteredAVMUris() {

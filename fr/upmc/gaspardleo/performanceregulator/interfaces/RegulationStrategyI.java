@@ -8,7 +8,7 @@ import fr.upmc.components.interfaces.RequiredI;
  * du composant PerformanceRegulatorI
  * @author Leonor & Alexandre
  */
-public interface RegulationStrategyI 
+public 	interface RegulationStrategyI 
 		extends	OfferedI, RequiredI{
 	
 	/**

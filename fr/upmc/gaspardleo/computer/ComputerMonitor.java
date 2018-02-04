@@ -7,8 +7,8 @@ import fr.upmc.components.ports.AbstractPort;
  * le contrôlleur d'un ordinateur dans le centre de données.
  * @author Leonor & Alexandre
  */
-public class ComputerMonitor 
-	extends fr.upmc.datacenter.hardware.tests.ComputerMonitor {
+public 	class ComputerMonitor 
+		extends fr.upmc.datacenter.hardware.tests.ComputerMonitor {
 
 	public enum ComputerMonitorPortTypes {
 		STATIC_STATE_OUT, DYNAMIC_STATE_OUT;
@@ -21,8 +21,7 @@ public class ComputerMonitor
 	 */
 	public ComputerMonitor(
 		String computerURI, 
-		boolean active
-		) throws Exception {
+		boolean active) throws Exception {
 		
 		super(
 			computerURI, 

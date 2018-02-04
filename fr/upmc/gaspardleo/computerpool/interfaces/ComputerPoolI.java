@@ -12,7 +12,7 @@ import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
  * pour gestion des ordinateur et des application VM
  * @author Leonor & Alexandre
  */
-public interface ComputerPoolI 
+public 	interface ComputerPoolI 
 		extends	OfferedI, RequiredI{
 
 	/**

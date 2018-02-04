@@ -26,7 +26,7 @@ public class ApplicationVMConnectionOutboundPort
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.applicationvm.interfaces#doRequestNotificationConnection(String)
+	 * @see fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI#doRequestNotificationConnection(String)
 	 */
 	@Override
 	public void doRequestNotificationConnection(String RD_RequestNotificationInboundPortURI) throws Exception {
@@ -34,7 +34,7 @@ public class ApplicationVMConnectionOutboundPort
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.applicationvm.interfaces#doRequestMonitorConnection(String)
+	 * @see fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI#doRequestMonitorConnection(String)
 	 */
 	@Override
 	public void doRequestMonitorConnection(String requestMonitor_in) throws Exception {

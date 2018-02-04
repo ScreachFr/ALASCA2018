@@ -14,8 +14,8 @@ import fr.upmc.gaspardleo.classfactory.ClassFactory;
  * la création dynamique d'autres composants
  * @author Leonor & Alexandre
  */
-public class ComponentCreator 
-	extends AbstractComponent {
+public 	class 	ComponentCreator 
+		extends AbstractComponent {
 	
 	/** CVM pour le déploiment des composant */
 	AbstractCVM cvm;
@@ -25,23 +25,18 @@ public class ComponentCreator
 	 * @throws Exception
 	 */
 	public ComponentCreator(AbstractCVM cvm) throws Exception{
-
 		super(1,1);
-		
 		this.cvm = cvm;
 		this.cvm.addDeployedComponent(this);
-		
 		this.toggleTracing();
-		
 		this.logMessage("ComponentCreator made");
-		
 	}
 	
 	/**
 	 * Crétaion d'un composant en fonctionde si la CVM est distribuée
-	 * @param clas					Classe du composant à instancier
-	 * @param constructorParams		Valeurs des parmètres du constructeur du composant à instancier
-	 * @throws Exception
+	 * @param 	clas					Classe du composant à instancier
+	 * @param 	constructorParams		Valeurs des parmètres du constructeur du composant à instancier
+	 * @throws 	Exception
 	 */
 	public void createComponent(
 			Class<?> clas,
@@ -59,9 +54,9 @@ public class ComponentCreator
 	
 	/**
 	 * Création non dynamique d'un composant
-	 * @param clas					Classe du composant à instancier
-	 * @param constructorParams		Valeurs des parmètres du constructeur du composant à instancier
-	 * @throws Exception
+	 * @param 	clas					Classe du composant à instancier
+	 * @param 	constructorParams		Valeurs des parmètres du constructeur du composant à instancier
+	 * @throws 	Exception
 	 */
 	public void componentCreation(Class<?> clas,
 			Object[] constructorParams) throws Exception{
@@ -84,9 +79,9 @@ public class ComponentCreator
 	
 	/**
 	 * Création dynamique d'un composant
-	 * @param clas					Classe du composant à instancier
-	 * @param constructorParams		Valeurs des parmètres du constructeur du composant à instancier
-	 * @throws Exception
+	 * @param 	clas					Classe du composant à instancier
+	 * @param 	constructorParams		Valeurs des parmètres du constructeur du composant à instancier
+	 * @throws 	Exception
 	 */
 	public void distributedComponetCreation(Class<?> clas,
 			Object[] constructorParams) throws Exception{

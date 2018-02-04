@@ -45,7 +45,7 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort;
  * Ce composant est pour la gestion des ordinateur et des application VM
  * @author Leonor & Alexandre
  */
-public class ComputerPool 
+public 	class ComputerPool 
 		extends AbstractComponent 
 		implements ComputerPoolI{
 	
@@ -107,7 +107,7 @@ public class ComputerPool
 	}
 	
 	/**
-	 * @see fr.upmc.gaspardleo.computerpool.interfaces#addComputer(HashMap<ComputerPortsTypes, String>, Integer, Integer)
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI#addComputer(HashMap<ComputerPortsTypes, String>, Integer, Integer)
 	 */
 	@Override
 	public void addComputer(
@@ -216,7 +216,7 @@ public class ComputerPool
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.computerpool.interfaces#createNewApplicationVM(String, Integer)
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI#createNewApplicationVM(String, Integer)
 	 */
 	@Override
 	public synchronized  HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(
@@ -256,7 +256,7 @@ public class ComputerPool
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.computerpool.interfaces#increaseCoreFrequency(String)
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI#increaseCoreFrequency(String)
 	 */
 	@Override
 	public Boolean increaseCoreFrequency(String avmUri) throws Exception {
@@ -351,7 +351,7 @@ public class ComputerPool
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.computerpool.interfaces#decreaseCoreFrequency(String)
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI#decreaseCoreFrequency(String)
 	 */
 	@Override
 	public Boolean decreaseCoreFrequency(String avmUri) throws Exception {
@@ -392,7 +392,7 @@ public class ComputerPool
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.computerpool.interfaces#hasAvailableCore()
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI#hasAvailableCore()
 	 */
 	@Override
 	public synchronized Boolean hasAvailableCore() throws Exception {
@@ -400,7 +400,7 @@ public class ComputerPool
 	}
 
 	/**
-	 * @see fr.upmc.gaspardleo.computerpool.interfaces#eleaseCores(String)
+	 * @see fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI#eleaseCores(String)
 	 */
 	@Override
 	public synchronized void releaseCores(String avmUri) throws Exception {
