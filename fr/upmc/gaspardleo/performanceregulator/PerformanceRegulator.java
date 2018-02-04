@@ -121,6 +121,10 @@ public class PerformanceRegulator
 		
 		this.logMessage("PerformanceRegulator made");
 	}
+	
+	public PerformanceRegulator() {
+		super(1, 1);
+	}
 
 	private RegulationStrategyI getStrategyFromEnum(RegulationStrategies strat) {
 		switch(strat) {
@@ -172,7 +176,6 @@ public class PerformanceRegulator
 
 	@Override
 	public Boolean addAVMToRD() throws Exception {
-		
 		HashMap<ApplicationVMPortTypes, String> avm = this.cpop.createNewApplicationVM("avm-"+(newAVMID++), 1);
 
 		if (avm == null) {

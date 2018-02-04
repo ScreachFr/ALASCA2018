@@ -32,8 +32,7 @@ import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
 public class PerformanceRegulatorPoolNetwork 
-extends AbstractComponent 
-implements PerformanceRegulatorI {
+	extends PerformanceRegulator {
 
 	private static int DEBUG_LEVEL = 2;
 	private static int newAVMID = 0;
@@ -71,7 +70,7 @@ implements PerformanceRegulatorI {
 			TargetValue targetValue)
 					throws Exception {
 
-		super(1, 1);
+		super();
 
 		this.uri = uri;
 
@@ -121,9 +120,13 @@ implements PerformanceRegulatorI {
 		this.computerPoolConnectorCanonicalName = ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName();
 		this.avmsOrigin = new HashMap<>();
 
+		updateCpops();
+		
 		// Debug
 		this.toggleLogging();
 		this.toggleTracing();
+		
+		this.logMessage("PRPN " + uri + " : has successfully been created.");
 	}
 
 

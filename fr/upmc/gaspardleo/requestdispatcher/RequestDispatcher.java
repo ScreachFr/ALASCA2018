@@ -229,8 +229,9 @@ public 	class 		RequestDispatcher
 			this.logMessage(this.Component_URI + " : no registered vm.");
 		
 		} else {
-			vmCursor = (vmCursor+1) % this.registeredVmsUri.size();
+			
 			String avmURI = getNextVmUriFromCursor();
+			
 			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(avmURI);
 			
 			this.logMessage(this.Component_URI + " is using " + avmURI);

@@ -29,7 +29,7 @@ import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPor
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
 
 public class AdmissionControllerPoolNetwork 
-		extends AbstractComponent
+		extends AdmissionController
 		implements AdmissionControllerI {
 
 	
@@ -42,8 +42,7 @@ public class AdmissionControllerPoolNetwork
 	public AdmissionControllerPoolNetwork(
 			String computerPoolNetWorkInboundPortUri,
 		HashMap<ACPortTypes, String> ac_uris) throws Exception{		
-		
-		super(1, 1);
+		super();
 
 		this.requestSources = new HashMap<>();
 

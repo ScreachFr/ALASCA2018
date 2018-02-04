@@ -61,6 +61,10 @@ public class AdmissionController
 		this.toggleTracing();		
 		this.logMessage("AdmissionController made");
 	}
+	
+	public AdmissionController() {
+		super(1,1);
+	}
 
 	@Override
 	public void addRequestDispatcher(
