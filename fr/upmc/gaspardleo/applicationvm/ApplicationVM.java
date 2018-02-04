@@ -69,7 +69,7 @@ public class ApplicationVM
 		this.sip.publishPort();
 
 		this.addRequiredInterface(RequestMonitorI.class);
-		this.rmop = new RequestMonitorOutboundPort(AbstractPort.generatePortURI(), this);
+		this.rmop = new RequestMonitorOutboundPort(this);
 		this.addPort(this.rmop);
 		this.rmop.publishPort();
 		

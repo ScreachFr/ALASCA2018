@@ -86,7 +86,7 @@ implements PerformanceRegulatorI {
 
 		//Request monitor port creation and connection.
 		this.addRequiredInterface(RequestMonitorI.class);
-		this.rmop = new RequestMonitorOutboundPort(AbstractPort.generatePortURI(), this);
+		this.rmop = new RequestMonitorOutboundPort(this);
 		this.addPort(rmop);
 		this.rmop.publishPort();
 
