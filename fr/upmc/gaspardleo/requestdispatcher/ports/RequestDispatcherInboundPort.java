@@ -9,22 +9,37 @@ import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 
-public class RequestDispatcherInboundPort 
-	extends AbstractInboundPort 
-	implements RequestDispatcherI{
+/**
+ * La classe <code> RequestDispatcherInboundPort </ code> implémente le port entrant 
+ * offrant l'interface <code> RequestDispatcherI </ code>.
+ * @author Leonor & Alexandre
+ */
+public 	class 		RequestDispatcherInboundPort 
+		extends 	AbstractInboundPort 
+		implements 	RequestDispatcherI{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-		
+	
+	/**
+	 * @param 	owner		Composant propriétaire du port
+	 * @throws 	Exception
+	 */
 	public RequestDispatcherInboundPort(ComponentI owner) throws Exception {
 		super(RequestDispatcherI.class, owner);
 	}
+	
+	/**
+	 * @param 	uri			URI de l'inbound port
+	 * @param 	owner		Composant propriétaire du port
+	 * @throws 	Exception
+	 */
 	public RequestDispatcherInboundPort(String uri, ComponentI owner) throws Exception {
 		super(uri, RequestDispatcherI.class, owner);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#registerVM(final HashMap<ApplicationVMPortTypes, String>, Class<?>)
+	 */
 	@Override
 	public String registerVM(final HashMap<ApplicationVMPortTypes, String> vmUri, Class<?> vmInterface) throws Exception {
 		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
@@ -36,6 +51,9 @@ public class RequestDispatcherInboundPort
 					}});
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#unregisterVM(final String)
+	 */
 	@Override
 	public void unregisterVM(final String vmUri) throws Exception {
 		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
@@ -48,6 +66,9 @@ public class RequestDispatcherInboundPort
 					}});
 	}
 	
+	/**
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#unregisterVM()
+	 */
 	@Override
 	public void unregisterVM() throws Exception {
 		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;
@@ -59,6 +80,10 @@ public class RequestDispatcherInboundPort
 						return requestDispatcher;
 					}});
 	}
+	
+	/**
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#getRegisteredAVMUris()
+	 */
 	@Override
 	public List<String> getRegisteredAVMUris() throws Exception {
 		final RequestDispatcher requestDispatcher = (RequestDispatcher)this.owner;

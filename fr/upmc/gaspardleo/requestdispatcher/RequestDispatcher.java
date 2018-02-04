@@ -31,6 +31,12 @@ import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 import fr.upmc.gaspardleo.requestdispatcher.ports.RequestDispatcherInboundPort;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
+/**
+ * La classe <code> RequestDispatcher </ code> implémente le composant représentant 
+ * le rrépartiteur de requêts dans le centre de données.
+ * 
+ * @author Leonor & Alexandre
+ */
 public 	class 		RequestDispatcher 
 		extends 	AbstractComponent 
 		implements 	RequestDispatcherI, 
@@ -51,20 +57,39 @@ public 	class 		RequestDispatcher
 		RQUEST_MONITOR_IN
 	}
 	
+	/** URI du composant */
 	private String Component_URI;
+	/** Liste de URIs et outbound ports utilisés pour la soumission de request */
 	private HashMap<String, RequestSubmissionOutboundPort> registeredVmsRsop;
+	/** Liste de URIs et outbound ports utilisés pour les notifications de request */
 	private HashMap<String, RequestNotificationInboundPort> registeredVmsRnip;
+	/** Liste des URIS des applications VM enregistrées */
 	private ArrayList<HashMap<ApplicationVMPortTypes, String>> registeredVmsUri;
+	/** Outbound port pour utiliser les services de soumission de requêts */
 	private RequestSubmissionInboundPort rsip;
+	/** URI de l'outbound port de notifictaion de requêtes */
 	private String rnop_uri;
+	/** URIs du RequestGenerator */
 	private HashMap<RGPortTypes, String> rg_uris;
+	/** Inbound port offrant les services de notification de requêtes */
 	private RequestNotificationInboundPort rnip;
+	/** Inbound port offrant les services du composant */
 	private RequestDispatcherInboundPort rdip;
+	/** Inbound port offrant les services d'arrêts d'autres composants tel que les applications VM */
 	private ShutdownableInboundPort sip;
+	/** Outbound port pour utiliser les service du contrôller d'admission */
 	private AdmissionControllerOutboundPort acop;
+	/** Intérateur sur les applications VM pour la soumission des requêtes */
 	private Integer vmCursor;
+	/** URI de l'outbound port pour utiliser les services du RequestMonitor */
 	private String rmop_uri;
 	
+	/**
+	 * @param 	component_uris	URIs du composant
+	 * @param 	rg_uris			URIs du RequestGenerator
+	 * @param 	ac_uris			URIs de l'AdmissionControler
+	 * @throws 	Exception
+	 */
 	public RequestDispatcher(
 		 	HashMap<RDPortTypes, String> component_uris, 
 			HashMap<RGPortTypes, String> rg_uris,
@@ -127,10 +152,16 @@ public 	class 		RequestDispatcher
 		this.logMessage("RequestDispatcher made");
 	}
 	
+	/**
+	 * @return L'URI de la prochaine application VM pour la soumission
+	 */
 	private synchronized String getNextVmUriFromCursor() {
 		return registeredVmsUri.get(vmCursor++%registeredVmsUri.size()).get(ApplicationVMPortTypes.INTROSPECTION);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#registerVM(final HashMap<ApplicationVMPortTypes, String>, Class<?>)
+	 */
 	@Override
 	public String registerVM(
 			HashMap<ApplicationVMPortTypes, String> avmURIs, 
@@ -178,6 +209,9 @@ public 	class 		RequestDispatcher
 		return rnip.getPortURI();
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#unregisterVM(final String)
+	 */
 	@Override
 	public void unregisterVM(String vmUri) throws Exception {
 		
@@ -195,11 +229,17 @@ public 	class 		RequestDispatcher
 		registeredVmsRsop.get(vmUri).doDisconnection();
 	}
 	
+	/**
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#unregisterVM()
+	 */
 	@Override
 	public void unregisterVM() throws Exception {
 		unregisterVM(getNextVmUriFromCursor());
 	}
 
+	/**
+	 * @see fr.upmc.datacenter.software.interfaces#acceptRequestSubmission(RequestI)
+	 */
 	@Override
 	public void acceptRequestSubmission(RequestI r) throws Exception {
 		
@@ -219,6 +259,9 @@ public 	class 		RequestDispatcher
 		}
 	}
 
+	/**
+	 * @see fr.upmc.datacenter.software.interfaces#acceptRequestSubmissionAndNotify(RequestI)
+	 */
 	@Override
 	public void acceptRequestSubmissionAndNotify(RequestI r) throws Exception {
 		
@@ -242,6 +285,9 @@ public 	class 		RequestDispatcher
 		}
 	}
 	
+	/**
+	 * @see fr.upmc.datacenter.software.interfaces.RequestNotificationHandlerI#acceptRequestTerminationNotification(RequestI)
+	 */
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		
@@ -264,6 +310,9 @@ public 	class 		RequestDispatcher
 		rnop.notifyRequestTermination(r);
 	}
 	
+	/**
+	 * @see fr.upmc.datacenter.software.interfaces.RequestNotificationI#notifyRequestTermination(RequestI)
+	 */
 	@Override
 	public void notifyRequestTermination(RequestI r) throws Exception {
 		
@@ -273,6 +322,9 @@ public 	class 		RequestDispatcher
 		rnop.notifyRequestTermination(r);
 	}
 	
+	/**
+	 * @see fr.upmc.gaspardleo.componentmanagement.ShutdownableI#shutdown()
+	 */
 	@Override
 	public void shutdown() throws ComponentShutdownException {
 		registeredVmsUri.forEach(e -> {
@@ -289,6 +341,13 @@ public 	class 		RequestDispatcher
 		super.shutdown();
 	}	
 	
+	/**
+	 * Connecte l'AdmissionControler pour la réception des notifiactions
+	 * @param 	AVMConnectionPort_URI	URI du port de connexion de l'application VM
+	 * @param 	notificationPort_URI	URI du port pour les notifications
+	 * @param 	requestMonitor_in		URI de port du RequestMonitor
+	 * @throws 	Exception
+	 */
 	private void doAVMRequestNotificationAndMonitoringConnection(
 		String AVMConnectionPort_URI,
 		String notificationPort_URI,
@@ -314,6 +373,9 @@ public 	class 		RequestDispatcher
 		this.logMessage("Admission controller : avmcop connection status : " + avmcop.connected());
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.requestdispatcher.interfaces#getRegisteredAVMUris()
+	 */
 	@Override
 	public List<String> getRegisteredAVMUris() {
 		return registeredVmsUri.stream()
@@ -321,6 +383,11 @@ public 	class 		RequestDispatcher
 		   .collect(Collectors.toList());
 	}
 	
+	/**
+	 * Construie les URIs du composant et de ses ports
+	 * @param num_rd	Numéro du RequestDispatcher pour la création unique d'URI
+	 * @return	Les URIs du composant et de ses ports
+	 */
 	public static HashMap<RDPortTypes, String> makeUris(int num_rd){
 		HashMap<RDPortTypes, String> requestDispatcher_uris = new HashMap<RDPortTypes, String>() ;		
 		requestDispatcher_uris.put(RDPortTypes.INTROSPECTION, "rd-"+num_rd);
