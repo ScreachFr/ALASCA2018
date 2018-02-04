@@ -65,10 +65,13 @@ public 	class 		PerformanceRegulatorPoolNetwork
 	private RegulationStrategyI strategy;
 	/** Correspond Ã  la valeur cible du temps d'attente entre des requÃªtes */
 	private TargetValue targetValue;
-	
+	/** Port de communication avec le registre des ComputerPools */
 	private ComputerPoolNetworkMasterOutboundPort cpnmop;
+	/** Liste des ComputerPools disponibles */
 	private HashMap<String, ComputerPoolOutboundPort> cpops;
+	/** Connecteur dynamique gardé en cache pour ne pas refaire trop de fois appel à ClassFactory */
 	private String computerPoolConnectorCanonicalName;
+	/** Permet de savoir de quel ComputerPool provient une AVM. */
 	private HashMap<String, String> avmsOrigin;
 	
 	/**
