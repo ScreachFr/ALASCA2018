@@ -12,20 +12,19 @@ import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolNetworkMasterI;
  * 
  * @author Leonor & Alexandre
  */
-public class ComputerPoolNetworkMasterOutboundPort 
-	extends AbstractOutboundPort 
-	implements ComputerPoolNetworkMasterI {
+public 	class 		ComputerPoolNetworkMasterOutboundPort 
+		extends 	AbstractOutboundPort 
+		implements 	ComputerPoolNetworkMasterI {
 
 
 	private static final long serialVersionUID = -6041921663130597612L;
 
 	/**
-	 * @param 	uri			URI du port.
 	 * @param 	owner		Composant propriétaire du port
 	 * @throws 	Exception
 	 */
-	public ComputerPoolNetworkMasterOutboundPort(String uri, ComponentI owner) throws Exception {
-		super(uri, ComputerPoolNetworkMasterI.class, owner);
+	public ComputerPoolNetworkMasterOutboundPort(ComponentI owner) throws Exception {
+		super(ComputerPoolNetworkMasterI.class, owner);
 	}
 	
 	/**
@@ -52,5 +51,4 @@ public class ComputerPoolNetworkMasterOutboundPort
 	public HashMap<String, String> getAvailableComputerPools() throws Exception {
 		return ((ComputerPoolNetworkMasterI)this.connector).getAvailableComputerPools();
 	}
-
 }

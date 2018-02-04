@@ -4,15 +4,14 @@ import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
 
 /**
- * Cette classe représente une stratégie de régulation qui influt sur la fréquence des processeur ainsi que le nombre d'AVM.
- * En effet elle va d'abord essayer d'augmenter ou de reduire la fréquence des processeurs concernés avant d'allourer
- * ou de desallouer des AVMs.
- * 
+ * Cette classe reprÃ©sente une stratÃ©gie de rÃ©gulation qui influt sur la frÃ©quence des processeur 
+ * ainsi que le nombre d'AVM. En effet elle va d'abord essayer d'augmenter ou de reduire la frÃ©quence 
+ * des processeurs concernÃ©s avant d'allourer ou de desallouer des AVMs.
  * 
  * @author Leonor & Alexandre
  */
-public class AVMAndFrequencyStrategy 
-	implements RegulationStrategyI{
+public 	class 		AVMAndFrequencyStrategy 
+		implements 	RegulationStrategyI {
 
 	/**
 	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI#increasePerformances(PerformanceRegulatorI)

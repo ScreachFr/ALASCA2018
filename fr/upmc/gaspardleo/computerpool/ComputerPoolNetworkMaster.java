@@ -16,25 +16,23 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolNetworkMasterInboundPor
  * 
  * @author Leonor & Alexandre
  */
-public class ComputerPoolNetworkMaster 
-	extends AbstractComponent
-	implements ComputerPoolNetworkMasterI{
+public 	class 		ComputerPoolNetworkMaster 
+		extends 	AbstractComponent
+		implements 	ComputerPoolNetworkMasterI{
 	
-	// URI du composant.
+	/** URI du composant */
 	private String uri;
 	
-	// Registe de ComputerPool. <URI du ComputerPool, URI du port ComputerPoolI in>
+	/** Registe de ComputerPool. <URI du ComputerPool, URI du port ComputerPoolI in> */
 	private HashMap<String, String> pools;
 	
-	// Port serveur du ComputerPoolNetwordMasterI.
+	/** Port serveur du ComputerPoolNetwordMasterI */
 	private ComputerPoolNetworkMasterInboundPort cpnmip;
 	
 	/**
-	 * @param componentUri
-	 * 		URI du composant.
-	 * @param computerPoolInboundPortUri
-	 * 		URI du port ComputerPoolNetworkMaster in.
-	 * @throws Exception
+	 * @param 	componentUri 				URI du composant.
+	 * @param 	computerPoolInboundPortUri 	URI du port ComputerPoolNetworkMaster in.
+	 * @throws 	Exception
 	 */
 	public ComputerPoolNetworkMaster(String componentUri, String computerPoolInboundPortUri) throws Exception {
 		super(1, 1);
@@ -79,5 +77,4 @@ public class ComputerPoolNetworkMaster
 	public HashMap<String, String> getAvailableComputerPools() {
 		return pools;
 	}
-
 }

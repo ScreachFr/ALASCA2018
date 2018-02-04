@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.exceptions.ComponentStartException;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
@@ -35,57 +34,52 @@ import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
  * le régulateur de performance du traitement des requêts dans le centre de calcul.
  * 
  * <p><strong>Description</strong></p>
- * Ce composant gère l'adaptation du des ressources du centre de calcul. Il est identique � <code>PerformanceRegulateur</code>
- * sauf qu'il utilise un registe de <code>ComputerPool</code> fournit par <code>ComputerPoolNetworkMaster</code> pour reclamer
+ * Ce composant gère l'adaptation du des ressources du centre de calcul. Il est identique à <code>PerformanceRegulateur</code>
+ * sauf qu'il utilise un registe de <code>ComputerPool</code> fournit par <code>ComputerPoolNetworkMaster</code> pour réclamer
  * des <code>ApplicationVM</code>.
  * 
  * @author Leonor & Alexandre
  */
-public class PerformanceRegulatorPoolNetwork 
-	extends PerformanceRegulator {
+public 	class 		PerformanceRegulatorPoolNetwork 
+		extends 	PerformanceRegulator {
 
+	/** Varibale pour l'activation du mode débug */
 	private static int DEBUG_LEVEL = 2;
+	/** Varibale d'incrémentation le nomage des applications VM */
 	private static int newAVMID = 0;
-
+	/** Variable pour calucler la fréquence du contrôle de prerformance */
 	public final static double CONTROL_FEQUENCY = 30; // Based on a minute.
+	/** Variable corrspond au temps d'attente entre deux régulation */
 	public final static long REGULATION_TRUCE = 30000; // 30 sec.
+	/** Variable correspondant au début de la première régulation */
 	public final static long FIRST_PERF_CHECK = 1000;
-
+	/** URI du composant */
 	private String uri;
-
-	// Hardware providers
+	/** Inbound port offrant les service du PerformanceRegulator */
+	private PerformanceRegulatorInboundPort prip;
+	/** Outbound port pour utiliser les services du RequestMonitor */
+	private RequestMonitorOutboundPort rmop;
+	/** Outbound port pour utiliser les services du RequestDispatcher */
+	private RequestDispatcherOutboundPort rdop;
+	/** Correspond à la stratégie de régulation en cours */
+	private RegulationStrategyI strategy;
+	/** Correspond à la valeur cible du temps d'attente entre des requêtes */
+	private TargetValue targetValue;
+	
 	private ComputerPoolNetworkMasterOutboundPort cpnmop;
 	private HashMap<String, ComputerPoolOutboundPort> cpops;
 	private String computerPoolConnectorCanonicalName;
-
-	// AVMs
 	private HashMap<String, String> avmsOrigin;
-
-	// Ports
-	private PerformanceRegulatorInboundPort prip;
-	private RequestMonitorOutboundPort rmop;
-	private RequestDispatcherOutboundPort rdop;
-
-	// Regulation
-	private RegulationStrategyI strategy;
-	private TargetValue targetValue;
 	
 	/**
-	 * @param uri
-	 * 		URI du composant.
-	 * @param component_uris
-	 * 		URIs du composant.
-	 * @param requestDispatcher
-	 * 		URIs du RequestDispatcher.
-	 * @param requestMonitor
-	 * 		URIs du RequestMonitor.
-	 * @param computerPoolNetworkMasterInboundPort_uri
-	 * 		URI du ComputerPoolNetworkMaster in.
-	 * @param strategy
-	 * 		Stratégie à appliquer.
-	 * @param targetValue
-	 * 		Cible de temps d'attente des réquêtes.
-	 * @throws Exception
+	 * @param 	uri 										URI du composant.
+	 * @param 	component_uris 								URIs du composant.
+	 * @param 	requestDispatcher 							URIs du RequestDispatcher.
+	 * @param 	requestMonitor 								URIs du RequestMonitor.
+	 * @param 	computerPoolNetworkMasterInboundPort_uri 	URI du ComputerPoolNetworkMaster in.
+	 * @param 	strategy 									Stratégie à appliquer.
+	 * @param 	targetValue 								Cible de temps d'attente des réquêtes.
+	 * @throws 	Exception
 	 */
 	public PerformanceRegulatorPoolNetwork(
 			String uri,
@@ -117,8 +111,8 @@ public class PerformanceRegulatorPoolNetwork
 		this.rmop.publishPort();
 
 		this.rmop.doConnection(
-				requestMonitor.get(RequestMonitorPorts.REQUEST_MONITOR_IN),
-				ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
+			requestMonitor.get(RequestMonitorPorts.REQUEST_MONITOR_IN),
+			ClassFactory.newConnector(RequestMonitorI.class).getCanonicalName());
 
 		//Request dispatcher port creation and connection.
 		this.addRequiredInterface(RequestDispatcherI.class);
@@ -127,19 +121,18 @@ public class PerformanceRegulatorPoolNetwork
 		this.rdop.publishPort();
 
 		this.rdop.doConnection(
-				requestDispatcher.get(RDPortTypes.REQUEST_DISPATCHER_IN),
-				ClassFactory.newConnector(RequestDispatcherI.class).getCanonicalName());
+			requestDispatcher.get(RDPortTypes.REQUEST_DISPATCHER_IN),
+			ClassFactory.newConnector(RequestDispatcherI.class).getCanonicalName());
 
 		this.addRequiredInterface(ComputerPoolNetworkMasterI.class);
-		this.cpnmop = new ComputerPoolNetworkMasterOutboundPort(AbstractPort.generatePortURI(), this);
+		this.cpnmop = new ComputerPoolNetworkMasterOutboundPort(this);
 
 		this.addPort(this.cpnmop);
 		this.cpnmop.publishPort();
 		this.cpnmop.doConnection(
-				computerPoolNetworkMasterInboundPort_uri,
-				ClassFactory.newConnector(ComputerPoolNetworkMasterI.class).getCanonicalName()
-				);
-
+			computerPoolNetworkMasterInboundPort_uri,
+			ClassFactory.newConnector(ComputerPoolNetworkMasterI.class).getCanonicalName()
+			);
 
 		this.addRequiredInterface(ComputerPoolI.class);
 
@@ -149,10 +142,8 @@ public class PerformanceRegulatorPoolNetwork
 
 		updateCpops();
 		
-		// Debug
 		this.toggleLogging();
 		this.toggleTracing();
-		
 		this.logMessage("PRPN " + uri + " : has successfully been created.");
 	}
 
@@ -163,42 +154,31 @@ public class PerformanceRegulatorPoolNetwork
 	@Override
 	public Boolean addAVMToRD() throws Exception {
 		Optional<HashMap<ApplicationVMPortTypes, String>> avmToAdd;
-		
 		String newAVMUri = "avm-"+(newAVMID++);
-		
 		for (Entry<String, ComputerPoolOutboundPort> e : cpops.entrySet()) {
 			avmToAdd = getAVMFromCpop(newAVMUri, 1, e.getValue());
-			
 			if (avmToAdd.isPresent()) {
 				avmsOrigin.put(e.getKey(), avmToAdd.get().get(ApplicationVMPortTypes.INTROSPECTION));
 				rdop.registerVM(avmToAdd.get(), RequestSubmissionI.class);
-				
 				return true;
 			}
 		}
-		
 		this.logMessage(this.uri + " : addAVMToRD : No available ressource!");
-		
 		return false;
 	}
 	
 	/**
-	 * Permet de reserver une AVM � un ComputerPool.
-	 * @param avmUri
-	 * 		URI de la nouvelle AVM.
-	 * @param numberOfCoreToAllocate
-	 * 		Combien de coeur le ComputerPool doit-il allouer � l'AVM.
-	 * @param cpop
-	 * 		Port du ComputerPool.
-	 * @return
-	 * 		Une possible nouvelle AVM.
-	 * @throws Exception
+	 * Permet de reserver une AVM à un ComputerPool.
+	 * @param 	avmUri 					URI de la nouvelle AVM.
+	 * @param 	numberOfCoreToAllocate 	Combien de coeur le ComputerPool doit-il allouer à l'AVM.
+	 * @param 	cpop					Port du ComputerPool.
+	 * @return 							Une possible nouvelle AVM.
+	 * @throws 	Exception
 	 */
 	private Optional<HashMap<ApplicationVMPortTypes, String>> getAVMFromCpop(
 			String avmUri,
 			Integer numberOfCoreToAllocate,
 			ComputerPoolOutboundPort cpop) throws Exception {
-		
 		return Optional.ofNullable(cpop.createNewApplicationVM(avmUri, numberOfCoreToAllocate));
 	}
 
@@ -208,17 +188,13 @@ public class PerformanceRegulatorPoolNetwork
 	@Override
 	public Boolean removeAVMFromRD() throws Exception {
 		List<String> avms = rdop.getRegisteredAVMUris();
-		
 		if (avms.size() <= 1) {
 			this.logMessage(this.uri + " : Can't remove any AVM : there's too few left in RD.");
 			return false;
 		}
-		
 		String avmToRemove = avms.remove(0);
-		
 		rdop.unregisterVM(avmToRemove);
 		cpops.get(avmsOrigin.get(avmToRemove)).releaseCores(avmToRemove);
-
 		return true;
 	}
 
@@ -228,42 +204,33 @@ public class PerformanceRegulatorPoolNetwork
 	@Override
 	public Boolean increaseCPUFrequency() throws Exception {
 		Boolean hasChangedFreq = false;
-
 		List<String> avms;
-
 		avms = rdop.getRegisteredAVMUris();
-
 		for (String avm : avms) {
 			if (cpops.get(avmsOrigin.get(avm)).increaseCoreFrequency(avm))
 				hasChangedFreq = true;
 		}
-
 		return hasChangedFreq;
 	}
 
 	@Override
 	public Boolean decreaseCPUFrequency() throws Exception {
 		Boolean hasChangedFreq = false;
-
 		List<String> avms;
-
 		avms = rdop.getRegisteredAVMUris();
-
 		for (String avm : avms) {
 			if (cpops.get(avmsOrigin.get(avm)).decreaseCoreFrequency(avm))
 				hasChangedFreq = true;
 		}
-
 		return hasChangedFreq;
 	}
 
 	/**
-	 * Met � jour la liste des ComputerPool disponibles.
+	 * Met à jour la liste des ComputerPool disponibles.
 	 * @throws Exception
 	 */
 	private void updateCpops() throws Exception {
 		HashMap<String, String> availablePools = cpnmop.getAvailableComputerPools();
-
 		// Removes ComputerPools that are not available anymore from cpops .
 		cpops.keySet().stream()
 		.filter(e -> !availablePools.containsKey(e))
@@ -275,9 +242,6 @@ public class PerformanceRegulatorPoolNetwork
 				e1.printStackTrace();
 			}
 		});
-
-
-
 		// Creates ports if needed.
 		for (Entry<String, String> e : availablePools.entrySet()) {
 			if (!cpops.containsKey(e.getKey())) {
@@ -288,8 +252,6 @@ public class PerformanceRegulatorPoolNetwork
 				cpops.put(e.getKey(), cpop);
 			}
 		}
-
-
 	}
 
 	/**
@@ -371,10 +333,8 @@ public class PerformanceRegulatorPoolNetwork
 
 	/**
 	 * Permet de definir la strategie de regulation du composant.
-	 * @param strat
-	 * 		Strategie � utiliser.
-	 * @return
-	 * 		Instance de la strategie voulue.
+	 * @param 	strat 	Strategie à utiliser.
+	 * @return 			Instance de la strategie voulue.
 	 */
 	private RegulationStrategyI getStrategyFromEnum(RegulationStrategies strat) {
 		switch(strat) {
@@ -393,10 +353,8 @@ public class PerformanceRegulatorPoolNetwork
 	
 	/**
 	 * Construit les URIs du composant et de ses ports.
-	 * @param rd_URI
-	 * 		URI RequestDispatcher
-	 * @return
-	 * 		Les URIs du composant et de ses ports
+	 * @param 	rd_URI URI RequestDispatcher
+	 * @return	Les URIs du composant et de ses ports
 	 */
 	public static HashMap<PerformanceRegulatorPorts, String> makeUris(String rd_URI){
 		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = new HashMap<>();

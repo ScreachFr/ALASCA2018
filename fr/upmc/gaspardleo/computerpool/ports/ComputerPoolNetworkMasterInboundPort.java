@@ -13,9 +13,9 @@ import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolNetworkMasterI;
  * 
  * @author Leonor & Alexandre
  */
-public class ComputerPoolNetworkMasterInboundPort 
-	extends AbstractInboundPort 
-	implements ComputerPoolNetworkMasterI {
+public 	class 		ComputerPoolNetworkMasterInboundPort 
+		extends 	AbstractInboundPort 
+		implements 	ComputerPoolNetworkMasterI {
 
 	private static final long serialVersionUID = 7303969117519739268L;
 

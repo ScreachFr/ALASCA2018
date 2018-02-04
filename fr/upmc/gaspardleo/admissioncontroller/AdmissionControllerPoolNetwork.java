@@ -31,14 +31,14 @@ import fr.upmc.gaspardleo.classfactory.ClassFactory;
  * 
  * <p><strong>Description</strong></p>
  * Ce composant gère la création et la suppression de ressources pour le traitement des requêtes.
- * Il est identique � <code>AdmissionController</code> sauf qu'il transmet un <code>ComputerPoolNetworkMaster</code> 
+ * Il est identique à <code>AdmissionController</code> sauf qu'il transmet un <code>ComputerPoolNetworkMaster</code> 
  * au <code>PerformanceRegulatorPoolNetword</code> au lieu d'un simple <code>ComputerPool</code>.
  * 
  * @author Leonor & Alexandre
  */
-public class AdmissionControllerPoolNetwork 
-		extends AdmissionController
-		implements AdmissionControllerI {
+public 	class 		AdmissionControllerPoolNetwork 
+		extends 	AdmissionController
+		implements 	AdmissionControllerI {
 
 	/** Inbound port offrant les services de l'admission contrôlleur */
 	private AdmissionControllerInboundPort acip;
@@ -50,11 +50,9 @@ public class AdmissionControllerPoolNetwork
 	private String computerPoolNetWorkInboundPortUri;
 	
 	/**
-	 * @param computerPoolNetWorkInboundPortUri
-	 * 		URI du fournisseur de registre de ComputerPool.
-	 * @param ac_uris
-	 * 		URI du composant en lui même.
-	 * @throws Exception
+	 * @param 	computerPoolNetWorkInboundPortUri 	URI du fournisseur de registre de ComputerPool.
+	 * @param 	ac_uris 							URI du composant en lui même.
+	 * @throws 	Exception
 	 */
 	public AdmissionControllerPoolNetwork(
 			String computerPoolNetWorkInboundPortUri,
