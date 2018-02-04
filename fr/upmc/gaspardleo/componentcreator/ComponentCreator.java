@@ -11,7 +11,8 @@ import fr.upmc.gaspardleo.classfactory.ClassFactory;
 
 /**
  * La classe <code> ComponentCreator </ code>  implément un composant permettant 
- * la création dynamique d'autres composants
+ * la création dynamique d'autres composants.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 	ComponentCreator 
@@ -33,9 +34,9 @@ public 	class 	ComponentCreator
 	}
 	
 	/**
-	 * Crétaion d'un composant en fonctionde si la CVM est distribuée
-	 * @param 	clas					Classe du composant à instancier
-	 * @param 	constructorParams		Valeurs des parmètres du constructeur du composant à instancier
+	 * Crétaion d'un composant en fonctionde si la CVM est distribuée.
+	 * @param 	clas					Classe du composant à instancier.
+	 * @param 	constructorParams		Valeurs des parmètres du constructeur du composant à instancier.
 	 * @throws 	Exception
 	 */
 	public void createComponent(
@@ -53,9 +54,9 @@ public 	class 	ComponentCreator
 	}
 	
 	/**
-	 * Création non dynamique d'un composant
-	 * @param 	clas					Classe du composant à instancier
-	 * @param 	constructorParams		Valeurs des parmètres du constructeur du composant à instancier
+	 * Création non dynamique d'un composant.
+	 * @param 	clas					Classe du composant à instancier.
+	 * @param 	constructorParams		Valeurs des parmètres du constructeur du composant à instancier.
 	 * @throws 	Exception
 	 */
 	public void componentCreation(Class<?> clas,
@@ -68,19 +69,16 @@ public 	class 	ComponentCreator
 		
 		Constructor<?> cons = null;
 		cons = clas.getConstructor(parameterTypes);
-		
 		assert cons != null : "assertion : cons null";
-		
 		AbstractComponent component = (AbstractComponent) cons.newInstance(constructorParams);
-		
 		component.start();
 		this.cvm.addDeployedComponent(component);
 	}
 	
 	/**
-	 * Création dynamique d'un composant
-	 * @param 	clas					Classe du composant à instancier
-	 * @param 	constructorParams		Valeurs des parmètres du constructeur du composant à instancier
+	 * Création dynamique d'un composant.
+	 * @param 	clas					Classe du composant à instancier.
+	 * @param 	constructorParams		Valeurs des parmètres du constructeur du composant à instancier.
 	 * @throws 	Exception
 	 */
 	public void distributedComponetCreation(Class<?> clas,
@@ -99,12 +97,7 @@ public 	class 	ComponentCreator
 				AbstractDistributedCVM.thisJVMURI +	AbstractCVM.DCC_INBOUNDPORT_URI_SUFFIX,
 				ClassFactory.newConnector(DynamicComponentCreationI.class).getCanonicalName());
 		
-		try{
-			dccop.createComponent(clas.getCanonicalName(), constructorParams);
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		dccop.createComponent(clas.getCanonicalName(), constructorParams);
 
 		dccop.doDisconnection();
 		dccop.destroyPort();

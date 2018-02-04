@@ -7,22 +7,22 @@ import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 /**
  * La classe <code> ApplicationVMConnectionOutboundPort </ code> implémente le port sortant 
  * offrant l'interface <code> ApplicationVMConnectionsI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
-public class ApplicationVMConnectionOutboundPort 
-	extends AbstractOutboundPort 
-	implements ApplicationVMConnectionsI {
+public 	class 		ApplicationVMConnectionOutboundPort 
+		extends 	AbstractOutboundPort 
+		implements 	ApplicationVMConnectionsI {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param	uri			URI du port
 	 * @param 	owner		Composant propriétaire du port
 	 * @throws 	Exception
 	 */
-	public ApplicationVMConnectionOutboundPort(String uri, ComponentI owner)
+	public ApplicationVMConnectionOutboundPort(ComponentI owner)
 			throws Exception {
-		super(uri, ApplicationVMConnectionsI.class, owner);
+		super(ApplicationVMConnectionsI.class, owner);
 	}
 
 	/**

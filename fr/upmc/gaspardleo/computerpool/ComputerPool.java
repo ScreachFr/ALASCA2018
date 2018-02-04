@@ -42,12 +42,13 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort;
  * une pool d'ordinateur dans le centre de calcul.
  * 
  * <p><strong>Description</strong></p>
- * Ce composant est pour la gestion des ordinateur et des application VM
+ * Ce composant est pour la gestion des ordinateur et des application VM.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class ComputerPool 
 		extends AbstractComponent 
-		implements ComputerPoolI{
+		implements ComputerPoolI {
 	
 	public enum ComputerPoolPorts {
 		INTROSPECTION,
@@ -76,7 +77,7 @@ public 	class ComputerPool
 	private ComponentCreator cc;
 
 	/**
-	 * @param 	component_uris	URIs du composant et de ses ports
+	 * @param 	component_uris	URIs du composant et de ses ports.
 	 * @throws 	Exception
 	 */
 	public ComputerPool(
@@ -227,32 +228,26 @@ public 	class ComputerPool
 		if (availableCores.size() == 0)
 			return null;
 
-		try{
-			HashMap<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(avmURI, cc);
-			// Create a mock up port to manage the AVM component (allocate cores).					
-			
-			if(!this.isRequiredInterface(ApplicationVMManagementI.class))
-				this.addRequiredInterface(ApplicationVMManagementI.class);
-
-			ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(this);
-			this.addPort(avmPort);
-			avmPort.publishPort();
-	
-			avmPort.doConnection(
-				result.get(ApplicationVMPortTypes.MANAGEMENT),
-				ClassFactory.newConnector(ApplicationVMManagementI.class).getCanonicalName());
-			
-			AllocatedCore[] cores = availableCores.remove(0);
-			avmPort.allocateCores(cores);
-	
-			avmInUse.put(result, cores);
+		HashMap<ApplicationVMPortTypes, String> result = ApplicationVM.newInstance(avmURI, cc);
+		// Create a mock up port to manage the AVM component (allocate cores).					
 		
-			return result;
-			
-		}catch (Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		if(!this.isRequiredInterface(ApplicationVMManagementI.class))
+			this.addRequiredInterface(ApplicationVMManagementI.class);
+
+		ApplicationVMManagementOutboundPort avmPort = new ApplicationVMManagementOutboundPort(this);
+		this.addPort(avmPort);
+		avmPort.publishPort();
+
+		avmPort.doConnection(
+			result.get(ApplicationVMPortTypes.MANAGEMENT),
+			ClassFactory.newConnector(ApplicationVMManagementI.class).getCanonicalName());
+		
+		AllocatedCore[] cores = availableCores.remove(0);
+		avmPort.allocateCores(cores);
+
+		avmInUse.put(result, cores);
+	
+		return result;
 	}
 
 	/**
@@ -292,11 +287,11 @@ public 	class ComputerPool
 	}
 
 	/**
-	 * Détermine une la fréquence suivante
-	 * @param pss		État static du processeur
-	 * @param pds		État dynamique du processor
-	 * @param coreNo	Numéro du coeur
-	 * @return			La fréquence suivante
+	 * Détermine une la fréquence suivante.
+	 * @param pss		État static du processeur.
+	 * @param pds		État dynamique du processor.
+	 * @param coreNo	Numéro du coeur.
+	 * @return			La fréquence suivante.
 	 */
 	private Optional<Integer> getNextAdmissibleFrequency(
 			ProcessorStaticState pss, ProcessorDynamicState pds, Integer coreNo) {
@@ -315,11 +310,11 @@ public 	class ComputerPool
 	}
 
 	/**
-	 * Détermine une la fréquence précedente
-	 * @param 	pss		État static du processeur
-	 * @param 	pds		État dynamique du processor
-	 * @param 	coreNo	Numéro du coeur
-	 * @return			La fréquence précedente
+	 * Détermine une la fréquence précedente.
+	 * @param 	pss		État static du processeur.
+	 * @param 	pds		État dynamique du processor.
+	 * @param 	coreNo	Numéro du coeur.
+	 * @return			La fréquence précedente.
 	 */
 	private Optional<Integer> getPreviousAdmissibleFequency(
 			ProcessorStaticState pss, ProcessorDynamicState pds, Integer coreNo) {
@@ -338,13 +333,14 @@ public 	class ComputerPool
 	}
 	
 	/**
-	 * Détermine si une fréquence est admissible en fonction d'une valeur min, une valeur max et de l'écart maximum
-	 * @param 	min			valeur de la fréquence minimale
-	 * @param 	max			valeur de la fréquence maximum
-	 * @param 	candidate	valeur de la fréquence candidate
-	 * @param 	maxGap		valeur de l'écart maximum entre deux fréquence
-	 * @return				true : si la fréquence est admissible
-	 * 						faux : si la fréquence n'est pas admissible
+	 * Détermine si une fréquence est admissible en fonction d'une valeur min, une valeur max 
+	 * et de l'écart maximum.
+	 * @param 	min			valeur de la fréquence minimale.
+	 * @param 	max			valeur de la fréquence maximum.
+	 * @param 	candidate	valeur de la fréquence candidate.
+	 * @param 	maxGap		valeur de l'écart maximum entre deux fréquence.
+	 * @return				true : si la fréquence est admissible.
+	 * 						faux : si la fréquence n'est pas admissible.
 	 */
 	private boolean isFrequencyGapAdmissible(int min, int max, int candidate, int maxGap) {
 		return Math.max(Math.abs(candidate - min), Math.abs(max - candidate)) <= maxGap;
@@ -384,8 +380,8 @@ public 	class ComputerPool
 	}
 
 	/**
-	 * Permet de récupérer l'URI du comosant
-	 * @return L'URI du composant
+	 * Permet de récupérer l'URI du comosant.
+	 * @return L'URI du composant.
 	 */
 	public String getUri() {
 		return uri;
@@ -412,7 +408,7 @@ public 	class ComputerPool
 	}
 	
 	/**
-	 * Construie les URIs du composant et des ses ports
+	 * Construie les URIs du composant et des ses ports.
 	 * @return Les URIs du composant et des ses ports
 	 */
 	public static HashMap<ComputerPoolPorts, String> makeUris(){

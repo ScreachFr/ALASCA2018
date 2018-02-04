@@ -6,10 +6,12 @@ import fr.upmc.components.interfaces.RequiredI;
 /**
  * L'interface <code> ShutdownableI </ code> définit le comportement des composant
  * pour qu'il s'éteigne. 
+ * 
  * @author Leonor & Alexandre
  */
-public interface ShutdownableI 
-		extends	OfferedI, RequiredI{
+public 	interface 	ShutdownableI 
+		extends		OfferedI, 
+					RequiredI {
 	
 	/**
 	 * Cette methode permet de demandé au composant qui l'implémente de 

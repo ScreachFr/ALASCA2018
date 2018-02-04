@@ -3,8 +3,6 @@ package fr.upmc.gaspardleo.computerpool.ports;
 import java.util.HashMap;
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
-import fr.upmc.components.ports.AbstractPort;
-
 import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 import fr.upmc.gaspardleo.computer.Computer.ComputerPortsTypes;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
@@ -12,6 +10,7 @@ import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 /**
  * La classe <code> ComputerPoolOutboundPort </ code> implémente le port sortrant 
  * offrant l'interface <code> ComputerPoolI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 		ComputerPoolOutboundPort 
@@ -21,20 +20,11 @@ public 	class 		ComputerPoolOutboundPort
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param 	uri			URI du port
-	 * @param 	owner		Composant propriétaire du port
-	 * @throws 	Exception
-	 */
-	public ComputerPoolOutboundPort(String uri, ComponentI owner) throws Exception {
-		super(uri, ComputerPoolI.class, owner);
-	}
-
-	/**
 	 * @param 	owner		Composant propriétaire du port
 	 * @throws 	Exception
 	 */
 	public ComputerPoolOutboundPort(ComponentI owner) throws Exception {
-		super(AbstractPort.generatePortURI(), ComputerPoolI.class, owner);
+		super(ComputerPoolI.class, owner);
 	}
 	
 	/**

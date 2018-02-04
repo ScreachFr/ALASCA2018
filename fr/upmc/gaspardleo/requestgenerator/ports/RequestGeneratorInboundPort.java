@@ -8,17 +8,18 @@ import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnection
 /**
  * La classe <code> RequestGeneratorInboundPort </ code> implémente le port entrant 
  * offrant l'interface <code> RequestGeneratorConnectionI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 		RequestGeneratorInboundPort
 		extends 	AbstractInboundPort
-		implements 	RequestGeneratorConnectionI{
+		implements 	RequestGeneratorConnectionI {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param 	uri			URI de l'inbound port
-	 * @param 	owner		Composant propriétaire du port
+	 * @param 	uri			URI de l'inbound port.
+	 * @param 	owner		Composant propriétaire du port.
 	 * @throws 	Exception
 	 */
 	public RequestGeneratorInboundPort(String uri, ComponentI owner) throws Exception {

@@ -8,6 +8,7 @@ import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
 /**
  * La classe <code> PerformanceRegulatorOutboundPort </ code> implémente le port sortant 
  * offrant l'interface <code> PerformanceRegulatorI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 		PerformanceRegulatorOutboundPort 
@@ -17,17 +18,7 @@ public 	class 		PerformanceRegulatorOutboundPort
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param 	uri			URI de l'inbound port
-	 * @param 	owner		Composant propriétaire du port
-	 * @throws 	Exception
-	 */
-	public PerformanceRegulatorOutboundPort(String uri, ComponentI owner)
-			throws Exception {
-		super(uri, PerformanceRegulatorI.class, owner);
-	}
-
-	/**
-	 * @param 	owner		Composant propriétaire du port
+	 * @param 	owner		Composant propriétaire du port.
 	 * @throws 	Exception
 	 */
 	public PerformanceRegulatorOutboundPort(ComponentI owner)

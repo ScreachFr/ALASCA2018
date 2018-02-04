@@ -5,11 +5,13 @@ import fr.upmc.components.interfaces.RequiredI;
 
 /**
  * L'interface <code> PerformanceRegulatorI </ code> définit le comportement de l'objet PerformanceRegulator
- * pour l'adaptation du centre de calcul
+ * pour l'adaptation du centre de calcul.
+ * 
  * @author Leonor & Alexandre
  */
-public 	interface PerformanceRegulatorI 
-		extends OfferedI, RequiredI{
+public 	interface 	PerformanceRegulatorI 
+		extends 	OfferedI, 
+					RequiredI {
 	
 	/**
 	 * Demande au ComputerPool connecté d'augmenter la fréquence des coeurs

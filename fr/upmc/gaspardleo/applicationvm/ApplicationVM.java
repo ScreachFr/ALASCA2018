@@ -26,10 +26,11 @@ import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
  * une application VM dans le centre de calcul.
  * 
  * <p><strong>Description</strong></p>
- * Ce composant simule l'exécution d'applications web en recevant des requêtes
+ * Ce composant simule l'exécution d'applications web en recevant des requêtes.
+ * 
  * @author Leonor & Alexandre
  */
-public class 		ApplicationVM 
+public 	class 		ApplicationVM 
 		extends 	fr.upmc.datacenter.software.applicationvm.ApplicationVM
 		implements 	ApplicationVMConnectionsI, 
 					ShutdownableI {
@@ -83,14 +84,12 @@ public class 		ApplicationVM
 		this.sip.publishPort();
 
 		this.addRequiredInterface(RequestMonitorI.class);
-		this.rmop = new RequestMonitorOutboundPort(AbstractPort.generatePortURI(), this);
+		this.rmop = new RequestMonitorOutboundPort(this);
 		this.addPort(this.rmop);
 		this.rmop.publishPort();
 		
-		// VM debug
 		this.toggleLogging();
 		this.toggleTracing();
-		
 		this.logMessage("ApplicationVM made");
 	}
 
@@ -107,14 +106,9 @@ public class 		ApplicationVM
 		this.addPort(requestNotificationOutboundPort);
 		this.requestNotificationOutboundPort.publishPort();
 
-		try{
-			this.requestNotificationOutboundPort.doConnection(
-				RD_RequestNotificationInboundPortURI,
-				ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		this.requestNotificationOutboundPort.doConnection(
+			RD_RequestNotificationInboundPortURI,
+			ClassFactory.newConnector(RequestNotificationI.class).getCanonicalName());
 		
 		this.logMessage("AVM : rnop connection status : " + this.requestNotificationOutboundPort.connected());
 	}
@@ -131,17 +125,14 @@ public class 		ApplicationVM
 	}
 
 	/**
-	 * Cée un RequestNotificationOutboundPort si il n'éxiste pas déjà et le retourne
-	 * @return RequestNotificationOutboundPort
+	 * Cée un RequestNotificationOutboundPort si il n'éxiste pas déjà et le retourne.
+	 * @return RequestNotificationOutboundPort.
 	 * @throws Exception
 	 */
 	public RequestNotificationOutboundPort getRequestNotificationOutboundPort() throws Exception {
-		
 		if (this.requestNotificationOutboundPort == null){
-			
 			if(!this.isRequiredInterface(RequestNotificationI.class))
 				this.addRequiredInterface(RequestNotificationI.class);
-			
 			this.requestNotificationOutboundPort = new RequestNotificationOutboundPort(this);
 		}
 		return this.requestNotificationOutboundPort;
@@ -204,10 +195,10 @@ public class 		ApplicationVM
 	}
 
 	/**
-	 * Création d'une application VM via le ComponentCreator qui gère la création dynamique
-	 * @param component_URI		URI de l'application VM
-	 * @param cc				ComponentCreator
-	 * @return					Les URIs de l'application VM et des ses ports
+	 * Création d'une application VM via le ComponentCreator qui gère la création dynamique.
+	 * @param component_URI		URI de l'application VM.
+	 * @param cc				ComponentCreator.
+	 * @return					Les URIs de l'application VM et des ses ports.
 	 * @throws Exception
 	 */
 	public static HashMap<ApplicationVMPortTypes, String> newInstance(
@@ -226,12 +217,7 @@ public class 		ApplicationVM
 				component_uris
 		};
 		
-		try{
-			cc.createComponent(ApplicationVM.class, constructorParams);
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		cc.createComponent(ApplicationVM.class, constructorParams);
 		
 		return component_uris;
 	}

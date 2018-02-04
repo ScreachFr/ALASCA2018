@@ -7,23 +7,23 @@ import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 /**
  * La classe <code> RequestMonitorOutboundPort </ code> implémente le port sortrant 
  * offrant l'interface <code> RequestMonitorI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 		RequestMonitorOutboundPort 
 		extends 	AbstractOutboundPort 
-		implements 	RequestMonitorI{
+		implements 	RequestMonitorI {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param 	uri			URI de l'inbound port
 	 * @param 	owner		Composant propriétaire du port
 	 * @throws 	Exception
 	 */
-	public RequestMonitorOutboundPort(String uri, ComponentI owner) throws Exception {
-		super(uri, RequestMonitorI.class, owner);
+	public RequestMonitorOutboundPort(ComponentI owner) throws Exception {
+		super(RequestMonitorI.class, owner);
 	}
-
+	
 	/**
 	 * @see fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI#addEntry(Long, Long)
 	 */

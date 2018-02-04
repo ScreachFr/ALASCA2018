@@ -5,11 +5,13 @@ import fr.upmc.components.interfaces.RequiredI;
 
 /**
  * L'interface <code> RequestMonitorI </ code> définit le comportement de l'objet RequestMonitor
- * pour le contrôlle des requêtes
+ * pour le contrôlle des requêtes.
+ * 
  * @author Leonor & Alexandre
  */
 public 	interface 	RequestMonitorI 
-		extends		OfferedI, RequiredI{
+		extends		OfferedI, 
+					RequiredI {
 	
 	/**
 	 * Ajoute une entrée au moniteur.

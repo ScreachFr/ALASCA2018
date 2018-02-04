@@ -19,7 +19,7 @@ import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
  */
 public 	class 		RequestGenerator 
 		extends 	fr.upmc.datacenterclient.requestgenerator.RequestGenerator
-		implements 	RequestGeneratorConnectionI{
+		implements 	RequestGeneratorConnectionI {
 
 	public static enum	RGPortTypes {
 		INTROSPECTION,

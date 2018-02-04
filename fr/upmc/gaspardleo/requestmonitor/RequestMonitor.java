@@ -37,8 +37,8 @@ public 	class 		RequestMonitor
 	private RequestMonitorInboundPort rmip;
 	
 	/**
-	 * @param 	component_uris	URIs du composant
-	 * @param 	alpha			Coefficient pour le calcul du temps moyen d'exécution de la requête
+	 * @param 	component_uris	URIs du composant.
+	 * @param 	alpha			Coefficient pour le calcul du temps moyen d'exécution de la requête.
 	 * @throws 	Exception
 	 */
 	public RequestMonitor(
@@ -86,16 +86,16 @@ public 	class 		RequestMonitor
 	}
 
 	/**
-	 * Ajoute une entrée pour le calcul du temps moyen d'exécution d'une requête
-	 * @param executionTime
+	 * Ajoute une entrée pour le calcul du temps moyen d'exécution d'une requête.
+	 * @param executionTime Temps d'éxection de la dernière requête.
 	 */
 	public void addEntry(Long executionTime) {
 		refreshMeanRequestExecutionTime(executionTime);
 	}
 
 	/**
-	 * Met à jour le temps moyen d'éxection d'une requête avec du temps d'éxection de la dernière requête
-	 * @param executionTime		Temps d'éxection de la dernière requête
+	 * Met à jour le temps moyen d'éxection d'une requête avec du temps d'éxection de la dernière requête.
+	 * @param executionTime		Temps d'éxection de la dernière requête.
 	 */
 	private void refreshMeanRequestExecutionTime(Long executionTime) {
 		synchronized (lock) {
@@ -120,10 +120,10 @@ public 	class 		RequestMonitor
 	}
 	
 	/**
-	 * Construit les URIs du composant et de ses ports
-	 * @param 	rg_monitor_in	URI de l'inboud port du composant
-	 * @param 	rd_URI			URI RequestDispatcher associé au RequestMonitor
-	 * @return					Les URIs du composant et de ses ports
+	 * Construit les URIs du composant et de ses ports.
+	 * @param 	rg_monitor_in	URI de l'inboud port du composant.
+	 * @param 	rd_URI			URI RequestDispatcher associé au RequestMonitor.
+	 * @return					Les URIs du composant et de ses ports.
 	 */
 	public static HashMap<RequestMonitorPorts, String> makeUris(String rg_monitor_in, String rd_URI){
 		HashMap<RequestMonitorPorts, String> rm_uris = new HashMap<>();

@@ -12,9 +12,10 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 /**
  * La classe <code> ApplicationVM </ code> implémente le composant représentant 
  * un ordinateur dans le centre de calcul.
+ * 
  * @author Leonor & Alexandre
  */
-public 	class Computer 
+public 	class 	Computer 
 		extends fr.upmc.datacenter.hardware.computers.Computer {
 
 	public static enum ComputerPortsTypes {
@@ -34,18 +35,17 @@ public 	class Computer
 	private static final int NB_CORES = 4;
 	
 	/**
-	 * @param computer_uris				URIS du composant et de ses ports
-	 * @param cp_uris					URI du ComputerPool auquel il est associé
-	 * @param admissibleFrequencies		Fréquences admissibles
-	 * @param processingPower			Puissance de calcul
+	 * @param computer_uris				URIS du composant et de ses ports.
+	 * @param cp_uris					URI du ComputerPool auquel il est associé.
+	 * @param admissibleFrequencies		Fréquences admissibles.
+	 * @param processingPower			Puissance de calcul.
 	 * @throws Exception
 	 */
 	public Computer(
 			HashMap<ComputerPortsTypes, String> computer_uris,
 			HashMap<ComputerPoolPorts, String> cp_uris,
 			HashSet<Integer> admissibleFrequencies, 
-			HashMap<Integer, Integer> processingPower
-			) throws Exception {
+			HashMap<Integer, Integer> processingPower) throws Exception {
 		
 		super(
 			computer_uris.get(ComputerPortsTypes.INTROSPECTION),
@@ -75,8 +75,8 @@ public 	class Computer
 	}
 
 	/**
-	 * Crée les valeurs de fréquences admissibles
-	 * @return	Les valeurs de fréquences admissibles
+	 * Crée les valeurs de fréquences admissibles.
+	 * @return	Les valeurs de fréquences admissibles.
 	 */
 	public static HashSet<Integer> makeFrequencies(){
 		HashSet<Integer> admissibleFrequencies = new HashSet<Integer>() ;
@@ -86,8 +86,8 @@ public 	class Computer
 	}
 	
 	/**
-	 * Crée les valeurs de puissance de calcul
-	 * @return	Les valeurs de puissance de calcul
+	 * Crée les valeurs de puissance de calcul.
+	 * @return	Les valeurs de puissance de calcul.
 	 */
 	public static HashMap<Integer,Integer> makeProcessingPower(){
 		HashMap<Integer,Integer> processingPower = new HashMap<Integer,Integer>() ;
@@ -97,8 +97,8 @@ public 	class Computer
 	}
 	
 	/**
-	 * Construit les URIs du composant et de ses ports
-	 * @param num_computer	URI du composant en lui même
+	 * Construit les URIs du composant et de ses ports.
+	 * @param num_computer	URI du composant en lui même.
 	 * @return
 	 */
 	public static HashMap<ComputerPortsTypes, String> makeUris(int num_computer){

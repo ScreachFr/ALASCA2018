@@ -12,17 +12,18 @@ import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 /**
  * La classe <code> ComputerPoolInbounPort </ code> implémente le port entrant 
  * offrant l'interface <code> ComputerPoolI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
-public class ComputerPoolInbounPort 
-		extends AbstractOutboundPort
-		implements ComputerPoolI {
+public 	class 		ComputerPoolInbounPort 
+		extends 	AbstractOutboundPort
+		implements 	ComputerPoolI {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param 	uri			URI du port
-	 * @param 	owner		Composant propriétaire du port
+	 * @param 	uri			URI du port.
+	 * @param 	owner		Composant propriétaire du port.
 	 * @throws 	Exception
 	 */
 	public ComputerPoolInbounPort(String uri, ComponentI owner) throws Exception {
@@ -37,7 +38,6 @@ public class ComputerPoolInbounPort
 			HashMap<ComputerPortsTypes, String> computerUris,
 			Integer numberOfProcessors,
 			Integer numberOfCores) throws Exception {
-
 		final ComputerPool computerPool = (ComputerPool)this.owner;
 		computerPool.handleRequestAsync(
 				new ComponentI.ComponentService<ComputerPool>(){
@@ -58,7 +58,6 @@ public class ComputerPoolInbounPort
 	public HashMap<ApplicationVMPortTypes, String> createNewApplicationVM(
 			String avmURI, 
 			Integer numberOfCoreToAllocate) throws Exception {
-		
 		final ComputerPool computerPool = (ComputerPool)this.owner;
 		return computerPool.handleRequestSync(
 				new ComponentI.ComponentService<HashMap<ApplicationVMPortTypes, String>>(){

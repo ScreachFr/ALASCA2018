@@ -9,9 +9,11 @@ import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOu
 /**
  * La classe <code> CVM </ code> définit le comportement de la CVM non distribuée
  * pour le déploiement et l'allocation de coeurs.
+ * 
  * @author Leonor & Alexandre
  */
-public class CVM extends AbstractCVM {
+public 	class 		CVM 
+		extends 	AbstractCVM {
 	
 	/** Liste des coeurs alloués */
 	private AllocatedCore[] cores;
@@ -45,8 +47,8 @@ public class CVM extends AbstractCVM {
 	}
 
 	/**
-	 * Récupère les coeurs alloués
-	 * @return	Les coeurs alloués
+	 * Récupère les coeurs alloués.
+	 * @return	Les coeurs alloués.
 	 */
 	private AllocatedCore[] getAllocatedCore() {
 		
@@ -60,8 +62,8 @@ public class CVM extends AbstractCVM {
 	}
 	
 	/**
-	 * Alloue un coeur à une application VM via son outbound port
-	 * @param 	avmPort		Outbound port de l'application VM
+	 * Alloue un coeur à une application VM via son outbound port.
+	 * @param 	avmPort		Outbound port de l'application VM.
 	 * @throws 	Exception
 	 */
 	public void allocateCores(ApplicationVMManagementOutboundPort avmPort) throws Exception {

@@ -5,9 +5,10 @@ import fr.upmc.components.ports.AbstractPort;
 /**
  * La classe <code> ComputerMonitor </ code> implémente le composant représentant 
  * le contrôlleur d'un ordinateur dans le centre de calcul.
+ * 
  * @author Leonor & Alexandre
  */
-public 	class ComputerMonitor 
+public 	class 	ComputerMonitor 
 		extends fr.upmc.datacenter.hardware.tests.ComputerMonitor {
 
 	public enum ComputerMonitorPortTypes {
@@ -15,8 +16,8 @@ public 	class ComputerMonitor
 	}
 	
 	/**
-	 * @param computerURI	URI de l'ordinateur à contrôller
-	 * @param active		État d'activité
+	 * @param computerURI	URI de l'ordinateur à contrôller.
+	 * @param active		État d'activité.
 	 * @throws Exception
 	 */
 	public ComputerMonitor(

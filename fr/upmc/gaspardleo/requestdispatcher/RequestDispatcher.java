@@ -85,9 +85,9 @@ public 	class 		RequestDispatcher
 	private String rmop_uri;
 	
 	/**
-	 * @param 	component_uris	URIs du composant
-	 * @param 	rg_uris			URIs du RequestGenerator
-	 * @param 	ac_uris			URIs de l'AdmissionControler
+	 * @param 	component_uris	URIs du composant.
+	 * @param 	rg_uris			URIs du RequestGenerator.
+	 * @param 	ac_uris			URIs de l'AdmissionControler.
 	 * @throws 	Exception
 	 */
 	public RequestDispatcher(
@@ -138,8 +138,8 @@ public 	class 		RequestDispatcher
 		this.addPort(acop);
 		
 		this.acop.doConnection(
-				ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
-				ClassFactory.newConnector(AdmissionControllerI.class).getCanonicalName());
+			ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), 
+			ClassFactory.newConnector(AdmissionControllerI.class).getCanonicalName());
 		
 		this.rmop_uri = component_uris.get(RDPortTypes.RQUEST_MONITOR_IN);
 		
@@ -216,9 +216,9 @@ public 	class 		RequestDispatcher
 	public void unregisterVM(String vmUri) throws Exception {
 		
 		Optional<HashMap<ApplicationVMPortTypes,String>> URIs = 
-				registeredVmsUri.stream()
-				.filter(e -> e.get(ApplicationVMPortTypes.INTROSPECTION).equals(vmUri))
-				.findFirst();
+			registeredVmsUri.stream()
+			.filter(e -> e.get(ApplicationVMPortTypes.INTROSPECTION).equals(vmUri))
+			.findFirst();
 		
 		if (!URIs.isPresent()) {
 			this.logMessage("Unregister AVM : This AVM is not registered!");
@@ -318,7 +318,7 @@ public 	class 		RequestDispatcher
 		
 		RequestNotificationOutboundPort rnop = (RequestNotificationOutboundPort) this.findPortFromURI(this.rnop_uri);
 		this.logMessage(this.Component_URI + " : incoming request termination notification.");
-		// XXX Pas utilisé.
+
 		rnop.notifyRequestTermination(r);
 	}
 	
@@ -342,10 +342,10 @@ public 	class 		RequestDispatcher
 	}	
 	
 	/**
-	 * Connecte l'AdmissionControler pour la réception des notifiactions
-	 * @param 	AVMConnectionPort_URI	URI du port de connexion de l'application VM
-	 * @param 	notificationPort_URI	URI du port pour les notifications
-	 * @param 	requestMonitor_in		URI de port du RequestMonitor
+	 * Connecte l'AdmissionControler pour la réception des notifiactions.
+	 * @param 	AVMConnectionPort_URI	URI du port de connexion de l'application VM.
+	 * @param 	notificationPort_URI	URI du port pour les notifications.
+	 * @param 	requestMonitor_in		URI de port du RequestMonitor.
 	 * @throws 	Exception
 	 */
 	private void doAVMRequestNotificationAndMonitoringConnection(
@@ -358,7 +358,7 @@ public 	class 		RequestDispatcher
 		if(!this.isRequiredInterface(ApplicationVMConnectionsI.class))
 			this.addRequiredInterface(ApplicationVMConnectionsI.class);
 		
-		ApplicationVMConnectionOutboundPort avmcop = new ApplicationVMConnectionOutboundPort(AbstractPort.generatePortURI(), this);
+		ApplicationVMConnectionOutboundPort avmcop = new ApplicationVMConnectionOutboundPort(this);
 		this.addPort(avmcop);
 		avmcop.publishPort();
 		
@@ -384,9 +384,9 @@ public 	class 		RequestDispatcher
 	}
 	
 	/**
-	 * Construit les URIs du composant et de ses ports
-	 * @param num_rd	Numéro du RequestDispatcher pour la création unique d'URI
-	 * @return	Les URIs du composant et de ses ports
+	 * Construit les URIs du composant et de ses ports.
+	 * @param 	num_rd	Numéro du RequestDispatcher pour la création unique d'URI.
+	 * @return			Les URIs du composant et de ses ports.
 	 */
 	public static HashMap<RDPortTypes, String> makeUris(int num_rd){
 		HashMap<RDPortTypes, String> requestDispatcher_uris = new HashMap<RDPortTypes, String>() ;		

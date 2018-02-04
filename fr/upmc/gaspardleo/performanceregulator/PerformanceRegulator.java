@@ -31,7 +31,8 @@ import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
  * le régulateur de performance du traitement des requêts dans le centre de calcul.
  * 
  * <p><strong>Description</strong></p>
- * Ce composant gère l'adaptation du des ressources du centre de calcul
+ * Ce composant gère l'adaptation du des ressources du centre de calcul.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 		PerformanceRegulator 
@@ -75,12 +76,12 @@ public 	class 		PerformanceRegulator
 	private TargetValue targetValue;
 
 	/**
-	 * @param 	component_uris		URIs du composant
-	 * @param 	requestDispatcher	URIs du RequestDispatcher
-	 * @param 	requestMonitor		URIs du RequestMonitor
-	 * @param 	computerPool		URIs du ComputerPool
-	 * @param 	strategy			Stratégie à appliquer
-	 * @param 	targetValue			Cible de temps d'attente des réquêtes
+	 * @param 	component_uris		URIs du composant.
+	 * @param 	requestDispatcher	URIs du RequestDispatcher.
+	 * @param 	requestMonitor		URIs du RequestMonitor.
+	 * @param 	computerPool		URIs du ComputerPool.
+	 * @param 	strategy			Stratégie à appliquer.
+	 * @param 	targetValue			Cible de temps d'attente des réquêtes.
 	 * @throws 	Exception
 	 */
 	public PerformanceRegulator(
@@ -89,8 +90,7 @@ public 	class 		PerformanceRegulator
 			HashMap<RequestMonitorPorts, String> requestMonitor,
 			HashMap<ComputerPoolPorts, String> computerPool,
 			RegulationStrategies strategy,
-			TargetValue targetValue
-			) throws Exception {
+			TargetValue targetValue) throws Exception {
 
 		super(1, 1);
 		
@@ -105,7 +105,7 @@ public 	class 		PerformanceRegulator
 
 		//Request monitor port creation and connection.
 		this.addRequiredInterface(RequestMonitorI.class);
-		this.rmop = new RequestMonitorOutboundPort(AbstractPort.generatePortURI(), this);
+		this.rmop = new RequestMonitorOutboundPort(this);
 		this.addPort(rmop);
 		this.rmop.publishPort();
 
@@ -125,23 +125,17 @@ public 	class 		PerformanceRegulator
 
 		//Computer pool port creation and connection.
 		this.addRequiredInterface(ComputerPoolI.class);
-		this.cpop = new ComputerPoolOutboundPort(AbstractPort.generatePortURI(), this);
+		this.cpop = new ComputerPoolOutboundPort(this);
 		this.addPort(this.cpop);
 		this.cpop.publishPort();
 
-		try{
-			this.cpop.doConnection(
-				computerPool.get(ComputerPoolPorts.COMPUTER_POOL), 
-				ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		this.cpop.doConnection(
+			computerPool.get(ComputerPoolPorts.COMPUTER_POOL), 
+			ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());
 		
 		//Debug
 		this.toggleTracing();
 		this.toggleLogging();
-		
 		this.logMessage("PerformanceRegulator made");
 	}
 
@@ -163,18 +157,13 @@ public 	class 		PerformanceRegulator
 	 */
 	@Override
 	public Boolean increaseCPUFrequency() throws Exception {
-
 		Boolean hasChangedFreq = false;
-		
 		List<String> avms;
-		
 		avms = rdop.getRegisteredAVMUris();
-
 		for (String avm : avms) {
 			if (cpop.increaseCoreFrequency(avm))
 				hasChangedFreq = true;
 		}
-		
 		return hasChangedFreq;
 	}
 
@@ -183,16 +172,12 @@ public 	class 		PerformanceRegulator
 	 */
 	@Override
 	public Boolean decreaseCPUFrequency() throws Exception {
-		
 		Boolean hasChangedFreq = false;
-		
 		List<String> avms = rdop.getRegisteredAVMUris();
-		
 		for (String avm : avms) {
 			if (cpop.decreaseCoreFrequency(avm))
 				hasChangedFreq = true;
 		}
-		
 		return hasChangedFreq;
 	}
 
@@ -201,18 +186,13 @@ public 	class 		PerformanceRegulator
 	 */
 	@Override
 	public Boolean addAVMToRD() throws Exception {
-		
 		HashMap<ApplicationVMPortTypes, String> avm = this.cpop.createNewApplicationVM("avm-"+(newAVMID++), 1);
-
 		if (avm == null) {
 			this.logMessage(this.uri + " : addAVMToRD : No available ressource!");
 			return false;
 		}
-
 		this.logMessage(this.uri + " : Adding an avm : " + avm);
-
 		rdop.registerVM(avm, RequestSubmissionI.class);
-
 		return true;
 	}
 
@@ -221,19 +201,14 @@ public 	class 		PerformanceRegulator
 	 */
 	@Override
 	public Boolean removeAVMFromRD() throws Exception {
-		
 		List<String> avms = rdop.getRegisteredAVMUris();
-		
 		if (avms.size() <= 1) {
 			this.logMessage(this.uri + " : Can't remove any AVM : there's too few left in RD.");
 			return false;
 		}
-		
 		String avmToRemove = avms.remove(0);
-		
 		rdop.unregisterVM(avmToRemove);
 		cpop.releaseCores(avmToRemove);
-
 		return true;
 	}
 
@@ -271,6 +246,7 @@ public 	class 		PerformanceRegulator
 	 */
 	@Override
 	public void startRegulationControlLoop() throws Exception {
+		
 		if (DEBUG_LEVEL > 0)
 			this.logMessage(this.uri + " : Regulation is active!");
 

@@ -5,7 +5,7 @@ import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
 
 /**
  * La classe <code> SimpleFrequencyStrategy </ code> implémente le comportement
- * pour une stratégie de régulation via les fréquences
+ * pour une stratégie de régulation via les fréquences.
  * 
  * @author Leonor & Alexandre
  */

@@ -5,11 +5,13 @@ import fr.upmc.components.interfaces.RequiredI;
 
 /**
  * L'interface <code> RegulationStrategyI </ code> définit les stratégies d'adaptation 
- * du composant PerformanceRegulatorI
+ * du composant PerformanceRegulatorI.
+ * 
  * @author Leonor & Alexandre
  */
-public 	interface RegulationStrategyI 
-		extends	OfferedI, RequiredI{
+public 	interface 	RegulationStrategyI 
+		extends		OfferedI, 
+					RequiredI {
 	
 	/**
 	 * Permet de réduire le temps d'attente entre le traitement de chaque requête du RequestDispatcher associé.

@@ -5,11 +5,13 @@ import fr.upmc.components.interfaces.RequiredI;
 
 /**
  * L'interface <code> RequestGeneratorConnectionI </ code> définit le comportement de l'objet RequestGenerator
- * pour la connexion avec un RequestDispatcher
+ * pour la connexion avec un RequestDispatcher.
+ * 
  * @author Leonor & Alexandre
  */
-public 	interface RequestGeneratorConnectionI 
-		extends	OfferedI, RequiredI{
+public 	interface 	RequestGeneratorConnectionI 
+		extends		OfferedI, 
+					RequiredI {
 
 	/**
 	 * Connecte un RequestGenerator avec une interface de traitement de requêtes.

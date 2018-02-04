@@ -8,11 +8,12 @@ import fr.upmc.gaspardleo.applicationvm.interfaces.ApplicationVMConnectionsI;
 /**
  * La classe <code> ApplicationVMConnectionInboundPort </ code> implémente le port entrant 
  * offrant l'interface <code> ApplicationVMConnectionsI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
-public class ApplicationVMConnectionInboundPort 
-		extends AbstractInboundPort 
-		implements ApplicationVMConnectionsI{
+public 	class 		ApplicationVMConnectionInboundPort 
+		extends 	AbstractInboundPort 
+		implements 	ApplicationVMConnectionsI {
 
 	private static final long serialVersionUID = 6418760843805692699L;
 
@@ -40,8 +41,6 @@ public class ApplicationVMConnectionInboundPort
 
 						return avm;
 					}});
-
-		
 	}
 
 	/**
@@ -59,5 +58,4 @@ public class ApplicationVMConnectionInboundPort
 						return avm;
 					}});
 	}
-
 }

@@ -35,11 +35,12 @@ import fr.upmc.gaspardleo.classfactory.ClassFactory;
  * 
  * <p><strong>Description</strong></p>
  * Ce composant gère la création et la suppression de ressources pour le traitement des requêtes.
+ * 
  * @author Leonor & Alexandre
  */
-public class AdmissionController 
-		extends AbstractComponent
-		implements AdmissionControllerI{
+public 	class 		AdmissionController 
+		extends 	AbstractComponent
+		implements 	AdmissionControllerI {
 
 	public static enum	ACPortTypes {
 		ADMISSION_CONTROLLER_IN
@@ -57,7 +58,6 @@ public class AdmissionController
 	private ComputerPoolOutboundPort cpop;
 	
 	/**
-	 * 
 	 * @param 	computerPoolUri		URI du composant ComputerPool
 	 * @param 	ac_uris				URI du composant en lui même
 	 * @throws 	Exception
@@ -79,7 +79,7 @@ public class AdmissionController
 		this.acip.publishPort();
 		
 		this.addRequiredInterface(ComputerPoolI.class);
-		this.cpop = new ComputerPoolOutboundPort(AbstractPort.generatePortURI(), this);
+		this.cpop = new ComputerPoolOutboundPort(this);
 		this.addPort(cpop);
 		this.cpop.publishPort();
 
@@ -105,8 +105,8 @@ public class AdmissionController
 
 		String rd_URI = RD_uris.get(RDPortTypes.INTROSPECTION);
 		
+		//Creation of the RequestMonitor
 		HashMap<RequestMonitorPorts, String> rm_uris = RequestMonitor.makeUris(rg_monitor_in, rd_URI);
-		
 		RequestMonitor rm = new RequestMonitor(rm_uris, 0.5);
 		rm.start();
 		
@@ -120,22 +120,21 @@ public class AdmissionController
 			RG_uris.get(RGPortTypes.CONNECTION_IN), 
 			ClassFactory.newConnector(RequestGeneratorConnectionI.class).getCanonicalName());
 		
+		//Connection with the RequestDispatcher
 		rgop.doConnectionWithRD(
 			RD_uris.get(RDPortTypes.REQUEST_SUBMISSION_IN));	
 		
 		// Performance regulator creation
-		
 		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = PerformanceRegulator.makeUris(rd_URI);
-				
 		PerformanceRegulator pr = new PerformanceRegulator(
 			performanceRegulator_uris, 
 			RD_uris, rm_uris, 
 			computerPoolURIs,
 			RegulationStrategies.SIMPLE_AVM,
 			new TargetValue(2000.0, 0.0));	
-		
 		pr.start();
 		
+		//PerformanceRegulator port
 		if(!this.isRequiredInterface(PerformanceRegulatorI.class))
 			this.addRequiredInterface(PerformanceRegulatorI.class);
 		
@@ -147,6 +146,7 @@ public class AdmissionController
 			performanceRegulator_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
 			ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
 		
+		//Addition of AVM to the RD
 		prop.addAVMToRD();
 			
 		this.logMessage("Admission controller : Request source successfully added!");
@@ -171,7 +171,7 @@ public class AdmissionController
 		if(!this.isRequiredInterface(ShutdownableI.class));
 			this.addRequiredInterface(ShutdownableI.class);
 			
-		ShutdownableOutboundPort sop = new ShutdownableOutboundPort(AbstractPort.generatePortURI(), this);
+		ShutdownableOutboundPort sop = new ShutdownableOutboundPort(this);
 		this.addPort(sop);
 		sop.publishPort();
 
@@ -192,9 +192,9 @@ public class AdmissionController
 	}
 	
 	/**
-	 * Construit les URIs pour le composant et ses ports
-	 * @param introspection_uri		URI du composant en lui même
-	 * @return
+	 * Construit les URIs pour le composant et ses ports.
+	 * @param 	introspection_uri		URI du composant en lui même.
+	 * @return							Les URIs pour le composant et ses ports.
 	 */
 	public static HashMap<ACPortTypes, String> makeUris(String introspection_uri){
 		HashMap<ACPortTypes, String> ac_uris = new HashMap<ACPortTypes, String>();		

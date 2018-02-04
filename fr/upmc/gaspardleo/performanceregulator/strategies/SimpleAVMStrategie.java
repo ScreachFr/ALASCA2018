@@ -9,8 +9,8 @@ import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
  * 
  * @author Leonor & Alexandre
  */
-public class 	SimpleAVMStrategie 
-	implements 	RegulationStrategyI {
+public 	class 		SimpleAVMStrategie 
+		implements 	RegulationStrategyI {
 	
 	/** Permet de savoir si la régulation est autorisée */
 	private Boolean canRegulate;

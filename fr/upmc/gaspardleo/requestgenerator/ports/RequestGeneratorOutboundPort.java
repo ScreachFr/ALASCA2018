@@ -7,11 +7,12 @@ import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnection
 /**
  * La classe <code> RequestGeneratorInboundPort </ code> implémente le port sortrant 
  * offrant l'interface <code> RequestGeneratorConnectionI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 		RequestGeneratorOutboundPort 
 		extends 	AbstractOutboundPort
-		implements 	RequestGeneratorConnectionI{
+		implements 	RequestGeneratorConnectionI {
 
 	private static final long serialVersionUID = 1L;
 

@@ -10,14 +10,16 @@ import fr.upmc.gaspardleo.applicationvm.ApplicationVM.ApplicationVMPortTypes;
 /**
  * L'interface <code> RequestDispatcherI </ code> définit le comportement de l'objet RequestDispatcher
  * pour la répartition de requêtes dans le centre de calcul.
+ * 
  * @author Leonor & Alexandre
  */
-public interface RequestDispatcherI
-		extends	OfferedI, RequiredI{
+public 	interface 	RequestDispatcherI
+		extends		OfferedI, 
+					RequiredI {
 
 	/**
-	 * Connect une ApplicationVM au RequestDispatcher.
-	 * @param 	vmUri 							Uri de l'AVM.
+	 * Connect une application VM au RequestDispatcher.
+	 * @param 	vmUri 							Uri de l'application VM.
 	 * @param 	requestSubmissionOutboundPort 	Uri du port de soumission des requètes.
 	 * @return 	Uri du port de notification de terminaison des requètes.
 	 * @throws 	Exception
@@ -28,20 +30,20 @@ public interface RequestDispatcherI
 	
 	/**
 	 * Deconnecte une ApplicationVM du RequestDispatcher. 
-	 * @param 	vmUri 		Uri de composant de l'ApplicationVM � deconnecter.
+	 * @param 	vmUri 		Uri de composant de l'application VM à deconnecter.
 	 * @throws 	Exception
 	 */
 	public void unregisterVM(String vmUri) throws Exception;
 	
 	/**
-	 * Deconnect une ApplicationVM du RequestDispatcher.
-	 * Il es probable que cette methode deconnecte une ApplicationVM al�atoire.
+	 * Deconnecte une ApplicationVM du RequestDispatcher.
+	 * Il es probable que cette methode deconnecte uneapplication VM aléatoire.
 	 * @throws Exception
 	 */
 	public void unregisterVM() throws Exception;
 	
 	/**
-	 * Permet de disposer de la liste des ApplicationVM utilis�es par le RequestDispatcher.
+	 * Permet de disposer de la liste des ApplicationVM utilisées par le RequestDispatcher.
 	 * @return Liste des URI de composant des ApplicationVM.
 	 * @throws Exception
 	 */

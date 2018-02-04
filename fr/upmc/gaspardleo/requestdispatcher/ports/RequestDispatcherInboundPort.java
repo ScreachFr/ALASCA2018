@@ -12,25 +12,18 @@ import fr.upmc.gaspardleo.requestdispatcher.interfaces.RequestDispatcherI;
 /**
  * La classe <code> RequestDispatcherInboundPort </ code> implémente le port entrant 
  * offrant l'interface <code> RequestDispatcherI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 		RequestDispatcherInboundPort 
 		extends 	AbstractInboundPort 
-		implements 	RequestDispatcherI{
+		implements 	RequestDispatcherI {
 
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * @param 	owner		Composant propriétaire du port
-	 * @throws 	Exception
-	 */
-	public RequestDispatcherInboundPort(ComponentI owner) throws Exception {
-		super(RequestDispatcherI.class, owner);
-	}
-	
-	/**
-	 * @param 	uri			URI de l'inbound port
-	 * @param 	owner		Composant propriétaire du port
+	 * @param 	uri			URI de l'inbound port.
+	 * @param 	owner		Composant propriétaire du port.
 	 * @throws 	Exception
 	 */
 	public RequestDispatcherInboundPort(String uri, ComponentI owner) throws Exception {

@@ -9,17 +9,18 @@ import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
 /**
  * La classe <code> PerformanceRegulatorInboundPort </ code> implémente le port entrant 
  * offrant l'interface <code> PerformanceRegulatorI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 		PerformanceRegulatorInboundPort 
 		extends 	AbstractInboundPort 
-		implements 	PerformanceRegulatorI{
+		implements 	PerformanceRegulatorI {
 
 	private static final long serialVersionUID = -8603941140083696346L;
 
 	/**
-	 * @param 	uri			URI de l'inbound port
-	 * @param 	owner		Composant propriétaire du port
+	 * @param 	uri			URI de l'inbound port.
+	 * @param 	owner		Composant propriétaire du port.
 	 * @throws 	Exception
 	 */
 	public PerformanceRegulatorInboundPort(String uri, ComponentI owner) throws Exception {
@@ -32,7 +33,6 @@ public 	class 		PerformanceRegulatorInboundPort
 	@Override
 	public Boolean increaseCPUFrequency() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
-
 		return pr.handleRequestSync(
 				new ComponentI.ComponentService<Boolean>(){
 					@Override
@@ -48,7 +48,6 @@ public 	class 		PerformanceRegulatorInboundPort
 	@Override
 	public Boolean decreaseCPUFrequency() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
-
 		return pr.handleRequestSync(
 				new ComponentI.ComponentService<Boolean>(){
 					@Override
@@ -64,18 +63,13 @@ public 	class 		PerformanceRegulatorInboundPort
 	@Override
 	public Boolean addAVMToRD() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
-		try{
-			return pr.handleRequestSync(
-					new ComponentI.ComponentService<Boolean>(){
-						@Override
-						public Boolean call() throws Exception {
-							return pr.addAVMToRD();
-						}
-					});
-		}catch(Exception e){
-			e.printStackTrace();
-			throw e;
-		}
+		return pr.handleRequestSync(
+				new ComponentI.ComponentService<Boolean>(){
+					@Override
+					public Boolean call() throws Exception {
+						return pr.addAVMToRD();
+					}
+				});
 	}
 
 	/**
@@ -84,7 +78,6 @@ public 	class 		PerformanceRegulatorInboundPort
 	@Override
 	public Boolean removeAVMFromRD() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
-
 		return pr.handleRequestSync(
 				new ComponentI.ComponentService<Boolean>(){
 					@Override
@@ -100,7 +93,6 @@ public 	class 		PerformanceRegulatorInboundPort
 	@Override
 	public void setRegulationStrategie(RegulationStrategyI strat) throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
-
 		pr.handleRequestAsync(
 				new ComponentI.ComponentService<PerformanceRegulator>(){
 					@Override
@@ -118,7 +110,6 @@ public 	class 		PerformanceRegulatorInboundPort
 	@Override
 	public RegulationStrategyI getRegulationStrategie() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
-
 		return pr.handleRequestSync(
 				new ComponentI.ComponentService<RegulationStrategyI>(){
 					@Override
@@ -134,7 +125,6 @@ public 	class 		PerformanceRegulatorInboundPort
 	@Override
 	public void startRegulationControlLoop() throws Exception {
 		PerformanceRegulator pr = (PerformanceRegulator)owner;
-
 		pr.handleRequestAsync(
 				new ComponentI.ComponentService<PerformanceRegulator>(){
 					@Override

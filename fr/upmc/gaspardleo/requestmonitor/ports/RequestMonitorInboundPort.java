@@ -9,6 +9,7 @@ import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 /**
  * La classe <code> RequestMonitorInboundPort </ code> implémente le port entrant 
  * offrant l'interface <code> RequestMonitorI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 		RequestMonitorInboundPort 
@@ -18,8 +19,8 @@ public 	class 		RequestMonitorInboundPort
 	private static final long serialVersionUID = -7495411833908280793L;
 
 	/**
-	 * @param 	uri			URI de l'inbound port
-	 * @param 	owner		Composant propriétaire du port
+	 * @param 	uri			URI de l'inbound port.
+	 * @param 	owner		Composant propriétaire du port.
 	 * @throws 	Exception
 	 */
 	public RequestMonitorInboundPort(String uri, ComponentI owner) throws Exception {

@@ -15,11 +15,12 @@ import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 /**
  * La classe <code> AdmissionControllerInboundPort </ code> implémente le port entrant 
  * offrant l'interface <code> AdmissionControllerI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
-public class AdmissionControllerInboundPort 
-		extends AbstractInboundPort
-		implements AdmissionControllerI {
+public 	class 		AdmissionControllerInboundPort 
+		extends 	AbstractInboundPort
+		implements 	AdmissionControllerI {
 
 	private static final long serialVersionUID = -476427438292215937L;
 

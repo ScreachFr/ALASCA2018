@@ -9,6 +9,7 @@ import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher;
 /**
  * La classe <code> ShutdownableInboundPort </ code> implémente le port entrant 
  * offrant l'interface <code> ShutdownableI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
 public 	class 		ShutdownableInboundPort 
@@ -32,7 +33,6 @@ public 	class 		ShutdownableInboundPort
 	@Override
 	public void shutdown() throws Exception {
 		ShutdownableI component = (ShutdownableI) this.owner;
-		
 		this.owner.handleRequestAsync(
 				new ComponentI.ComponentService<AbstractComponent>(){
 					@Override
@@ -41,5 +41,4 @@ public 	class 		ShutdownableInboundPort
 						return null;
 					}});
 	}
-
 }

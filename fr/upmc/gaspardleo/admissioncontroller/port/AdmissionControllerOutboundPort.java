@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import fr.upmc.components.ComponentI;
 import fr.upmc.components.ports.AbstractOutboundPort;
-import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.applicationvm.ports.ApplicationVMManagementOutboundPort;
 import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
@@ -15,21 +14,21 @@ import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 /**
  * La classe <code> AdmissionControllerOutboundPort </ code> implémente le port sortant 
  * offrant l'interface <code> AdmissionControllerI </ code>.
+ * 
  * @author Leonor & Alexandre
  */
-public class AdmissionControllerOutboundPort 
-		extends AbstractOutboundPort
-		implements AdmissionControllerI{
+public 	class 		AdmissionControllerOutboundPort 
+		extends 	AbstractOutboundPort
+		implements 	AdmissionControllerI {
 
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * 
 	 * @param 	owner		Composant propriétaire du port
 	 * @throws 	Exception
 	 */
 	public AdmissionControllerOutboundPort(ComponentI owner) throws Exception {
-		super(AbstractPort.generatePortURI(), AdmissionControllerI.class, owner);
+		super(AdmissionControllerI.class, owner);
 		assert	uri != null ;
 	}
 
@@ -41,7 +40,6 @@ public class AdmissionControllerOutboundPort
 			HashMap<RDPortTypes, String> RD_uris,
 			HashMap<RGPortTypes, String> RG_uris,
 			String rg_monitor_in) throws Exception { 
-		
 		((AdmissionControllerI)this.connector).addRequestSource(
 				RD_uris, 
 				RG_uris,

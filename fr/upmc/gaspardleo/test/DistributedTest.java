@@ -19,8 +19,8 @@ import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator;
 import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
-public class DistributedTest 
-	extends	AbstractDistributedCVM{
+public 	class 	DistributedTest 
+		extends	AbstractDistributedCVM {
 
 	private static final String Datacenter = "datacenter";
 	private static final String DatacenterClient = "datacenterclient";
