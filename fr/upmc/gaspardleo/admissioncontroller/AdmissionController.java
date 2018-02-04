@@ -68,6 +68,7 @@ public class AdmissionController
 
 	@Override
 	public void addRequestDispatcher(
+			Integer howManyAVMsOnStartup,
 			HashMap<RDPortTypes, String> RD_uris,
 			HashMap<RGPortTypes, String> RG_uris,
 			String rg_monitor_in) throws Exception {
@@ -118,7 +119,10 @@ public class AdmissionController
 			performanceRegulator_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
 			ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
 		
-		prop.addAVMToRD();
+		for (int i = 0; i < howManyAVMsOnStartup; i++) {
+			if (!prop.addAVMToRD())
+				this.logMessage("Admission controller : not any avms available at the moment.");
+		}
 			
 		this.logMessage("Admission controller : Request source successfully added!");
 	}
@@ -163,7 +167,9 @@ public class AdmissionController
 	}
 
 	@Override
-	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,
+	public void createNewRequestDispatcher(
+			Integer num_rd,
+			HashMap<RGPortTypes, String> rg_uris, 
 			HashMap<ACPortTypes, String> ac_uris) throws Exception {
 		RequestDispatcher rd = new RequestDispatcher(RequestDispatcher.makeUris(num_rd), rg_uris, ac_uris);
 		rd.start();

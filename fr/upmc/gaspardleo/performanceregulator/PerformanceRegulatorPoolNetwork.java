@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.exceptions.ComponentStartException;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
@@ -16,8 +15,6 @@ import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolNetworkMasterI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolNetworkMasterOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
-import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.PerformanceRegulatorPorts;
-import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.RegulationStrategies;
 import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;

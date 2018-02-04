@@ -23,6 +23,7 @@ implements AdmissionControllerI {
 
 	@Override
 	public void addRequestDispatcher(
+			Integer howManyAVMsOnStartup,
 			HashMap<RDPortTypes, String> RD_uris,
 			HashMap<RGPortTypes, String> RG_uris,
 			String rg_monitor_in) throws Exception {
@@ -32,6 +33,7 @@ implements AdmissionControllerI {
 					@Override
 					public AdmissionController call() throws Exception {
 						ac.addRequestDispatcher(
+								howManyAVMsOnStartup,
 								RD_uris, 
 								RG_uris,
 								rg_monitor_in);
@@ -66,7 +68,9 @@ implements AdmissionControllerI {
 	}
 
 	@Override
-	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,
+	public void createNewRequestDispatcher(
+			Integer num_rd,
+			HashMap<RGPortTypes, String> rg_uris,
 			HashMap<ACPortTypes, String> ac_uris) throws Exception {
 		AdmissionController ac = (AdmissionController) this.owner;
 		ac.handleRequestAsync(

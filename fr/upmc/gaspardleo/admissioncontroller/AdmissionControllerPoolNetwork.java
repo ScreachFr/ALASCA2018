@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
-import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
@@ -23,7 +22,6 @@ import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnection
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorOutboundPort;
 import fr.upmc.gaspardleo.requestmonitor.RequestMonitor;
 import fr.upmc.gaspardleo.requestmonitor.RequestMonitor.RequestMonitorPorts;
-import fr.upmc.gaspardleo.admissioncontroller.AdmissionController.ACPortTypes;
 import fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI;
 import fr.upmc.gaspardleo.admissioncontroller.port.AdmissionControllerInboundPort;
 import fr.upmc.gaspardleo.classfactory.ClassFactory;
@@ -62,6 +60,7 @@ public class AdmissionControllerPoolNetwork
 
 	@Override
 	public void addRequestDispatcher(
+			Integer howManyAVMsOnStartup,
 			HashMap<RDPortTypes, String> RD_uris,
 			HashMap<RGPortTypes, String> RG_uris,
 			String rg_monitor_in) throws Exception {
@@ -115,7 +114,10 @@ public class AdmissionControllerPoolNetwork
 			performanceRegulator_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN),
 			ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
 		
-		prop.addAVMToRD();
+		for (int i = 0; i < howManyAVMsOnStartup; i++) {
+			if (!prop.addAVMToRD())
+				this.logMessage("Admission controller : not any avms available at the moment.");
+		}
 			
 		this.logMessage("Admission controller : Request source successfully added!");
 	}
@@ -160,9 +162,10 @@ public class AdmissionControllerPoolNetwork
 	}
 
 	@Override
-	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,
-			HashMap<ACPortTypes, String> ac_uris)
-			throws Exception {
+	public void createNewRequestDispatcher(
+			Integer num_rd,
+			HashMap<RGPortTypes, String> rg_uris, 
+			HashMap<ACPortTypes, String> ac_uris) throws Exception{
 		RequestDispatcher rd = new RequestDispatcher(RequestDispatcher.makeUris(num_rd), rg_uris, ac_uris);
 		rd.start();
 	}
