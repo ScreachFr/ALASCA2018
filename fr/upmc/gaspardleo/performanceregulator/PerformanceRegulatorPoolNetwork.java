@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.exceptions.ComponentStartException;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
@@ -29,6 +30,17 @@ import fr.upmc.gaspardleo.requestmonitor.RequestMonitor.RequestMonitorPorts;
 import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
+/**
+ * La classe <code> PerformanceRegulatorPoolNetwork </ code> impl√©mente le composant repr√©sentant 
+ * le r√©gulateur de performance du traitement des requ√™ts dans le centre de calcul.
+ * 
+ * <p><strong>Description</strong></p>
+ * Ce composant g√®re l'adaptation du des ressources du centre de calcul. Il est identique ‡ <code>PerformanceRegulateur</code>
+ * sauf qu'il utilise un registe de <code>ComputerPool</code> fournit par <code>ComputerPoolNetworkMaster</code> pour reclamer
+ * des <code>ApplicationVM</code>.
+ * 
+ * @author Leonor & Alexandre
+ */
 public class PerformanceRegulatorPoolNetwork 
 	extends PerformanceRegulator {
 
@@ -57,7 +69,24 @@ public class PerformanceRegulatorPoolNetwork
 	// Regulation
 	private RegulationStrategyI strategy;
 	private TargetValue targetValue;
-
+	
+	/**
+	 * @param uri
+	 * 		URI du composant.
+	 * @param component_uris
+	 * 		URIs du composant.
+	 * @param requestDispatcher
+	 * 		URIs du RequestDispatcher.
+	 * @param requestMonitor
+	 * 		URIs du RequestMonitor.
+	 * @param computerPoolNetworkMasterInboundPort_uri
+	 * 		URI du ComputerPoolNetworkMaster in.
+	 * @param strategy
+	 * 		Strat√©gie √† appliquer.
+	 * @param targetValue
+	 * 		Cible de temps d'attente des r√©qu√™tes.
+	 * @throws Exception
+	 */
 	public PerformanceRegulatorPoolNetwork(
 			String uri,
 			HashMap<PerformanceRegulatorPorts, String> component_uris,
@@ -128,6 +157,9 @@ public class PerformanceRegulatorPoolNetwork
 	}
 
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#addAVMToRD()
+	 */
 	@Override
 	public Boolean addAVMToRD() throws Exception {
 		Optional<HashMap<ApplicationVMPortTypes, String>> avmToAdd;
@@ -150,6 +182,18 @@ public class PerformanceRegulatorPoolNetwork
 		return false;
 	}
 	
+	/**
+	 * Permet de reserver une AVM ‡ un ComputerPool.
+	 * @param avmUri
+	 * 		URI de la nouvelle AVM.
+	 * @param numberOfCoreToAllocate
+	 * 		Combien de coeur le ComputerPool doit-il allouer ‡ l'AVM.
+	 * @param cpop
+	 * 		Port du ComputerPool.
+	 * @return
+	 * 		Une possible nouvelle AVM.
+	 * @throws Exception
+	 */
 	private Optional<HashMap<ApplicationVMPortTypes, String>> getAVMFromCpop(
 			String avmUri,
 			Integer numberOfCoreToAllocate,
@@ -158,6 +202,9 @@ public class PerformanceRegulatorPoolNetwork
 		return Optional.ofNullable(cpop.createNewApplicationVM(avmUri, numberOfCoreToAllocate));
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#removeAVMFromRD()
+	 */
 	@Override
 	public Boolean removeAVMFromRD() throws Exception {
 		List<String> avms = rdop.getRegisteredAVMUris();
@@ -175,6 +222,9 @@ public class PerformanceRegulatorPoolNetwork
 		return true;
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#increaseCPUFrequency()
+	 */
 	@Override
 	public Boolean increaseCPUFrequency() throws Exception {
 		Boolean hasChangedFreq = false;
@@ -207,6 +257,10 @@ public class PerformanceRegulatorPoolNetwork
 		return hasChangedFreq;
 	}
 
+	/**
+	 * Met ‡ jour la liste des ComputerPool disponibles.
+	 * @throws Exception
+	 */
 	private void updateCpops() throws Exception {
 		HashMap<String, String> availablePools = cpnmop.getAvailableComputerPools();
 
@@ -238,18 +292,25 @@ public class PerformanceRegulatorPoolNetwork
 
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#setRegulationStrategie(RegulationStrategyI)
+	 */
 	@Override
 	public void setRegulationStrategie(RegulationStrategyI strat) throws Exception {
 		this.strategy = strat;
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#getRegulationStrategie()
+	 */
 	@Override
 	public RegulationStrategyI getRegulationStrategie() throws Exception {
 		return strategy;
 	}
 
+	/**
+	 * @see AbstractComponent#start();
+	 */
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
@@ -260,7 +321,9 @@ public class PerformanceRegulatorPoolNetwork
 		}
 	}
 
-
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI#startRegulationControlLoop()
+	 */
 	@Override
 	public void startRegulationControlLoop() throws Exception {
 		if (DEBUG_LEVEL > 0)
@@ -306,6 +369,13 @@ public class PerformanceRegulatorPoolNetwork
 
 	}
 
+	/**
+	 * Permet de definir la strategie de regulation du composant.
+	 * @param strat
+	 * 		Strategie ‡ utiliser.
+	 * @return
+	 * 		Instance de la strategie voulue.
+	 */
 	private RegulationStrategyI getStrategyFromEnum(RegulationStrategies strat) {
 		switch(strat) {
 		case SIMPLE_AVM :
@@ -320,7 +390,14 @@ public class PerformanceRegulatorPoolNetwork
 			throw new Error("Performance regulator constructor error : Strategy selection error. This shouldn't happen though.");
 		}
 	}
-
+	
+	/**
+	 * Construit les URIs du composant et de ses ports.
+	 * @param rd_URI
+	 * 		URI RequestDispatcher
+	 * @return
+	 * 		Les URIs du composant et de ses ports
+	 */
 	public static HashMap<PerformanceRegulatorPorts, String> makeUris(String rd_URI){
 		HashMap<PerformanceRegulatorPorts, String> performanceRegulator_uris = new HashMap<>();
 		performanceRegulator_uris.put(PerformanceRegulatorPorts.INTROSPECTION, rd_URI + "-pr");

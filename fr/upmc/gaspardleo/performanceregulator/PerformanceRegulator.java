@@ -145,6 +145,13 @@ public 	class 		PerformanceRegulator
 		super(1, 1);
 	}
 
+	/**
+	 * Permet de definir la strategie de regulation du composant.
+	 * @param strat
+	 * 		Strategie à utiliser.
+	 * @return
+	 * 		Instance de la strategie voulue.
+	 */
 	private RegulationStrategyI getStrategyFromEnum(RegulationStrategies strat) {
 		switch(strat) {
 		case SIMPLE_AVM :

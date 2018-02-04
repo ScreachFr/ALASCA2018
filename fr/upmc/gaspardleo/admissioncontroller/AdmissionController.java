@@ -173,8 +173,6 @@ public 	class 		AdmissionController
 
 		requestSources.remove(optRD.get());
 
-		// TODO Attendre la fin du shutdown avant de faire ça ?
-		//sop.doDisconnection();
 	}
 
 	/**

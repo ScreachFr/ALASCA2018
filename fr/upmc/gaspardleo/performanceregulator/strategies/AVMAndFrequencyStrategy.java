@@ -3,9 +3,20 @@ package fr.upmc.gaspardleo.performanceregulator.strategies;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
 
+/**
+ * Cette classe représente une stratégie de régulation qui influt sur la fréquence des processeur ainsi que le nombre d'AVM.
+ * En effet elle va d'abord essayer d'augmenter ou de reduire la fréquence des processeurs concernés avant d'allourer
+ * ou de desallouer des AVMs.
+ * 
+ * 
+ * @author Leonor & Alexandre
+ */
 public class AVMAndFrequencyStrategy 
 	implements RegulationStrategyI{
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI#increasePerformances(PerformanceRegulatorI)
+	 */
 	@Override
 	public void increasePerformances(PerformanceRegulatorI regulator) throws Exception {
 		if (!regulator.increaseCPUFrequency()) {
@@ -20,6 +31,9 @@ public class AVMAndFrequencyStrategy
 		}
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI#decreasePerformances(PerformanceRegulatorI)
+	 */
 	@Override
 	public void decreasePerformances(PerformanceRegulatorI regulator) throws Exception {
 		if (!regulator.decreaseCPUFrequency()) {
@@ -33,6 +47,9 @@ public class AVMAndFrequencyStrategy
 		}
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI#canRegulate(PerformanceRegulatorI)
+	 */
 	@Override
 	public Boolean canRegulate(PerformanceRegulatorI regulator) throws Exception {
 		return true;
