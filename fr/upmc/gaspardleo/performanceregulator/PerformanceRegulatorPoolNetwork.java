@@ -69,7 +69,7 @@ public 	class 		PerformanceRegulatorPoolNetwork
 	private ComputerPoolNetworkMasterOutboundPort cpnmop;
 	/** Liste des ComputerPools disponibles */
 	private HashMap<String, ComputerPoolOutboundPort> cpops;
-	/** Connecteur dynamique gardé en cache pour ne pas refaire trop de fois appel à ClassFactory */
+	/** Connecteur dynamique gardÃ© en cache pour ne pas refaire trop de fois appel Ã  ClassFactory */
 	private String computerPoolConnectorCanonicalName;
 	/** Permet de savoir de quel ComputerPool provient une AVM. */
 	private HashMap<String, String> avmsOrigin;
