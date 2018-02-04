@@ -37,10 +37,12 @@ public 	class 		AdmissionControllerOutboundPort
 	 */
 	@Override
 	public void addRequestSource(
+			Integer howManyAVMsOnStartup,
 			HashMap<RDPortTypes, String> RD_uris,
 			HashMap<RGPortTypes, String> RG_uris,
 			String rg_monitor_in) throws Exception { 
 		((AdmissionControllerI)this.connector).addRequestSource(
+				howManyAVMsOnStartup,
 				RD_uris, 
 				RG_uris,
 				rg_monitor_in);	
@@ -69,7 +71,8 @@ public 	class 		AdmissionControllerOutboundPort
 	 */
 	@Override
 	public void createNewRequestDispatcher(
-			int num_rd, HashMap<RGPortTypes, String> rg_uris,
+			Integer num_rd,
+			HashMap<RGPortTypes, String> rg_uris,
 			HashMap<ACPortTypes, String> ac_uris) throws Exception {
 		((AdmissionControllerI)this.connector).createNewRequestDispatcher(num_rd, rg_uris, ac_uris);
 	}

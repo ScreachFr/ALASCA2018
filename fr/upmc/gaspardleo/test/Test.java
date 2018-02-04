@@ -46,7 +46,7 @@ public class Test {
 			for (int i = 0; i < NB_DATASOURCE; i++) {
 				
 				HashMap<RGPortTypes, String> rg_uris = RequestGenerator.makeUris(i);
-				new RequestGenerator(rg_uris, new Double(500.0), new Long(6000000000L));
+				new RequestGenerator(rg_uris, 500.0, 6000000000L);
 				
 				new RequestDispatcher(RequestDispatcher.makeUris(i), rg_uris, ac_uris);
 				

@@ -17,7 +17,7 @@ public 	class 		RequestMonitorOutboundPort
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param 	owner		Composant propriétaire du port
+	 * @param 	owner		Composant propriétaire du port.
 	 * @throws 	Exception
 	 */
 	public RequestMonitorOutboundPort(ComponentI owner) throws Exception {

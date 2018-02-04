@@ -28,6 +28,7 @@ public 	interface 	AdmissionControllerI
 	 * @throws 	Exception
 	 */
 	public void addRequestSource(
+		Integer howManyAVMsOnStartup,
 		HashMap<RDPortTypes, String> RD_uris,
 		HashMap<RGPortTypes, String> RG_uris,
 		String rg_monitor_in) throws Exception;
@@ -56,7 +57,7 @@ public 	interface 	AdmissionControllerI
 	 * @retunr 	la liste des outbound ports de management des machines virtuelles d'application.
 	 */
 	public void createNewRequestDispatcher(
-			int num_rd, 
+			Integer num_rd,
 			HashMap<RGPortTypes, String> rg_uris, 
 			HashMap<ACPortTypes, String> ac_uris) throws Exception;
 }

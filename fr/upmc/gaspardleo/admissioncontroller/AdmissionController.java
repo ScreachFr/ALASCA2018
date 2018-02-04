@@ -8,8 +8,6 @@ import fr.upmc.components.AbstractComponent;
 import fr.upmc.gaspardleo.componentmanagement.ShutdownableI;
 import fr.upmc.gaspardleo.componentmanagement.ports.ShutdownableOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ComputerPool.ComputerPoolPorts;
-import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
-import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.PerformanceRegulatorPorts;
 import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.RegulationStrategies;
@@ -53,8 +51,6 @@ public 	class 		AdmissionController
 	private HashMap<HashMap<RGPortTypes, String>, HashMap<RDPortTypes, String>> requestSources;
 	/** Liste d'URIs pour gérer le ComputerPool */
 	private HashMap<ComputerPoolPorts, String> computerPoolURIs;
-	/** Outbound port pour utiliser les services du CompuerPool */
-	private ComputerPoolOutboundPort cpop;
 	
 	/**
 	 * @param 	computerPoolUri		URI du composant ComputerPool
@@ -76,19 +72,14 @@ public 	class 		AdmissionController
 		this.acip = new AdmissionControllerInboundPort(ac_uris.get(ACPortTypes.ADMISSION_CONTROLLER_IN), this);
 		this.addPort(this.acip);
 		this.acip.publishPort();
-		
-		this.addRequiredInterface(ComputerPoolI.class);
-		this.cpop = new ComputerPoolOutboundPort(this);
-		this.addPort(cpop);
-		this.cpop.publishPort();
 
-		this.cpop.doConnection(
-			computerPoolURIs.get(ComputerPoolPorts.COMPUTER_POOL), 
-			ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName());		
-		
 		this.toggleLogging();
 		this.toggleTracing();		
 		this.logMessage("AdmissionController made");
+	}
+	
+	public AdmissionController() {
+		super(1,1);
 	}
 
 	/**
@@ -96,6 +87,7 @@ public 	class 		AdmissionController
 	 */
 	@Override
 	public void addRequestSource(
+			Integer howManyAVMsOnStartup,
 			HashMap<RDPortTypes, String> RD_uris,
 			HashMap<RGPortTypes, String> RG_uris,
 			String rg_monitor_in) throws Exception {
@@ -146,7 +138,10 @@ public 	class 		AdmissionController
 			ClassFactory.newConnector(PerformanceRegulatorI.class).getCanonicalName());
 		
 		//Addition of AVM to the RD
-		prop.addAVMToRD();
+		for (int i = 0; i < howManyAVMsOnStartup; i++) {
+			if (!prop.addAVMToRD())
+				this.logMessage("Admission controller : not any avms available at the moment.");
+		}
 			
 		this.logMessage("Admission controller : Request source successfully added!");
 	}
@@ -205,7 +200,9 @@ public 	class 		AdmissionController
 	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI#createNewRequestDispatcher(int, HashMap<RGPortTypes, String>, HashMap<ACPortTypes, String>)
 	 */
 	@Override
-	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,
+	public void createNewRequestDispatcher(
+			Integer num_rd,
+			HashMap<RGPortTypes, String> rg_uris, 
 			HashMap<ACPortTypes, String> ac_uris) throws Exception {
 		RequestDispatcher rd = new RequestDispatcher(RequestDispatcher.makeUris(num_rd), rg_uris, ac_uris);
 		rd.start();

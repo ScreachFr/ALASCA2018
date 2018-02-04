@@ -38,6 +38,7 @@ public 	class 		AdmissionControllerInboundPort
 	 */
 	@Override
 	public void addRequestSource(
+			Integer howManyAVMsOnStartup,
 			HashMap<RDPortTypes, String> RD_uris,
 			HashMap<RGPortTypes, String> RG_uris,
 			String rg_monitor_in) throws Exception {
@@ -47,6 +48,7 @@ public 	class 		AdmissionControllerInboundPort
 					@Override
 					public AdmissionController call() throws Exception {
 						ac.addRequestSource(
+								howManyAVMsOnStartup,
 								RD_uris, 
 								RG_uris,
 								rg_monitor_in);
@@ -90,7 +92,9 @@ public 	class 		AdmissionControllerInboundPort
 	 * @see fr.upmc.gaspardleo.admissioncontroller.interfaces.AdmissionControllerI#createNewRequestDispatcher(int, HashMap<RGPortTypes, String>, HashMap<ACPortTypes, String>)
 	 */
 	@Override
-	public void createNewRequestDispatcher(int num_rd, HashMap<RGPortTypes, String> rg_uris,
+	public void createNewRequestDispatcher(
+			Integer num_rd,
+			HashMap<RGPortTypes, String> rg_uris,
 			HashMap<ACPortTypes, String> ac_uris) throws Exception {
 		AdmissionController ac = (AdmissionController) this.owner;
 		ac.handleRequestAsync(

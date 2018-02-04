@@ -2,6 +2,7 @@ package fr.upmc.gaspardleo.classfactory;
 
 import fr.upmc.components.connectors.AbstractConnector;
 import javassist.CannotCompileException;
+import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
@@ -40,6 +41,7 @@ public class ClassFactory {
 	 * @throws CannotCompileException
 	 */
 	public static Class<?> newConnector(String connectorName, Class<?> extendedClass, Class<?> implementedInterface) throws NotFoundException, CannotCompileException {
+		ClassPool.getDefault().insertClassPath(new ClassClassPath(AbstractConnector.class));
 		ClassPool cpool = ClassPool.getDefault();
 		CtClass extendedClassCt = cpool.get(extendedClass.getCanonicalName());
 		CtClass implementedInterfaceCt = cpool.get(implementedInterface.getCanonicalName());

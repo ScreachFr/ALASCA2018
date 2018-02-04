@@ -144,7 +144,7 @@ public 	class 		RequestDispatcher
 		this.rmop_uri = component_uris.get(RDPortTypes.RQUEST_MONITOR_IN);
 		
 		 //Addition by AC the new RD for a specific RG
-		this.acop.addRequestSource(component_uris, rg_uris, this.rmop_uri);
+		this.acop.addRequestSource(1, component_uris, rg_uris, this.rmop_uri);
 		
 		// Request Dispatcher debug
 		this.toggleLogging();
@@ -272,8 +272,9 @@ public 	class 		RequestDispatcher
 			this.logMessage(this.Component_URI + " : no registered vm.");
 		
 		} else {
-			vmCursor = (vmCursor+1) % this.registeredVmsUri.size();
+			
 			String avmURI = getNextVmUriFromCursor();
+			
 			RequestSubmissionOutboundPort rsop = this.registeredVmsRsop.get(avmURI);
 			
 			this.logMessage(this.Component_URI + " is using " + avmURI);
