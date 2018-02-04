@@ -23,8 +23,9 @@ public 	interface 	AdmissionControllerI
 	/**
 	 * Créé les composants RequestMonitor et PerformanceRegulator nécessaire ua traitement des requêtes.
 	 * Connecte ces nouveaux commposant au RequestDispatcher et au RequestGenerator gâce aux Uris données en paramètre.
-	 * @param 	RD_uris 	URIs du RequestDispatcher.
-	 * @param 	RG_uris 	URIs du RequestGenerator.
+	 * @param 	howManyAVMsOnStartup	Combien d'AVM doivent �tre affect�s au RequestDispatcher ? 
+	 * @param 	RD_uris 				URIs du RequestDispatcher.
+	 * @param 	RG_uris 				URIs du RequestGenerator.
 	 * @throws 	Exception
 	 */
 	public void addRequestSource(
