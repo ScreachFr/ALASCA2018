@@ -14,7 +14,7 @@ import fr.upmc.components.examples.ddeployment_cs.components.interfaces.URIConsu
  * invariant	true
  * </pre>
  * 
- * <p>Created on : 22 févr. 2017</p>
+ * <p>Created on : 22 fÃ©vr. 2017</p>
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  * @version	$Name$ -- $Revision$ -- $Date$
