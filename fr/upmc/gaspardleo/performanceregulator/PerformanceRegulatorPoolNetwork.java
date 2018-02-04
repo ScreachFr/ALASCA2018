@@ -73,6 +73,8 @@ public 	class 		PerformanceRegulatorPoolNetwork
 	private String computerPoolConnectorCanonicalName;
 	/** Permet de savoir de quel ComputerPool provient une AVM. */
 	private HashMap<String, String> avmsOrigin;
+	/** Prochaine regulation. */
+	private long nextRegulation;
 	
 	/**
 	 * @param 	uri 										URI du composant.
@@ -102,6 +104,8 @@ public 	class 		PerformanceRegulatorPoolNetwork
 		this.strategy = getStrategyFromEnum(strategy);
 		this.targetValue = targetValue;
 
+		this.nextRegulation = 0;
+		
 		this.addOfferedInterface(PerformanceRegulatorI.class);
 		this.prip = new PerformanceRegulatorInboundPort(component_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN), this);
 		this.addPort(this.prip);
@@ -296,6 +300,9 @@ public 	class 		PerformanceRegulatorPoolNetwork
 
 		this.scheduleTaskAtFixedRate(() -> {
 			try {
+				// May skip some regulations.
+				if (System.currentTimeMillis() < nextRegulation)
+					return;
 				Double mean = rmop.getMeanRequestExecutionTime();
 
 				if (DEBUG_LEVEL > 1)
@@ -317,11 +324,10 @@ public 	class 		PerformanceRegulatorPoolNetwork
 						this.logMessage(uri + " : lower bound regulation.");
 
 					strategy.decreasePerformances(this);
-
-					Thread.sleep(REGULATION_TRUCE);
+					nextRegulation = System.currentTimeMillis() + REGULATION_TRUCE;
 				} else {
 					if (DEBUG_LEVEL > 1)
-						this.logMessage(uri + " : everything seems within bounds, no regullation needed.");
+						this.logMessage(uri + " : everything seems within bounds, no regulation needed.");
 				}
 
 				

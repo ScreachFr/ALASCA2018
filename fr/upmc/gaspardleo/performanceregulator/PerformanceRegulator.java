@@ -28,11 +28,11 @@ import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
 /**
- * La classe <code> PerformanceRegulator </ code> implÃ©mente le composant reprÃ©sentant 
- * le rÃ©gulateur de performance du traitement des requÃªts dans le centre de calcul.
+ * La classe <code> PerformanceRegulator </ code> implémente le composant représentant 
+ * le régulateur de performance du traitement des requêts dans le centre de calcul.
  * 
  * <p><strong>Description</strong></p>
- * Ce composant gÃ¨re l'adaptation du des ressources du centre de calcul.
+ * Ce composant gère l'adaptation du des ressources du centre de calcul.
  * 
  * @author Leonor & Alexandre
  */
@@ -52,15 +52,15 @@ public 	class 		PerformanceRegulator
 		STRATEGY_TO_SURPASS_METAL_GEAR
 	}
 	
-	/** Varibale pour l'activation du mode dÃ©bug */
+	/** Varibale pour l'activation du mode débug */
 	private static int DEBUG_LEVEL = 2;
-	/** Varibale d'incrÃ©mentation le nomage des applications VM */
+	/** Varibale d'incrémentation le nomage des applications VM */
 	private static int newAVMID = 0;
-	/** Variable pour calucler la frÃ©quence du contrÃ´le de prerformance */
+	/** Variable pour calucler la fréquence du contrôle de prerformance */
 	public final static double CONTROL_FEQUENCY = 30; // Based on a minute.
-	/** Variable corrspond au temps d'attente entre deux rÃ©gulation */
+	/** Variable corrspond au temps d'attente entre deux régulation */
 	public final static long REGULATION_TRUCE = 30000; // 30 sec.
-	/** Variable correspondant au dÃ©but de la premiÃ¨re rÃ©gulation */
+	/** Variable correspondant au début de la première régulation */
 	public final static long FIRST_PERF_CHECK = 1000;
 	/** URI du composant */
 	private String uri;
@@ -72,18 +72,20 @@ public 	class 		PerformanceRegulator
 	private RequestDispatcherOutboundPort rdop;
 	/** Outbound port pour utiliser les services du ComputerPool */
 	private ComputerPoolOutboundPort cpop;
-	/** Correspond Ã  la stratÃ©gie de rÃ©gulation en cours */
+	/** Correspond à la stratégie de régulation en cours */
 	private RegulationStrategyI strategy;
-	/** Correspond Ã  la valeur cible du temps d'attente entre des requÃªtes */
+	/** Correspond à la valeur cible du temps d'attente entre des requêtes */
 	private TargetValue targetValue;
+	/** Prochaine regulation. */
+	private long nextRegulation;
 
 	/**
 	 * @param 	component_uris		URIs du composant.
 	 * @param 	requestDispatcher	URIs du RequestDispatcher.
 	 * @param 	requestMonitor		URIs du RequestMonitor.
 	 * @param 	computerPool		URIs du ComputerPool.
-	 * @param 	strategy			StratÃ©gie Ã  appliquer.
-	 * @param 	targetValue			Cible de temps d'attente des rÃ©quÃªtes.
+	 * @param 	strategy			Stratégie à appliquer.
+	 * @param 	targetValue			Cible de temps d'attente des réquêtes.
 	 * @throws 	Exception
 	 */
 	public PerformanceRegulator(
@@ -99,6 +101,8 @@ public 	class 		PerformanceRegulator
 		this.uri = component_uris.get(PerformanceRegulatorPorts.INTROSPECTION);
 		this.strategy = getStrategyFromEnum(strategy);
 		this.targetValue = targetValue;
+		
+		this.nextRegulation = 0;
 
 		this.addOfferedInterface(PerformanceRegulatorI.class);
 		this.prip = new PerformanceRegulatorInboundPort(component_uris.get(PerformanceRegulatorPorts.PERFORMANCE_REGULATOR_IN), this);
@@ -139,6 +143,7 @@ public 	class 		PerformanceRegulator
 		this.toggleTracing();
 		this.toggleLogging();
 		this.logMessage("PerformanceRegulator made");
+		
 	}
 	
 	public PerformanceRegulator() {
@@ -147,7 +152,7 @@ public 	class 		PerformanceRegulator
 
 	/**
 	 * Permet de definir la strategie de regulation du composant.
-	 * @param 	strat 	Strategie Ã  utiliser.
+	 * @param 	strat 	Strategie à utiliser.
 	 * @return 			Instance de la strategie voulue.
 	 */
 	private RegulationStrategyI getStrategyFromEnum(RegulationStrategies strat) {
@@ -265,6 +270,10 @@ public 	class 		PerformanceRegulator
 
 		this.scheduleTaskAtFixedRate(() -> {
 			try {
+				// May skip some regulations.
+				if (System.currentTimeMillis() < nextRegulation)
+					return;
+				
 				Double mean = rmop.getMeanRequestExecutionTime();
 
 				if (DEBUG_LEVEL > 1)
@@ -279,18 +288,17 @@ public 	class 		PerformanceRegulator
 						this.logMessage(uri + " : upper bound regulation.");
 					strategy.increasePerformances(this);
 
-					// Permet de ne pas reverifier l'Ã©tat du systÃ¨me trop rapidement aprÃ¨s rÃ©gulation.
+					// Permet de ne pas reverifier l'état du système trop rapidement après régulation.
 					Thread.sleep(REGULATION_TRUCE);
 				} else if (mean < targetValue.getLowerBound()) {
 					if (DEBUG_LEVEL > 1)
 						this.logMessage(uri + " : lower bound regulation.");
 
 					strategy.decreasePerformances(this);
-
-					Thread.sleep(REGULATION_TRUCE);
+					nextRegulation = System.currentTimeMillis() + REGULATION_TRUCE;
 				} else {
 					if (DEBUG_LEVEL > 1)
-						this.logMessage(uri + " : everything seems within bounds, no regullation needed.");
+						this.logMessage(uri + " : everything seems within bounds, no regulation needed.");
 				}
 
 			} catch (Exception e) {
