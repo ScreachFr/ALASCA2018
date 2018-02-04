@@ -17,6 +17,7 @@ import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
 import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorInboundPort;
+import fr.upmc.gaspardleo.performanceregulator.strategies.AVMAndFrequencyStrategy;
 import fr.upmc.gaspardleo.performanceregulator.strategies.SimpleAVMStrategie;
 import fr.upmc.gaspardleo.performanceregulator.strategies.SimpleFrequencyStrategy;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
@@ -38,6 +39,7 @@ public class PerformanceRegulator
 	public enum RegulationStrategies {
 		SIMPLE_AVM, 
 		SIMPLE_FREQ, 
+		FREQ_AVM,
 		STRATEGY_TO_SURPASS_METAL_GEAR
 	}
 	
@@ -121,6 +123,10 @@ public class PerformanceRegulator
 		
 		this.logMessage("PerformanceRegulator made");
 	}
+	
+	public PerformanceRegulator() {
+		super(1, 1);
+	}
 
 	private RegulationStrategyI getStrategyFromEnum(RegulationStrategies strat) {
 		switch(strat) {
@@ -128,6 +134,8 @@ public class PerformanceRegulator
 			return new SimpleAVMStrategie();
 		case SIMPLE_FREQ :
 			return new SimpleFrequencyStrategy();
+		case FREQ_AVM :
+			return new AVMAndFrequencyStrategy();
 		case STRATEGY_TO_SURPASS_METAL_GEAR:
 			throw new Error("Such a lust for revenge. WHO? (Not implemented yet)"); // Yes, I'm making bad jokes about video games when I'm too tired to work.
 		default :
@@ -172,7 +180,6 @@ public class PerformanceRegulator
 
 	@Override
 	public Boolean addAVMToRD() throws Exception {
-		
 		HashMap<ApplicationVMPortTypes, String> avm = this.cpop.createNewApplicationVM("avm-"+(newAVMID++), 1);
 
 		if (avm == null) {

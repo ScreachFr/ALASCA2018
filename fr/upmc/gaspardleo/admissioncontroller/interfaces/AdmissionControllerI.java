@@ -14,6 +14,7 @@ public interface AdmissionControllerI
 	extends	OfferedI, RequiredI{
 
 	public void addRequestDispatcher(
+		Integer howManyAVMsOnStartup,
 		HashMap<RDPortTypes, String> RD_uris,
 		HashMap<RGPortTypes, String> RG_uris,
 		String rg_monitor_in) throws Exception;
@@ -29,7 +30,7 @@ public interface AdmissionControllerI
 	public ArrayList<ApplicationVMManagementOutboundPort> getApplicationVMManagementOutboundPorts() throws Exception;
 	
 	public void createNewRequestDispatcher(
-			int num_rd, 
+			Integer num_rd,
 			HashMap<RGPortTypes, String> rg_uris, 
 			HashMap<ACPortTypes, String> ac_uris) throws Exception;
 }

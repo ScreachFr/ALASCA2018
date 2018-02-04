@@ -45,7 +45,7 @@ public class CPNetworkTest {
 			
 			HashSet<Integer> admissibleFrequencies = Computer.makeFrequencies();
 			HashMap<Integer,Integer> processingPower = Computer.makeProcessingPower();
-			new Computer(Computer.makeUris(0), cp_uris_1, admissibleFrequencies, processingPower);
+			new Computer(Computer.makeUris(0), cp_uris_2, admissibleFrequencies, processingPower);
 			new Computer(Computer.makeUris(1), cp_uris_2, admissibleFrequencies, processingPower);
 			new Computer(Computer.makeUris(2), cp_uris_3, admissibleFrequencies, processingPower);
 

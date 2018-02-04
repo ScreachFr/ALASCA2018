@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import fr.upmc.components.AbstractComponent;
 import fr.upmc.components.exceptions.ComponentStartException;
 import fr.upmc.components.ports.AbstractPort;
 import fr.upmc.datacenter.software.interfaces.RequestSubmissionI;
@@ -16,12 +15,11 @@ import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolI;
 import fr.upmc.gaspardleo.computerpool.interfaces.ComputerPoolNetworkMasterI;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolNetworkMasterOutboundPort;
 import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
-import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.PerformanceRegulatorPorts;
-import fr.upmc.gaspardleo.performanceregulator.PerformanceRegulator.RegulationStrategies;
 import fr.upmc.gaspardleo.performanceregulator.data.TargetValue;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.PerformanceRegulatorI;
 import fr.upmc.gaspardleo.performanceregulator.interfaces.RegulationStrategyI;
 import fr.upmc.gaspardleo.performanceregulator.ports.PerformanceRegulatorInboundPort;
+import fr.upmc.gaspardleo.performanceregulator.strategies.AVMAndFrequencyStrategy;
 import fr.upmc.gaspardleo.performanceregulator.strategies.SimpleAVMStrategie;
 import fr.upmc.gaspardleo.performanceregulator.strategies.SimpleFrequencyStrategy;
 import fr.upmc.gaspardleo.requestdispatcher.RequestDispatcher.RDPortTypes;
@@ -32,8 +30,7 @@ import fr.upmc.gaspardleo.requestmonitor.interfaces.RequestMonitorI;
 import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
 public class PerformanceRegulatorPoolNetwork 
-extends AbstractComponent 
-implements PerformanceRegulatorI {
+	extends PerformanceRegulator {
 
 	private static int DEBUG_LEVEL = 2;
 	private static int newAVMID = 0;
@@ -71,7 +68,7 @@ implements PerformanceRegulatorI {
 			TargetValue targetValue)
 					throws Exception {
 
-		super(1, 1);
+		super();
 
 		this.uri = uri;
 
@@ -121,9 +118,13 @@ implements PerformanceRegulatorI {
 		this.computerPoolConnectorCanonicalName = ClassFactory.newConnector(ComputerPoolI.class).getCanonicalName();
 		this.avmsOrigin = new HashMap<>();
 
+		updateCpops();
+		
 		// Debug
 		this.toggleLogging();
 		this.toggleTracing();
+		
+		this.logMessage("PRPN " + uri + " : has successfully been created.");
 	}
 
 
@@ -311,6 +312,8 @@ implements PerformanceRegulatorI {
 			return new SimpleAVMStrategie();
 		case SIMPLE_FREQ :
 			return new SimpleFrequencyStrategy();
+		case FREQ_AVM :
+			return new AVMAndFrequencyStrategy();
 		case STRATEGY_TO_SURPASS_METAL_GEAR:
 			throw new Error("Such a lust for revenge. WHO? (Not implemented yet)"); // Yes, I'm making bad jokes about video games when I'm too tired to work.
 		default :
