@@ -3,17 +3,21 @@ package fr.upmc.gaspardleo.requestgenerator.interfaces;
 import fr.upmc.components.interfaces.OfferedI;
 import fr.upmc.components.interfaces.RequiredI;
 
-public interface RequestGeneratorConnectionI 
-	extends	OfferedI, RequiredI{
+/**
+ * L'interface <code> RequestGeneratorConnectionI </ code> dÃ©finit le comportement de l'objet RequestGenerator
+ * pour la connexion avec un RequestDispatcher
+ * @author Leonor & Alexandre
+ */
+public 	interface RequestGeneratorConnectionI 
+		extends	OfferedI, RequiredI{
 
 	/**
-	 * Connecte un RequestGenerator avec une interface de traitement de requête.
-	 * Le port utilisé ici est celui de RequestSubmission. Il permet au 
-	 * RequestGenerator d'avoir une réponse à ses requêtes.
+	 * Connecte un RequestGenerator avec une interface de traitement de requÃªtes.
+	 * Le port utilisÃ© ici est celui de RequestSubmission. Il permet au 
+	 * RequestGenerator d'avoir une rÃ©ponse Ã  ses requÃªtes.
 	 * ie : RequestDispatcher/ApplicationVM in -> RequestGenerator_out.
-	 * @param Request_Submission_In
-	 * 		Uri du RequestSubmissionInboundPort, donc server, avec lequel se connecter.
-	 * @throws Exception
+	 * @param 	Request_	Submission_In Uri du RequestSubmissionInboundPort, donc server, avec lequel se connecter.
+	 * @throws 	Exception
 	 */
 	public void doConnectionWithRD(String Request_Submission_In) throws Exception;
 }

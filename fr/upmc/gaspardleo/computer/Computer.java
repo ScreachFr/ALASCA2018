@@ -11,7 +11,7 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolOutboundPort;
 
 /**
  * La classe <code> ApplicationVM </ code> implémente le composant représentant 
- * un ordinateur dans le centre de données.
+ * un ordinateur dans le centre de calcul.
  * @author Leonor & Alexandre
  */
 public 	class Computer 

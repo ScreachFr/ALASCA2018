@@ -11,9 +11,15 @@ import fr.upmc.gaspardleo.classfactory.ClassFactory;
 import fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI;
 import fr.upmc.gaspardleo.requestgenerator.ports.RequestGeneratorInboundPort;
 
-public 	class RequestGenerator 
-		extends fr.upmc.datacenterclient.requestgenerator.RequestGenerator
-		implements RequestGeneratorConnectionI{
+/**
+ * La classe <code> RequestGenerator </ code> implémente le composant représentant 
+ * le générateur requêts dans le centre de calcul.
+ * 
+ * @author Leonor & Alexandre
+ */
+public 	class 		RequestGenerator 
+		extends 	fr.upmc.datacenterclient.requestgenerator.RequestGenerator
+		implements 	RequestGeneratorConnectionI{
 
 	public static enum	RGPortTypes {
 		INTROSPECTION,
@@ -24,8 +30,15 @@ public 	class RequestGenerator
 		REQUEST_NOTIFICATION_HANDLER_IN
 	}
 
+	/** Inboud port offrant les services du RequestGenerator */
 	private RequestGeneratorInboundPort rgip;
 	
+	/**
+	 * @param 	rg_uris						URIs du composant
+	 * @param 	meanInterArrivalTime		Temps interarrivaire moyen des requêtes en ms.
+	 * @param 	meanNumberOfInstructions	Nombre moyen d'instructions des requêtes en ms.
+	 * @throws 	Exception
+	 */
 	public RequestGenerator(
 		HashMap<RGPortTypes, String> rg_uris,
 		Double meanInterArrivalTime,
@@ -50,12 +63,18 @@ public 	class RequestGenerator
 		this.logMessage("RequestGenerator made");
 	}
 
+	/**
+	 * @see fr.upmc.datacenterclient.requestgenerator.RequestGenerator#acceptRequestTerminationNotification(RequestI)
+	 */
 	@Override
 	public void acceptRequestTerminationNotification(RequestI r) throws Exception {
 		super.logMessage(rgURI  + " : gettting an answer for " + r.getRequestURI());
 		super.acceptRequestTerminationNotification(r);
 	}
 	
+	/**
+	 * @see fr.upmc.datacenterclient.requestgenerator.RequestGenerator#startGeneration()
+	 */
 	@Override
 	public void startGeneration() throws Exception {
 		try {
@@ -66,11 +85,16 @@ public 	class RequestGenerator
 		}
 	}
 	
-
+	/**
+	 * Ajoute un port au composant
+	 */
 	public void addPort(PortI p) throws Exception{
 		super.addPort(p);
 	}
 
+	/**
+	 * @see fr.upmc.gaspardleo.requestgenerator.interfaces.RequestGeneratorConnectionI#doConnectionWithRD(String)
+	 */
 	@Override
 	public void doConnectionWithRD(String RD_Request_Submission_In) throws Exception {
 		
@@ -91,6 +115,11 @@ public 	class RequestGenerator
 			ClassFactory.newConnector(RequestSubmissionI.class).getCanonicalName());
 	}
 
+	/**
+	 * Construie les URIs du composant et de ses ports
+	 * @param 	num_rg	Numéro du composant permettant la création unique d'URI
+	 * @return	Les URIs du composant et de ses ports
+	 */
 	public static HashMap<RGPortTypes, String> makeUris(int num_rg){
 		HashMap<RGPortTypes, String> rg_uris = new HashMap<RGPortTypes, String>();		
 		rg_uris.put(RGPortTypes.INTROSPECTION, "rg-"+num_rg);

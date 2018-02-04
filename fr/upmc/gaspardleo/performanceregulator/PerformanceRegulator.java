@@ -28,7 +28,7 @@ import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
 /**
  * La classe <code> PerformanceRegulator </ code> implémente le composant représentant 
- * le régulateur de performance du traitement des requêts dans le centre de données.
+ * le régulateur de performance du traitement des requêts dans le centre de calcul.
  * 
  * <p><strong>Description</strong></p>
  * Ce composant gère l'adaptation du des ressources du centre de calcul

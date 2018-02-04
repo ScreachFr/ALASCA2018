@@ -39,7 +39,7 @@ import fr.upmc.gaspardleo.computerpool.ports.ComputerPoolInbounPort;
 
 /**
  * La classe <code> ComputerPool </ code> implémente le composant représentant 
- * une pool d'ordinateur dans le centre de données.
+ * une pool d'ordinateur dans le centre de calcul.
  * 
  * <p><strong>Description</strong></p>
  * Ce composant est pour la gestion des ordinateur et des application VM

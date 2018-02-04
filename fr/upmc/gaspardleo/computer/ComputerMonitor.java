@@ -4,7 +4,7 @@ import fr.upmc.components.ports.AbstractPort;
 
 /**
  * La classe <code> ComputerMonitor </ code> implémente le composant représentant 
- * le contrôlleur d'un ordinateur dans le centre de données.
+ * le contrôlleur d'un ordinateur dans le centre de calcul.
  * @author Leonor & Alexandre
  */
 public 	class ComputerMonitor 

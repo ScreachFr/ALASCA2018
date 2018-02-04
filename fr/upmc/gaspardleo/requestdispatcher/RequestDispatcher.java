@@ -33,7 +33,7 @@ import fr.upmc.gaspardleo.requestgenerator.RequestGenerator.RGPortTypes;
 
 /**
  * La classe <code> RequestDispatcher </ code> implémente le composant représentant 
- * le rrépartiteur de requêts dans le centre de données.
+ * le répartiteur de requêts dans le centre de calcul.
  * 
  * @author Leonor & Alexandre
  */

@@ -23,7 +23,7 @@ import fr.upmc.gaspardleo.requestmonitor.ports.RequestMonitorOutboundPort;
 
 /**
  * La classe <code> ApplicationVM </ code> implémente le composant représentant 
- * une application VM dans le centre de données.
+ * une application VM dans le centre de calcul.
  * 
  * <p><strong>Description</strong></p>
  * Ce composant simule l'exécution d'applications web en recevant des requêtes
