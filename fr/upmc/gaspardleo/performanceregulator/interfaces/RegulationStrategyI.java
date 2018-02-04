@@ -30,7 +30,7 @@ public 	interface 	RegulationStrategyI
 	/**
 	 * Indique si une régulation peut être opéré.
 	 * @param 	regulator 	Régulateur pour lequel les changements doivent être opérés.
-	 * @return 	Une régulation de performance peut-elle être efféctuée ?
+	 * @return 				Une régulation de performance peut-elle être efféctuée ?
 	 * @throws 	Exception
 	 */
 	public Boolean canRegulate(PerformanceRegulatorI regulator) throws Exception;

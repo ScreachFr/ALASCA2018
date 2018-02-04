@@ -147,10 +147,8 @@ public 	class 		PerformanceRegulator
 
 	/**
 	 * Permet de definir la strategie de regulation du composant.
-	 * @param strat
-	 * 		Strategie à utiliser.
-	 * @return
-	 * 		Instance de la strategie voulue.
+	 * @param 	strat 	Strategie Ã  utiliser.
+	 * @return 			Instance de la strategie voulue.
 	 */
 	private RegulationStrategyI getStrategyFromEnum(RegulationStrategies strat) {
 		switch(strat) {

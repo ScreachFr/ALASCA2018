@@ -53,5 +53,4 @@ public 	class 		AVMAndFrequencyStrategy
 	public Boolean canRegulate(PerformanceRegulatorI regulator) throws Exception {
 		return true;
 	}
-
 }
